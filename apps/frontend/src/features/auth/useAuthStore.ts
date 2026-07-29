@@ -1,10 +1,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-interface AuthUser {
+export interface AuthUser {
+  id: string;
   name: string;
   email: string;
-  role: string;
+  role: 'SUPERADMIN' | 'ANALYST';
 }
 
 interface AuthState {
@@ -34,9 +35,7 @@ export const useAuthStore = create<AuthState>()(
             body: JSON.stringify({ email, password }),
           });
           const data = await res.json() as { access_token?: string; user?: AuthUser; message?: string };
-          if (!res.ok) {
-            throw new Error(data.message ?? 'Error de autenticación');
-          }
+          if (!res.ok) throw new Error(data.message ?? 'Error de autenticación');
           set({ token: data.access_token!, user: data.user!, isLoading: false });
         } catch (err) {
           set({ isLoading: false, error: (err as Error).message });

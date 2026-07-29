@@ -9,17 +9,22 @@ export class GroqLLMAdapter implements ILLMAdapter {
   private readonly logger = new Logger(GroqLLMAdapter.name);
   private readonly client: OpenAI;
   private readonly model: string;
+  private readonly jsonMode: boolean;
 
   constructor(private readonly config: ConfigService) {
     const apiKey = config.get<string>('GROQ_API_KEY') ?? '';
     const baseURL =
       config.get<string>('LLM_BASE_URL') ?? 'https://api.groq.com/openai/v1';
 
-    this.model = config.get<string>('LLM_MODEL') ?? 'gemma2-9b-it';
+    this.model = config.get<string>('LLM_MODEL') ?? 'llama-3.1-8b-instant';
+
+    // JSON mode solo en proveedores que lo soporten (Groq, OpenAI). En otros (Gemma local,
+    // Ollama sin parche) puede fallar — desactivar con LLM_JSON_MODE=false.
+    this.jsonMode = config.get<string>('LLM_JSON_MODE') !== 'false';
 
     this.client = new OpenAI({ apiKey, baseURL });
 
-    this.logger.log(`LLM configurado: model=${this.model}, baseURL=${baseURL}`);
+    this.logger.log(`LLM configurado: model=${this.model}, baseURL=${baseURL}, jsonMode=${this.jsonMode}`);
   }
 
   async complete(request: LLMCompletionRequest): Promise<string> {
@@ -32,8 +37,7 @@ export class GroqLLMAdapter implements ILLMAdapter {
         ],
         max_tokens: request.maxTokens ?? 2048,
         temperature: request.temperature ?? 0.2,
-        // response_format fuerza JSON en modelos que lo soportan (Llama3, Mixtral, Gemma2)
-        response_format: { type: 'json_object' },
+        ...(this.jsonMode && { response_format: { type: 'json_object' } }),
       });
 
       const content = response.choices[0]?.message?.content;
