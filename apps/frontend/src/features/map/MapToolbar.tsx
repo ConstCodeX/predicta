@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
-import { Flame, MessageSquare, History, Sparkles } from 'lucide-react';
+import { Crosshair, Flame, MessageSquare, History, Sparkles } from 'lucide-react';
 
-export type MapTool = 'predictions' | 'heatmap' | 'timeline' | 'chat';
+export type MapTool = 'predictions' | 'heatmap' | 'timeline' | 'chat' | 'scenarios';
 
 interface Props {
   activeTool: MapTool | null;
@@ -9,10 +9,11 @@ interface Props {
 }
 
 const TOOLS: { id: MapTool; icon: React.ReactNode; label: string; color: string }[] = [
-  { id: 'predictions', icon: <Sparkles size={15} />, label: 'Predicciones', color: 'oklch(0.60 0.18 240)' },
-  { id: 'heatmap',     icon: <Flame size={15} />,    label: 'Mapa de calor', color: '#f97316' },
-  { id: 'timeline',    icon: <History size={15} />,  label: 'Línea de tiempo', color: '#a78bfa' },
-  { id: 'chat',        icon: <MessageSquare size={15} />, label: 'Asistente IA', color: '#22d3ee' },
+  { id: 'predictions', icon: <Sparkles size={15} />,    label: 'Predicciones',      color: 'oklch(0.60 0.18 240)' },
+  { id: 'heatmap',     icon: <Flame size={15} />,       label: 'Mapa de calor',     color: '#f97316' },
+  { id: 'timeline',    icon: <History size={15} />,     label: 'Línea de tiempo',   color: '#a78bfa' },
+  { id: 'scenarios',   icon: <Crosshair size={15} />,   label: 'Escenarios',        color: '#8b5cf6' },
+  { id: 'chat',        icon: <MessageSquare size={15} />, label: 'Asistente IA',    color: '#22d3ee' },
 ];
 
 export function MapToolbar({ activeTool, onToggle }: Props) {

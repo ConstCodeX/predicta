@@ -12,6 +12,7 @@ import { DataExplorerPanel } from './features/data/DataExplorerPanel';
 import { AnalyticsPanel } from './features/analytics/AnalyticsPanel';
 import { PredictionsPanel } from './features/predictions/PredictionsPanel';
 import { HeatmapPanel } from './features/heatmap/HeatmapPanel';
+import { ScenariosPanel } from './features/escenarios/ScenariosPanel';
 
 export default function App() {
   const { token } = useAuthStore();
@@ -69,6 +70,17 @@ export default function App() {
               {activeTool === 'heatmap' && (
                 <HeatmapPanel
                   key="heatmap"
+                  token={token}
+                  onClose={() => setActiveTool(null)}
+                />
+              )}
+            </AnimatePresence>
+
+            {/* Scenarios panel */}
+            <AnimatePresence>
+              {activeTool === 'scenarios' && (
+                <ScenariosPanel
+                  key="scenarios"
                   token={token}
                   onClose={() => setActiveTool(null)}
                 />

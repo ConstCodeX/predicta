@@ -14,29 +14,6 @@ export interface TimelineFrame {
   events: TimelineEvent[];
 }
 
-// Mapeo de familias INDECI (DB) → TipoAlerta para visualización en mapa
-const FAMILIA_TIPO: Record<string, AlertaMapa['tipo_alerta']> = {
-  'HIDROMETEOROLOGICO': 'HIDROMETEOROLOGICO',
-  'MOVIMIENTO DE MASA': 'MOVIMIENTO_DE_MASA',
-  'BAJAS TEMPERATURAS': 'BAJAS_TEMPERATURAS',
-  'INCENDIO':           'INCENDIO',
-  'GEOFISICO':          'GEOFISICO',
-  'BIOLOGICO':          'BIOLOGICO',
-  'ANTROPICO':          'ANTROPICO',
-  'TECNOLOGICO':        'TECNOLOGICO',
-};
-
-function timelineToAlerta(e: TimelineEvent): AlertaMapa {
-  return {
-    departamento: e.departamento,
-    distrito: e.distrito,
-    tipo_alerta: FAMILIA_TIPO[e.familiaEvento] ?? 'MOVIMIENTO_DE_MASA',
-    severidad: Math.min(3, Math.max(1, Math.ceil(e.count / 3))),
-    probabilidad_porcentaje: 50,
-    descripcion: `${e.count} evento(s) histórico(s) · ${e.familiaEvento}`,
-    acciones_sugeridas: [],
-  };
-}
 
 export interface HeatmapPoint {
   departamento: string;
@@ -56,6 +33,7 @@ interface MapState {
   timelineMode: boolean;
   timelineFrames: TimelineFrame[];
   timelineIndex: number;
+  timelineGlobalMax: number;
   heatmapPoints: HeatmapPoint[];
   heatmapMax: number;
   heatmapLoading: boolean;
@@ -88,6 +66,7 @@ export const useMapStore = create<MapState & MapActions>((set, get) => ({
   timelineMode: false,
   timelineFrames: [],
   timelineIndex: 0,
+  timelineGlobalMax: 0,
   heatmapPoints: [],
   heatmapMax: 0,
   heatmapLoading: false,
@@ -143,22 +122,42 @@ export const useMapStore = create<MapState & MapActions>((set, get) => ({
     }
   },
 
-  setTimelineFrames: (frames: TimelineFrame[]) =>
-    set({ timelineFrames: frames, timelineIndex: 0 }),
+  setTimelineFrames: (frames: TimelineFrame[]) => {
+    // Compute global max across all frames for consistent color scale
+    let globalMax = 0;
+    for (const f of frames) {
+      for (const e of f.events) {
+        if (e.count > globalMax) globalMax = e.count;
+      }
+    }
+    set({ timelineFrames: frames, timelineIndex: 0, timelineGlobalMax: globalMax });
+  },
 
   setTimelineFrame: (index: number) => {
-    const { timelineFrames } = get();
+    const { timelineFrames, timelineGlobalMax } = get();
     const frame = timelineFrames[index];
     if (!frame) return;
-    const alerts = frame.events.map(timelineToAlerta);
-    set({ timelineIndex: index, alerts, selectedAlert: null, selectedCoords: null });
+    // Timeline now drives the heatmap layer for richer visualization
+    const heatmapPoints = frame.events.map((e) => ({
+      departamento: e.departamento,
+      distrito: e.distrito,
+      count: e.count,
+    }));
+    set({
+      timelineIndex: index,
+      heatmapPoints,
+      heatmapMax: timelineGlobalMax,
+      alerts: [],
+      selectedAlert: null,
+      selectedCoords: null,
+    });
   },
 
   activateTimeline: () =>
-    set({ timelineMode: true, alerts: [], selectedAlert: null }),
+    set({ timelineMode: true, alerts: [], heatmapPoints: [], selectedAlert: null }),
 
   deactivateTimeline: () =>
-    set({ timelineMode: false, timelineFrames: [], timelineIndex: 0, alerts: [] }),
+    set({ timelineMode: false, timelineFrames: [], timelineIndex: 0, alerts: [], heatmapPoints: [], heatmapMax: 0 }),
 
   setHeatmap: (points, max) => set({ heatmapPoints: points, heatmapMax: max }),
   clearHeatmap: () => set({ heatmapPoints: [], heatmapMax: 0 }),
