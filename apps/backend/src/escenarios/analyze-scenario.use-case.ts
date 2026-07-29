@@ -92,11 +92,20 @@ export class AnalyzeScenarioUseCase {
         include = promedioAnual >= esc.umbrales.normal;
         nivel = promedioAnual >= esc.umbrales.moderado ? 'moderado' : 'normal';
       } else if (intensidad === 'moderado') {
-        include = promedioAnual >= esc.umbrales.moderado || maximoAnual >= esc.umbrales.moderado * 2;
-        nivel = promedioAnual >= esc.umbrales.extremo ? 'extremo' : 'moderado';
+        include = promedioAnual >= esc.umbrales.moderado || maximoAnual >= esc.umbrales.moderado;
+        nivel = maximoAnual >= esc.umbrales.extremo || promedioAnual >= esc.umbrales.extremo
+          ? 'extremo' : 'moderado';
       } else {
-        include = maximoAnual >= esc.umbrales.extremo || promedioAnual >= esc.umbrales.extremo;
-        nivel = 'extremo';
+        // extremo = análisis de peor caso: muestra TODAS las zonas con historial
+        // para que el planificador vea dónde el impacto sería mayor si ocurre el evento
+        include = promedioAnual >= esc.umbrales.normal;
+        if (maximoAnual >= esc.umbrales.extremo || promedioAnual >= esc.umbrales.extremo) {
+          nivel = 'extremo';
+        } else if (promedioAnual >= esc.umbrales.moderado || maximoAnual >= esc.umbrales.moderado) {
+          nivel = 'moderado';
+        } else {
+          nivel = 'normal';
+        }
       }
 
       if (include) {

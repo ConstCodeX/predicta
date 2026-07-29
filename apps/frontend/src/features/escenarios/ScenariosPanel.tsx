@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
-import { Bot, BotOff, Crosshair, Loader2, X } from 'lucide-react';
+import { Bot, BotOff, Crosshair, Loader2, MapPin, X } from 'lucide-react';
 import { useState } from 'react';
+import { getCoords } from '../map/constants/peru-coords';
 import { useMapStore } from '../map/store/useMapStore';
 
 interface EscenarioTipo {
@@ -48,7 +49,7 @@ interface Props {
 }
 
 export function ScenariosPanel({ token, onClose }: Props) {
-  const { setHeatmap, clearHeatmap, setHeatmapLoading } = useMapStore();
+  const { setHeatmap, clearHeatmap, setHeatmapLoading, setFlyTarget } = useMapStore();
 
   const [tipos, setTipos] = useState<EscenarioTipo[]>([]);
   const [tiposLoaded, setTiposLoaded] = useState(false);
@@ -279,12 +280,21 @@ export function ScenariosPanel({ token, onClose }: Props) {
                 {result.zonas_afectadas.slice(0, 12).map((z, i) => {
                   const max = result.zonas_afectadas[0].promedio_anual || 1;
                   const pct = Math.round((z.promedio_anual / max) * 100);
+                  const coords = getCoords(z.departamento, z.distrito);
                   return (
-                    <div key={i} className="flex flex-col gap-0.5">
+                    <button
+                      key={i}
+                      onClick={() => coords && setFlyTarget(coords)}
+                      className="flex flex-col gap-0.5 rounded-lg px-1.5 py-1 text-left transition-colors hover:bg-white/5 active:bg-white/10"
+                      title={coords ? `Ir a ${z.distrito}` : undefined}
+                    >
                       <div className="flex justify-between items-center">
-                        <span className="text-[10px] text-zinc-300 truncate max-w-[160px]">
-                          {z.distrito}
-                        </span>
+                        <div className="flex items-center gap-1">
+                          <MapPin size={9} style={{ color: NIVEL_COLOR[z.nivel], flexShrink: 0 }} />
+                          <span className="text-[10px] text-zinc-300 truncate max-w-[130px]">
+                            {z.distrito}
+                          </span>
+                        </div>
                         <div className="flex items-center gap-1.5">
                           <span
                             className="text-[9px] font-medium px-1.5 py-0.5 rounded-full"
@@ -304,7 +314,7 @@ export function ScenariosPanel({ token, onClose }: Props) {
                           style={{ width: `${pct}%`, background: NIVEL_COLOR[z.nivel] }}
                         />
                       </div>
-                    </div>
+                    </button>
                   );
                 })}
               </div>

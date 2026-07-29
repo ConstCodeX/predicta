@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { AlertCircle, Bot, Flame, Loader2, MapPin, X } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { SelectField } from '../../components/SelectField';
+import { getCoords } from '../map/constants/peru-coords';
 import { useMapStore } from '../map/store/useMapStore';
 
 const FAMILIA_OPTIONS = [
@@ -32,7 +33,7 @@ interface Props {
 }
 
 export function HeatmapPanel({ token, onClose }: Props) {
-  const { setHeatmap, clearHeatmap, heatmapLoading, setHeatmapLoading } = useMapStore();
+  const { setHeatmap, clearHeatmap, heatmapLoading, setHeatmapLoading, setFlyTarget } = useMapStore();
 
   const [familia, setFamilia] = useState('');
   const [evento, setEvento] = useState('');
@@ -252,8 +253,14 @@ export function HeatmapPanel({ token, onClose }: Props) {
                 {top10.map((p, i) => {
                   const ratio = result.max > 0 ? p.count / result.max : 0;
                   const barColor = ratio > 0.7 ? '#ef4444' : ratio > 0.4 ? '#f97316' : ratio > 0.2 ? '#fbbf24' : '#60a5fa';
+                  const coords = getCoords(p.departamento, p.distrito);
                   return (
-                    <div key={i} className="flex flex-col gap-0.5">
+                    <button
+                      key={i}
+                      onClick={() => coords && setFlyTarget(coords)}
+                      className="flex flex-col gap-0.5 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-white/5 active:bg-white/10"
+                      title={coords ? `Ir a ${p.distrito}` : undefined}
+                    >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
                           <MapPin size={10} style={{ color: barColor, flexShrink: 0 }} />
@@ -270,7 +277,7 @@ export function HeatmapPanel({ token, onClose }: Props) {
                           style={{ width: `${ratio * 100}%`, background: barColor }}
                         />
                       </div>
-                    </div>
+                    </button>
                   );
                 })}
               </div>

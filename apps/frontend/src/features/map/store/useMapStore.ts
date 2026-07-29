@@ -37,6 +37,8 @@ interface MapState {
   heatmapPoints: HeatmapPoint[];
   heatmapMax: number;
   heatmapLoading: boolean;
+  // [lng, lat] target for map flyTo; wraps in object so same coords re-trigger
+  flyTarget: { coords: [number, number]; seq: number } | null;
 }
 
 interface MapActions {
@@ -52,6 +54,7 @@ interface MapActions {
   setHeatmap: (points: HeatmapPoint[], max: number) => void;
   clearHeatmap: () => void;
   setHeatmapLoading: (v: boolean) => void;
+  setFlyTarget: (coords: [number, number]) => void;
 }
 
 export const useMapStore = create<MapState & MapActions>((set, get) => ({
@@ -70,6 +73,7 @@ export const useMapStore = create<MapState & MapActions>((set, get) => ({
   heatmapPoints: [],
   heatmapMax: 0,
   heatmapLoading: false,
+  flyTarget: null,
 
   selectAlert: (alert, coords) =>
     set({ selectedAlert: alert, selectedCoords: coords }),
@@ -162,4 +166,6 @@ export const useMapStore = create<MapState & MapActions>((set, get) => ({
   setHeatmap: (points, max) => set({ heatmapPoints: points, heatmapMax: max }),
   clearHeatmap: () => set({ heatmapPoints: [], heatmapMax: 0 }),
   setHeatmapLoading: (v) => set({ heatmapLoading: v }),
+  setFlyTarget: (coords) =>
+    set((state) => ({ flyTarget: { coords, seq: (state.flyTarget?.seq ?? 0) + 1 } })),
 }));

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { SelectField } from '../../components/SelectField';
+import { getCoords } from '../map/constants/peru-coords';
 import { useMapStore } from '../map/store/useMapStore';
 import type { AlertaMapa } from '../map/types';
 import {
@@ -60,6 +61,7 @@ interface Props {
 
 export function PredictionsPanel({ token, onClose }: Props) {
   const setForecast = useMapStore((s) => s.setForecast);
+  const setFlyTarget = useMapStore((s) => s.setFlyTarget);
   const [tipos, setTipos] = useState<PredictionType[]>([]);
   const [selectedTipo, setSelectedTipo] = useState('HIDRO_GEOLOGICO');
   const [ventana, setVentana] = useState('7');
@@ -308,7 +310,11 @@ export function PredictionsPanel({ token, onClose }: Props) {
                 return (
                   <tr
                     key={i}
-                    onClick={() => setSelected(isSelected ? null : p)}
+                    onClick={() => {
+                        setSelected(isSelected ? null : p);
+                        const coords = getCoords(p.departamento, p.distrito);
+                        if (coords) setFlyTarget(coords);
+                      }}
                     className="cursor-pointer transition-colors"
                     style={{
                       borderBottom: '1px solid rgba(255,255,255,0.04)',

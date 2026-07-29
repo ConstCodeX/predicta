@@ -1,7 +1,7 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
-import { Map, Marker, Popup } from 'react-map-gl/maplibre';
+import { useEffect, useRef, useState } from 'react';
+import { Map, Marker, Popup, type MapRef } from 'react-map-gl/maplibre';
 import { AlertMarkerIcon } from './components/AlertMarkerIcon';
 import { AlertPopup } from './components/AlertPopup';
 import { HeatmapLayer } from './components/HeatmapLayer';
@@ -21,23 +21,63 @@ interface HeatmapClickInfo {
   count: number;
 }
 
+// Pulsing location indicator rendered as a Marker
+function PulseMarker({ coords }: { coords: [number, number] }) {
+  return (
+    <Marker longitude={coords[0]} latitude={coords[1]} anchor="center">
+      <div className="relative flex items-center justify-center" style={{ width: 48, height: 48, pointerEvents: 'none' }}>
+        <div
+          className="absolute animate-ping rounded-full"
+          style={{ width: 40, height: 40, background: 'rgba(96,165,250,0.30)', animationDuration: '1.1s' }}
+        />
+        <div
+          className="absolute rounded-full"
+          style={{ width: 20, height: 20, background: 'rgba(96,165,250,0.15)', border: '1.5px solid rgba(96,165,250,0.5)' }}
+        />
+        <div
+          className="rounded-full"
+          style={{ width: 7, height: 7, background: '#60a5fa', boxShadow: '0 0 8px #60a5fa' }}
+        />
+      </div>
+    </Marker>
+  );
+}
+
 export function MapDashboard() {
+  const mapRef = useRef<MapRef>(null);
+
   const {
     alerts, selectedAlert, selectedCoords,
     selectAlert, clearSelection,
     heatmapPoints, timelineMode,
     setHoveredAlert,
+    flyTarget, setFlyTarget,
   } = useMapStore();
 
   const [heatmapClick, setHeatmapClick] = useState<HeatmapClickInfo | null>(null);
+
+  // Fly to target whenever it changes (seq ensures same-coords re-triggers)
+  useEffect(() => {
+    if (!flyTarget || !mapRef.current) return;
+    mapRef.current.flyTo({
+      center: flyTarget.coords,
+      zoom: 11,
+      duration: 1400,
+      essential: true,
+    });
+  }, [flyTarget?.seq]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleMarkerClick = (alert: AlertaMapa) => {
     const coords = getCoords(alert.departamento, alert.distrito);
     if (!coords) return;
     selectAlert(alert, coords);
+    setFlyTarget(coords);
   };
 
-  const handleMapClick = (e: { lngLat: { lng: number; lat: number }; features?: Array<{ properties: Record<string, unknown> }> }) => {
+  const handleMapClick = (e: {
+    lngLat: { lng: number; lat: number };
+    features?: Array<{ properties: Record<string, unknown> }>;
+  }) => {
     const feat = e.features?.[0];
     if (!feat || heatmapPoints.length === 0) {
       setHeatmapClick(null);
@@ -45,13 +85,16 @@ export function MapDashboard() {
     }
     const p = feat.properties as { departamento?: string; distrito?: string; count?: number };
     if (!p.departamento) return;
-    setHeatmapClick({
+
+    const info: HeatmapClickInfo = {
       lng: e.lngLat.lng,
       lat: e.lngLat.lat,
       departamento: p.departamento,
       distrito: p.distrito ?? '',
       count: p.count ?? 0,
-    });
+    };
+    setHeatmapClick(info);
+    setFlyTarget([info.lng, info.lat]);
   };
 
   const heatmapActive = heatmapPoints.length > 0;
@@ -59,6 +102,7 @@ export function MapDashboard() {
   return (
     <div className="relative h-full w-full overflow-hidden">
       <Map
+        ref={mapRef}
         initialViewState={{ longitude: -75.0, latitude: -9.1, zoom: 5 }}
         style={{ width: '100%', height: '100%' }}
         mapStyle={CARTO_DARK}
@@ -69,7 +113,7 @@ export function MapDashboard() {
         {/* Heatmap overlay */}
         <HeatmapLayer />
 
-        {/* Alert markers — hidden when heatmap is active */}
+        {/* Alert markers — hidden when heatmap active */}
         {heatmapPoints.length === 0 ? alerts.map((alert, i) => {
           const coords = getCoords(alert.departamento, alert.distrito);
           if (!coords) return null;
@@ -85,6 +129,9 @@ export function MapDashboard() {
             </Marker>
           );
         }) : null}
+
+        {/* Fly target pulse */}
+        {flyTarget && <PulseMarker coords={flyTarget.coords} />}
 
         {/* Alert marker popup */}
         <AnimatePresence>
@@ -119,7 +166,7 @@ export function MapDashboard() {
               style={{
                 background: 'rgba(9,9,11,0.95)',
                 backdropFilter: 'blur(16px)',
-                border: '1px solid rgba(255,255,255,0.1)',
+                border: '1px solid rgba(255,255,255,0.10)',
                 minWidth: 140,
               }}
             >
@@ -145,10 +192,8 @@ export function MapDashboard() {
       {/* Map overlays */}
       <MapLegend />
 
-      {/* Bottom status bar — hidden when timeline active */}
       {!timelineMode && <MapStatusBar />}
 
-      {/* Empty state hint */}
       {alerts.length === 0 && heatmapPoints.length === 0 && !timelineMode && (
         <div
           className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 rounded-full px-4 py-2 pointer-events-none"
