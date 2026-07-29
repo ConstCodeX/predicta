@@ -1,10 +1,18 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { Type } from 'class-transformer';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RunPredictionUseCase } from './run-prediction.use-case';
 import { PREDICTION_TYPES } from './prediction-types';
 
 class PredictDto {
+  @IsString()
   tipo!: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  @Type(() => Number)
   ventana_dias?: number;
 }
 

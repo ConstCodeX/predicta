@@ -6,17 +6,6 @@ import { useMapStore, type TimelineFrame } from '../store/useMapStore';
 
 const MESES = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
-const FAMILIA_OPTIONS = [
-  { value: '',                  label: 'Todas las familias' },
-  { value: 'HIDROMETEOROLÓGICO', label: 'Hidrometeorólogico' },
-  { value: 'MOVIMIENTO EN MASA', label: 'Movimiento en masa' },
-  { value: 'BAJAS TEMPERATURAS', label: 'Bajas temperaturas' },
-  { value: 'INCENDIO',           label: 'Incendio' },
-  { value: 'INUNDACIÓN',         label: 'Inundación' },
-  { value: 'SISMO',              label: 'Sismo' },
-  { value: 'VIENTO',             label: 'Viento' },
-];
-
 const SPEED_OPTIONS = [
   { value: '1200', label: 'Lento' },
   { value: '700',  label: 'Normal' },
@@ -32,33 +21,42 @@ export function TimelinePlayer({ token, onClose }: Props) {
   const { timelineFrames, timelineIndex, setTimelineFrames, setTimelineFrame, activateTimeline, deactivateTimeline } = useMapStore();
   const [loading, setLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [familiaOptions, setFamiliaOptions] = useState<{ value: string; label: string }[]>([]);
   const [familia, setFamilia] = useState('');
   const [speed, setSpeed] = useState('700');
   const [totalEvents, setTotalEvents] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const fetchFrames = useCallback(async () => {
+  const fetchFrames = useCallback(async (familiaFilter: string) => {
     setLoading(true);
     activateTimeline();
     try {
       const params = new URLSearchParams();
-      if (familia) params.set('familiaEvento', familia);
+      if (familiaFilter) params.set('familiaEvento', familiaFilter);
       const res = await fetch(`/api/v1/emergencias/timeline?${params}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const data = (await res.json()) as { frames: TimelineFrame[]; total: number };
+      const data = (await res.json()) as { frames: TimelineFrame[]; familias: string[]; total: number };
       setTimelineFrames(data.frames);
       setTotalEvents(data.total);
       if (data.frames.length > 0) setTimelineFrame(0);
+
+      // On the initial (unfiltered) call, populate dropdown from actual DB values
+      if (!familiaFilter && data.familias.length > 0) {
+        setFamiliaOptions([
+          { value: '', label: 'Todas las familias' },
+          ...data.familias.sort().map((f) => ({ value: f, label: f })),
+        ]);
+      }
     } finally {
       setLoading(false);
     }
-  }, [token, familia, activateTimeline, setTimelineFrames, setTimelineFrame]);
+  }, [token, activateTimeline, setTimelineFrames, setTimelineFrame]);
 
   useEffect(() => {
-    void fetchFrames();
+    void fetchFrames('');
     return () => deactivateTimeline();
-  }, []);  // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Playback interval
   useEffect(() => {
@@ -95,10 +93,14 @@ export function TimelinePlayer({ token, onClose }: Props) {
 
   const handleApplyFilter = () => {
     setIsPlaying(false);
-    void fetchFrames();
+    void fetchFrames(familia);
   };
 
   const eventCount = currentFrame?.events.reduce((s, e) => s + e.count, 0) ?? 0;
+
+  const dropdownOptions = familiaOptions.length > 0
+    ? familiaOptions
+    : [{ value: '', label: 'Todas las familias' }];
 
   return (
     <motion.div
@@ -120,18 +122,18 @@ export function TimelinePlayer({ token, onClose }: Props) {
         style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
       >
         <span className="text-[11px] font-semibold text-white flex-shrink-0">Línea de tiempo histórica</span>
-        <div style={{ width: 200 }}>
+        <div style={{ width: 220 }}>
           <SelectField
             value={familia}
             onChange={setFamilia}
-            options={FAMILIA_OPTIONS}
+            options={dropdownOptions}
             placeholder="Todas las familias"
           />
         </div>
         <button
           onClick={handleApplyFilter}
           disabled={loading}
-          className="rounded-lg px-3 py-1 text-[11px] font-medium text-white disabled:opacity-50 transition-colors"
+          className="flex items-center gap-1.5 rounded-lg px-3 py-1 text-[11px] font-medium text-white disabled:opacity-50 transition-colors"
           style={{ background: 'rgba(96,165,250,0.15)', border: '1px solid rgba(96,165,250,0.2)' }}
         >
           {loading ? <Loader2 size={11} className="animate-spin" /> : 'Aplicar'}
@@ -201,7 +203,7 @@ export function TimelinePlayer({ token, onClose }: Props) {
             >
               <span className="text-sm font-bold text-white tabular-nums">{currentFrame?.anio ?? '—'}</span>
               <span className="text-[10px]" style={{ color: 'oklch(0.50 0 0)' }}>
-                {currentFrame ? MESES[currentFrame.mes] ?? `M${currentFrame.mes}` : '—'}
+                {currentFrame ? (MESES[currentFrame.mes] ?? `M${currentFrame.mes}`) : '—'}
               </span>
             </motion.div>
           </AnimatePresence>
@@ -223,12 +225,12 @@ export function TimelinePlayer({ token, onClose }: Props) {
               cursor: loading ? 'not-allowed' : 'pointer',
             }}
           />
-          {/* Year ticks */}
           {timelineFrames.length > 0 && (() => {
             const years = [...new Set(timelineFrames.map((f) => f.anio))];
+            const step = Math.ceil(years.length / 8);
             return (
               <div className="flex justify-between mt-1 px-0.5">
-                {years.filter((_, i, arr) => arr.length <= 8 || i % Math.ceil(arr.length / 8) === 0).map((y) => (
+                {years.filter((_, i) => i % step === 0).map((y) => (
                   <span key={y} className="text-[9px] tabular-nums" style={{ color: 'oklch(0.36 0 0)' }}>{y}</span>
                 ))}
               </div>
@@ -246,7 +248,7 @@ export function TimelinePlayer({ token, onClose }: Props) {
               className="text-xs tabular-nums font-medium"
               style={{ color: eventCount > 50 ? '#ef4444' : eventCount > 20 ? '#f97316' : 'oklch(0.56 0 0)' }}
             >
-              {eventCount > 0 ? `${eventCount} ev` : '0 ev'}
+              {eventCount > 0 ? `${eventCount} ev` : loading ? '' : '0 ev'}
             </motion.span>
           </AnimatePresence>
         </div>
