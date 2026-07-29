@@ -5,6 +5,8 @@
 
 # ── Stage 1: base — node 22 + pnpm 10 ────────────────────────────────────────
 FROM node:22-alpine AS base
+# OpenSSL requerido por el query engine binario de Prisma en Alpine (musl libc)
+RUN apk add --no-cache openssl
 RUN corepack enable && corepack prepare pnpm@10 --activate
 
 # ── Stage 2: builder — instala deps, genera Prisma client, compila TS ─────────
@@ -34,8 +36,9 @@ RUN pnpm --filter backend deploy --prod --legacy /deploy
 # ── Stage 3: runner — imagen mínima de producción ─────────────────────────────
 FROM node:22-alpine AS runner
 
-# dumb-init: reenvía señales al proceso Node correctamente (evita zombies)
-RUN apk add --no-cache dumb-init
+# openssl: requerido por Prisma query engine en Alpine
+# dumb-init: reenvía señales UNIX al proceso Node correctamente
+RUN apk add --no-cache openssl dumb-init
 
 WORKDIR /app
 
