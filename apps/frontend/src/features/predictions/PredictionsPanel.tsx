@@ -113,6 +113,8 @@ export function PredictionsPanel({ token, onClose }: Props) {
           descripcion: `${p.probabilidad_pct.toFixed(1)}% · X${p.x_base.toFixed(1)} · Pico: ${p.dia_pico}`,
           acciones_sugeridas: [],
         })),
+        charts: [],
+        metricas_clave: [],
       });
     } catch (err) {
       setError((err as Error).message);

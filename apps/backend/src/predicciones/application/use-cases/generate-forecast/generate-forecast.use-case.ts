@@ -54,7 +54,7 @@ export class GenerateForecastUseCase {
     const rawResponse = await this.llm.complete({
       systemPrompt: FORECAST_SYSTEM_PROMPT,
       userMessage: this.buildUserMessage(command.query, context),
-      maxTokens: 2048,
+      maxTokens: 3000,
       temperature: 0.2,
     });
 
@@ -103,8 +103,34 @@ export class GenerateForecastUseCase {
       }
     }
 
-    lines.push('', '--- DETALLE POR AÑO Y DEPARTAMENTO (top 30 grupos) ---');
-    const topGroups = [...events].sort((a, b) => b.ocurrencias - a.ocurrencias).slice(0, 30);
+    // Year-by-year totals (for LINE chart and trend analysis)
+    const byYear = new Map<number, number>();
+    for (const e of events) {
+      byYear.set(e.anio, (byYear.get(e.anio) ?? 0) + e.ocurrencias);
+    }
+    const sortedYears = Array.from(byYear.entries()).sort((a, b) => a[0] - b[0]);
+    lines.push('', '--- TENDENCIA ANUAL (total eventos — usa estos datos para gráfico LINE) ---');
+    for (const [year, count] of sortedYears) {
+      lines.push(`${year}: ${count} eventos`);
+    }
+
+    // Top 5 event types overall (for PIE chart)
+    const byEvento = new Map<string, number>();
+    for (const e of events) {
+      byEvento.set(e.evento, (byEvento.get(e.evento) ?? 0) + e.ocurrencias);
+    }
+    const topEventos = Array.from(byEvento.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6);
+    const totalEventos = Array.from(byEvento.values()).reduce((s, v) => s + v, 0);
+    lines.push('', '--- DISTRIBUCIÓN POR TIPO DE EVENTO (usa para gráfico PIE o BAR) ---');
+    for (const [ev, count] of topEventos) {
+      const pct = Math.round((count / totalEventos) * 100);
+      lines.push(`${ev}: ${count} ocurrencias (${pct}%)`);
+    }
+
+    lines.push('', '--- DETALLE POR AÑO Y DEPARTAMENTO (top 20 grupos) ---');
+    const topGroups = [...events].sort((a, b) => b.ocurrencias - a.ocurrencias).slice(0, 20);
     for (const e of topGroups) {
       const distrito = e.distrito ? ` (${e.distrito})` : '';
       lines.push(

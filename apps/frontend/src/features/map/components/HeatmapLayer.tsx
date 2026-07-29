@@ -10,7 +10,7 @@ export function HeatmapLayer() {
     const features: {
       type: 'Feature';
       geometry: { type: 'Point'; coordinates: [number, number] };
-      properties: { weight: number; count: number };
+      properties: Record<string, unknown>;
     }[] = [];
     for (const p of heatmapPoints) {
       const coords = getCoords(p.departamento, p.distrito);
@@ -21,6 +21,8 @@ export function HeatmapLayer() {
         properties: {
           weight: heatmapMax > 0 ? p.count / heatmapMax : 0,
           count: p.count,
+          departamento: p.departamento,
+          distrito: p.distrito,
         },
       });
     }

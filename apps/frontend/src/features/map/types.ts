@@ -34,10 +34,33 @@ export interface AlertaMapa {
   acciones_sugeridas: string[];
 }
 
+export type ChartTipo = 'BAR' | 'LINE' | 'PIE';
+export type Tendencia = 'UP' | 'DOWN' | 'STABLE';
+
+export interface ChartDato {
+  label: string;
+  valor: number;
+}
+
+export interface ChartData {
+  tipo: ChartTipo;
+  titulo: string;
+  unidad?: string;
+  datos: ChartDato[];
+}
+
+export interface MetricaClave {
+  label: string;
+  valor: string;
+  tendencia?: Tendencia;
+}
+
 export interface ForecastResponse {
   analisis_general: string;
   nivel_riesgo_global: NivelRiesgoGlobal;
   alertas_mapa: AlertaMapa[];
+  charts: ChartData[];
+  metricas_clave: MetricaClave[];
 }
 
 export interface ForecastQuery {
