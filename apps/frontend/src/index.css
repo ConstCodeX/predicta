@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@theme {
+  /* Colores base — dark first */
+  --color-background: oklch(0.11 0 0);
+  --color-foreground: oklch(0.97 0 0);
+  --color-muted: oklch(0.45 0 0);
+  --color-border: oklch(0.22 0 0);
+  --color-card: oklch(0.15 0.005 250);
+  --color-card-hover: oklch(0.18 0.007 250);
+
+  /* Brand */
+  --color-primary: oklch(0.60 0.18 240);
+  --color-primary-foreground: oklch(0.98 0 0);
+  --color-primary-hover: oklch(0.65 0.18 240);
+
+  /* Semánticos */
+  --color-danger: oklch(0.58 0.22 20);
+  --color-warning: oklch(0.72 0.18 70);
+  --color-success: oklch(0.65 0.17 145);
+
+  /* Severidad */
+  --color-severity-leve: oklch(0.65 0.17 145);
+  --color-severity-moderado: oklch(0.72 0.18 70);
+  --color-severity-grave: oklch(0.65 0.22 40);
+  --color-severity-muy-grave: oklch(0.58 0.22 20);
+
+  /* Tipografía */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Radios */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── MapLibre GL overrides ─────────────────────────────────────────── */
+/* Strip default white popup chrome so our glassmorphism div is visible */
+.maplibregl-popup-content {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+.maplibregl-popup-tip {
+  display: none !important;
+}
+.maplibregl-popup {
+  z-index: 20;
+}
+/* Remove default map attribution bottom-right padding */
+.maplibregl-ctrl-attrib {
+  display: none;
+}

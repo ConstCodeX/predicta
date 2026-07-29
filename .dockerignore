@@ -1,0 +1,48 @@
+# ── Dependencias (se reinstalan dentro del contenedor) ────────────────────────
+node_modules
+**/node_modules
+.pnpm-store
+.pnpm-debug.log
+
+# ── Outputs de build (se generan dentro del contenedor) ───────────────────────
+**/dist
+**/.next
+
+# ── Variables de entorno con datos reales ─────────────────────────────────────
+.env
+.env.local
+.env.development
+.env.production
+# Conserva .env.example (documentación, no tiene secretos)
+!.env.example
+
+# ── Archivos de editor / OS ───────────────────────────────────────────────────
+.vscode
+.idea
+**/.DS_Store
+**/*.swp
+**/*.swo
+Thumbs.db
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+**/logs
+**/*.log
+
+# ── Tests ─────────────────────────────────────────────────────────────────────
+**/*.test.ts
+**/*.spec.ts
+**/test/
+**/tests/
+**/__tests__/
+**/*.test.tsx
+**/*.spec.tsx
+
+# ── Git / CI ──────────────────────────────────────────────────────────────────
+.git
+.gitignore
+.gitattributes
+.github
+
+# ── Documentación (no necesaria en la imagen) ─────────────────────────────────
+*.md
+!apps/backend/prisma/migrations/**

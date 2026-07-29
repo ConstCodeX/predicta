@@ -1,0 +1,72 @@
+name: predictape
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Predicta AI — Configuración de producción para Dokploy
+#
+# Requisitos antes del primer despliegue:
+#   1. Crea la migración inicial localmente:
+#      pnpm --filter backend exec prisma migrate dev --name init
+#   2. Commitea la carpeta apps/backend/prisma/migrations/ al repo.
+#   3. Copia .env.example → .env y rellena las variables reales.
+#
+# Dokploy leerá este archivo desde GitHub y gestionará las env vars desde su UI.
+# ──────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── PostgreSQL 16 ─────────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       ${POSTGRES_DB:-predictape}
+      POSTGRES_USER:     ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?La variable POSTGRES_PASSWORD es obligatoria}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:         ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-predictape}"]
+      interval:     10s
+      timeout:      5s
+      retries:      5
+      start_period: 20s
+
+  # ── Backend NestJS + Prisma ────────────────────────────────────────────────
+  backend:
+    build:
+      context:    .
+      dockerfile: apps/backend/Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV:    production
+      PORT:        3001
+      # La URL usa el nombre de servicio Docker "db" como host
+      DATABASE_URL: >-
+        postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-predictape}?schema=public
+      # ── LLM / Groq ──────────────────────────────────────────────────────
+      GROQ_API_KEY: ${GROQ_API_KEY:?La variable GROQ_API_KEY es obligatoria}
+      LLM_BASE_URL: ${LLM_BASE_URL:-https://api.groq.com/openai/v1}
+      LLM_MODEL:    ${LLM_MODEL:-gemma2-9b-it}
+    depends_on:
+      db:
+        condition: service_healthy
+    # No se expone al exterior; solo accesible desde el proxy Nginx
+    expose:
+      - "3001"
+
+  # ── Frontend Vite → Nginx ─────────────────────────────────────────────────
+  frontend:
+    build:
+      context:    .
+      dockerfile: apps/frontend/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      # Descomenta si configuras SSL/TLS en el servidor:
+      # - "443:443"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+    driver: local

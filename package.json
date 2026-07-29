@@ -1,0 +1,16 @@
+{
+  "name": "predictape",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Predicta AI — Perú (Prevención Fenómeno del Niño)",
+  "scripts": {
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:backend": "pnpm --filter backend start:dev",
+    "build:frontend": "pnpm --filter frontend build",
+    "build:backend": "pnpm --filter backend build"
+  },
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10"
+  }
+}

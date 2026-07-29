@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ReporteEmergencia {
+  id              String    @id @default(cuid())
+
+  // Campos temporales
+  fecha           DateTime?
+  hora            String?
+  anio            Int
+  mes             Int?
+  semanaEpi       Int?
+
+  // Identificación del reporte
+  tipoReporte     String?
+  numReporte      String?
+  secuencia       Int?
+  esUltimoReporte Boolean   @default(false)
+
+  // Clasificación del evento
+  evento          String
+  familiaEvento   String?
+
+  // Ubicación
+  departamento    String
+  distrito        String?
+
+  // Detalle
+  titulo          String?
+  idEvento        String?
+  urlDetalle      String?
+  urlPdf          String?
+  tienePdf        Boolean   @default(false)
+  urlIcono        String?
+  colorFondo      String?
+  pagina          Int?
+
+  // Metadatos de calidad del origen (preservados del CSV)
+  duplicado       Boolean   @default(false)
+  parseOk         Boolean   @default(true)
+  notas           String?
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([departamento])
+  @@index([anio])
+  @@index([familiaEvento])
+  @@index([evento])
+  @@index([idEvento])
+  @@index([departamento, anio])
+  @@map("reportes_emergencia")
+}
