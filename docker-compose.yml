@@ -18,6 +18,8 @@ services:
       timeout:      5s
       retries:      5
       start_period: 20s
+    networks:
+      - app-network
 
   # ── Backend NestJS + Prisma ──────────────────────────────────────────────────
   backend:
@@ -37,6 +39,8 @@ services:
         condition: service_healthy
     expose:
       - "3001"
+    networks:
+      - app-network
 
   # ── Frontend Vite → Nginx ────────────────────────────────────────────────────
   frontend:
@@ -48,6 +52,15 @@ services:
       - "80"
     depends_on:
       - backend
+    networks:
+      - app-network
+
+networks:
+  # Red explícita y compartida para todos los servicios.
+  # Sin esto, Dokploy puede aislar los contenedores en redes separadas
+  # impidiendo que se resuelvan entre sí por nombre de servicio.
+  app-network:
+    driver: bridge
 
 volumes:
   postgres_data:
