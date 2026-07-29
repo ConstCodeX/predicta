@@ -53,14 +53,16 @@ services:
     depends_on:
       - backend
     networks:
-      - app-network
+      - app-network      # para comunicarse con backend por nombre
+      - dokploy-network  # para que Traefik pueda enrutar el dominio a este contenedor
 
 networks:
-  # Red explícita y compartida para todos los servicios.
-  # Sin esto, Dokploy puede aislar los contenedores en redes separadas
-  # impidiendo que se resuelvan entre sí por nombre de servicio.
+  # Red interna entre los tres servicios
   app-network:
     driver: bridge
+  # Red de Traefik — gestionada por Dokploy, debe existir en el servidor
+  dokploy-network:
+    external: true
 
 volumes:
   postgres_data:
