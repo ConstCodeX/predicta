@@ -6,6 +6,7 @@ import { EmergenciasModule } from './emergencias/emergencias.module';
 import { PrediccionesModule } from './predicciones/predicciones.module';
 import { UsersModule } from './users/users.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { RiesgoModule } from './riesgo/riesgo.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
     AnalyticsModule,
     EmergenciasModule,
     PrediccionesModule,
+    RiesgoModule,
   ],
 })
 export class AppModule {}

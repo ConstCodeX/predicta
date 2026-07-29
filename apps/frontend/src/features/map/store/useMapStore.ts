@@ -1,70 +1,41 @@
 import { create } from 'zustand';
 import type { AlertaMapa, ForecastQuery, ForecastResponse, NivelRiesgoGlobal } from '../types';
 
-// ── Datos de demostración para ver el mapa funcionando sin backend ────────────
+export interface TimelineEvent {
+  departamento: string;
+  distrito: string;
+  familiaEvento: string;
+  count: number;
+}
 
-const DEMO_ALERTS: AlertaMapa[] = [
-  {
-    departamento: 'PIURA',
-    tipo_alerta: 'INUNDACION',
-    severidad: 5,
-    probabilidad_porcentaje: 92,
-    descripcion:
-      'Alto riesgo de desborde del río Piura. Zonas bajas de Castilla y el casco urbano de Piura en alerta máxima por saturación de suelos.',
-    acciones_sugeridas: [
-      'Evacuar zonas ribereñas de inmediato',
-      'Activar albergues municipales',
-      'Restringir circulación en vías costeras',
-    ],
-  },
-  {
-    departamento: 'TUMBES',
-    tipo_alerta: 'LLUVIAS_EXTREMAS',
-    severidad: 4,
-    probabilidad_porcentaje: 78,
-    descripcion:
-      'Precipitaciones extremas proyectadas para los próximos 10 días. Primer departamento históricamente afectado por el Niño Costero.',
-    acciones_sugeridas: [
-      'Reforzar sistemas de drenaje urbano',
-      'Alertar a comunidades en cuencas del Tumbes',
-    ],
-  },
-  {
-    departamento: 'LA LIBERTAD',
-    tipo_alerta: 'MOVIMIENTO_MASA',
-    severidad: 3,
-    probabilidad_porcentaje: 61,
-    descripcion:
-      'Riesgo de huaicos en zona altoandina. Provincias de Pataz y Gran Chimú registran suelos saturados.',
-    acciones_sugeridas: [
-      'Monitorear quebradas activas',
-      'Activar alertas tempranas en zonas rurales',
-    ],
-  },
-  {
-    departamento: 'LORETO',
-    tipo_alerta: 'DESABASTECIMIENTO',
-    severidad: 3,
-    probabilidad_porcentaje: 55,
-    descripcion:
-      'Crecida del Amazonas y afluentes puede interrumpir cadenas logísticas. Riesgo para medicamentos e insumos médicos en distritos remotos.',
-    acciones_sugeridas: [
-      'Incrementar stock en centros de salud',
-      'Activar rutas aéreas de contingencia',
-    ],
-  },
-  {
-    departamento: 'ANCASH',
-    tipo_alerta: 'LLUVIAS_EXTREMAS',
-    severidad: 2,
-    probabilidad_porcentaje: 43,
-    descripcion:
-      'Precipitaciones sobre la media histórica en la sierra ancashina. Riesgo moderado-bajo con potencial de escalada.',
-    acciones_sugeridas: ['Limpiar canales de riego', 'Revisar estado de puentes rurales'],
-  },
-];
+export interface TimelineFrame {
+  anio: number;
+  mes: number;
+  events: TimelineEvent[];
+}
 
-// ── Tipos del store ───────────────────────────────────────────────────────────
+const FAMILIA_TIPO: Record<string, AlertaMapa['tipo_alerta']> = {
+  'HIDROMETEOROLÓGICO': 'LLUVIAS_EXTREMAS',
+  'INUNDACIÓN': 'INUNDACION',
+  'MOVIMIENTO EN MASA': 'MOVIMIENTO_MASA',
+  'BAJAS TEMPERATURAS': 'INUNDACION',
+  'INCENDIO': 'MOVIMIENTO_MASA',
+  'SISMO': 'MOVIMIENTO_MASA',
+  'VIENTO': 'LLUVIAS_EXTREMAS',
+  'CONTAMINACIÓN': 'DESABASTECIMIENTO',
+};
+
+function timelineToAlerta(e: TimelineEvent): AlertaMapa {
+  return {
+    departamento: e.departamento,
+    distrito: e.distrito,
+    tipo_alerta: FAMILIA_TIPO[e.familiaEvento] ?? 'MOVIMIENTO_MASA',
+    severidad: Math.min(5, Math.max(1, e.count)),
+    probabilidad_porcentaje: 50,
+    descripcion: `${e.count} evento(s) histórico(s) · ${e.familiaEvento}`,
+    acciones_sugeridas: [],
+  };
+}
 
 interface MapState {
   alerts: AlertaMapa[];
@@ -74,27 +45,33 @@ interface MapState {
   error: string | null;
   riskLevel: NivelRiesgoGlobal | null;
   analysisText: string | null;
+  timelineMode: boolean;
+  timelineFrames: TimelineFrame[];
+  timelineIndex: number;
 }
 
 interface MapActions {
   selectAlert: (alert: AlertaMapa, coords: [number, number]) => void;
   clearSelection: () => void;
   setForecast: (data: ForecastResponse) => void;
-  fetchForecast: (query: ForecastQuery) => Promise<void>;
+  fetchForecast: (query: ForecastQuery, token: string) => Promise<void>;
+  setTimelineFrame: (index: number) => void;
+  setTimelineFrames: (frames: TimelineFrame[]) => void;
+  activateTimeline: () => void;
+  deactivateTimeline: () => void;
 }
 
-// ── Store ─────────────────────────────────────────────────────────────────────
-
-export const useMapStore = create<MapState & MapActions>((set) => ({
-  // Estado inicial con datos de demo para vista inmediata
-  alerts: DEMO_ALERTS,
+export const useMapStore = create<MapState & MapActions>((set, get) => ({
+  alerts: [],
   selectedAlert: null,
   selectedCoords: null,
   isLoading: false,
   error: null,
-  riskLevel: 'ALTO',
-  analysisText:
-    'Vista de demostración con alertas de ejemplo. Usa el panel "Generar pronóstico" para consultar datos reales del INDECI vía IA.',
+  riskLevel: null,
+  analysisText: null,
+  timelineMode: false,
+  timelineFrames: [],
+  timelineIndex: 0,
 
   selectAlert: (alert, coords) =>
     set({ selectedAlert: alert, selectedCoords: coords }),
@@ -109,19 +86,23 @@ export const useMapStore = create<MapState & MapActions>((set) => ({
       analysisText: data.analisis_general,
       selectedAlert: null,
       selectedCoords: null,
+      timelineMode: false,
     }),
 
-  fetchForecast: async (query: ForecastQuery) => {
+  fetchForecast: async (query: ForecastQuery, token: string) => {
     set({ isLoading: true, error: null });
     try {
       const res = await fetch('/api/v1/ai/forecast', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(query),
       });
 
       if (!res.ok) {
-        const body = await res.json().catch(() => ({})) as { message?: string };
+        const body = (await res.json().catch(() => ({}))) as { message?: string };
         throw new Error(body.message ?? `Error del servidor (${res.status})`);
       }
 
@@ -134,9 +115,27 @@ export const useMapStore = create<MapState & MapActions>((set) => ({
         selectedCoords: null,
         isLoading: false,
         error: null,
+        timelineMode: false,
       });
     } catch (err) {
       set({ error: (err as Error).message, isLoading: false });
     }
   },
+
+  setTimelineFrames: (frames: TimelineFrame[]) =>
+    set({ timelineFrames: frames, timelineIndex: 0 }),
+
+  setTimelineFrame: (index: number) => {
+    const { timelineFrames } = get();
+    const frame = timelineFrames[index];
+    if (!frame) return;
+    const alerts = frame.events.map(timelineToAlerta);
+    set({ timelineIndex: index, alerts, selectedAlert: null, selectedCoords: null });
+  },
+
+  activateTimeline: () =>
+    set({ timelineMode: true, alerts: [], selectedAlert: null }),
+
+  deactivateTimeline: () =>
+    set({ timelineMode: false, timelineFrames: [], timelineIndex: 0, alerts: [] }),
 }));

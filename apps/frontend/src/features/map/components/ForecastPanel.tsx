@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlertTriangle, ChevronDown, Loader2, Radio } from 'lucide-react';
 import { useState } from 'react';
+import { useAuthStore } from '../../auth/useAuthStore';
 import type { ForecastQuery, NivelRiesgoGlobal } from '../types';
 import { useMapStore } from '../store/useMapStore';
 
@@ -12,6 +13,7 @@ const RISK_BADGE: Record<NivelRiesgoGlobal, { label: string; color: string; bg: 
 
 export function ForecastPanel() {
   const { riskLevel, analysisText, isLoading, error, fetchForecast } = useMapStore();
+  const token = useAuthStore((s) => s.token);
   const [expanded, setExpanded] = useState(false);
   const [query, setQuery] = useState('');
   const [departamento, setDepartamento] = useState('');
@@ -20,10 +22,10 @@ export function ForecastPanel() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!query.trim()) return;
+    if (!query.trim() || !token) return;
     const payload: ForecastQuery = { query: query.trim() };
     if (departamento.trim()) payload.departamento = departamento.trim().toUpperCase();
-    await fetchForecast(payload);
+    await fetchForecast(payload, token);
     setExpanded(false);
   };
 

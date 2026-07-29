@@ -1,44 +1,54 @@
 import { motion } from 'framer-motion';
-import { BarChart2, Database, LogOut, Map, Shield, Users } from 'lucide-react';
+import { BarChart2, Clock, Database, LogOut, Map, Shield, Sparkles, Users } from 'lucide-react';
 import { useAuthStore } from '../features/auth/useAuthStore';
 
-export type AppView = 'map' | 'data' | 'analytics' | 'users';
+export type AppView = 'map' | 'predictions' | 'data' | 'analytics' | 'users';
 
 interface Props {
   view: AppView;
   onChangeView: (v: AppView) => void;
+  timelineActive?: boolean;
+  onToggleTimeline?: () => void;
 }
 
-const NAV_ITEMS: { id: AppView; label: string; icon: React.ReactNode; superadminOnly?: boolean }[] = [
-  { id: 'map',       label: 'Mapa',      icon: <Map size={13} /> },
-  { id: 'data',      label: 'Datos',     icon: <Database size={13} /> },
-  { id: 'analytics', label: 'Análisis',  icon: <BarChart2 size={13} /> },
-  { id: 'users',     label: 'Usuarios',  icon: <Users size={13} />, superadminOnly: true },
+const NAV_ITEMS: {
+  id: AppView;
+  label: string;
+  icon: React.ReactNode;
+  superadminOnly?: boolean;
+}[] = [
+  { id: 'map',         label: 'Mapa',          icon: <Map size={13} /> },
+  { id: 'predictions', label: 'Predicciones',  icon: <Sparkles size={13} /> },
+  { id: 'data',        label: 'Datos',          icon: <Database size={13} /> },
+  { id: 'analytics',   label: 'Análisis',       icon: <BarChart2 size={13} /> },
+  { id: 'users',       label: 'Usuarios',       icon: <Users size={13} />, superadminOnly: true },
 ];
 
-export function TopNav({ view, onChangeView }: Props) {
+export function TopNav({ view, onChangeView, timelineActive, onToggleTimeline }: Props) {
   const { user, logout } = useAuthStore();
 
   return (
     <div
-      className="flex h-11 flex-shrink-0 items-center px-4 gap-4 z-40 relative"
+      className="flex h-11 flex-shrink-0 items-center px-4 gap-3 z-40 relative"
       style={{
         background: 'rgba(9,9,11,0.96)',
         borderBottom: '1px solid rgba(255,255,255,0.07)',
         backdropFilter: 'blur(16px)',
+        overflowX: 'auto',
+        scrollbarWidth: 'none',
       }}
     >
       {/* Brand */}
-      <div className="flex items-center gap-2 mr-2">
+      <div className="flex items-center gap-2 mr-1 flex-shrink-0">
         <Shield size={14} style={{ color: 'oklch(0.60 0.18 240)' }} />
         <span className="text-sm font-bold text-white tracking-tight">Predicta</span>
       </div>
 
       {/* Divider */}
-      <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.08)' }} />
+      <div className="flex-shrink-0" style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.08)' }} />
 
       {/* Nav items */}
-      <nav className="flex items-center gap-0.5">
+      <nav className="flex items-center gap-0.5 flex-shrink-0">
         {NAV_ITEMS.map((item) => {
           if (item.superadminOnly && user?.role !== 'SUPERADMIN') return null;
           const active = view === item.id;
@@ -47,33 +57,50 @@ export function TopNav({ view, onChangeView }: Props) {
               key={item.id}
               onClick={() => onChangeView(item.id)}
               whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors whitespace-nowrap"
               style={{
                 color: active ? 'white' : 'oklch(0.52 0 0)',
                 background: active ? 'rgba(255,255,255,0.08)' : 'transparent',
               }}
             >
               {item.icon}
-              {item.label}
+              <span className="hidden sm:inline">{item.label}</span>
             </motion.button>
           );
         })}
       </nav>
 
+      {/* Timeline toggle (only in map view) */}
+      {view === 'map' && onToggleTimeline && (
+        <motion.button
+          onClick={onToggleTimeline}
+          whileTap={{ scale: 0.95 }}
+          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors flex-shrink-0"
+          style={{
+            color: timelineActive ? 'white' : 'oklch(0.52 0 0)',
+            background: timelineActive ? 'rgba(96,165,250,0.15)' : 'transparent',
+            border: timelineActive ? '1px solid rgba(96,165,250,0.25)' : '1px solid transparent',
+          }}
+        >
+          <Clock size={13} />
+          <span className="hidden sm:inline">Historia</span>
+        </motion.button>
+      )}
+
       {/* Spacer */}
       <div className="flex-1" />
 
       {/* User info + logout */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-shrink-0">
         {user?.role === 'SUPERADMIN' && (
           <span
-            className="rounded-full px-2 py-0.5 text-[10px] font-semibold"
+            className="rounded-full px-2 py-0.5 text-[10px] font-semibold hidden sm:inline"
             style={{ background: 'rgba(96,165,250,0.12)', color: 'oklch(0.60 0.18 240)', border: '1px solid rgba(96,165,250,0.2)' }}
           >
             ADMIN
           </span>
         )}
-        <span className="text-[11px]" style={{ color: 'oklch(0.46 0 0)' }}>
+        <span className="text-[11px] hidden md:inline" style={{ color: 'oklch(0.46 0 0)' }}>
           {user?.name ?? user?.email}
         </span>
         <motion.button
@@ -84,7 +111,7 @@ export function TopNav({ view, onChangeView }: Props) {
           style={{ color: 'oklch(0.46 0 0)' }}
         >
           <LogOut size={12} />
-          Salir
+          <span className="hidden sm:inline">Salir</span>
         </motion.button>
       </div>
     </div>

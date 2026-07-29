@@ -21,7 +21,7 @@ export function MapDashboard() {
   };
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden">
+    <div className="relative h-full w-full overflow-hidden">
       <Map
         initialViewState={{ longitude: -75.0, latitude: -9.1, zoom: 5 }}
         style={{ width: '100%', height: '100%' }}

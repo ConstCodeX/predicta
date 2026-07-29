@@ -93,9 +93,10 @@ export function AIChatPanel({ token, onClose }: Props) {
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: '100%', opacity: 0 }}
       transition={{ type: 'spring', stiffness: 280, damping: 30 }}
-      className="fixed top-0 right-0 z-30 flex h-full flex-col shadow-2xl"
+      className="fixed top-11 right-0 z-30 flex flex-col shadow-2xl"
       style={{
         width: 400,
+        height: 'calc(100vh - 2.75rem)',
         background: 'rgba(9,9,11,0.96)',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
