@@ -7,7 +7,9 @@ import {
   UnprocessableEntityException,
   ServiceUnavailableException,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
 import { GenerateForecastUseCase } from '../../application/use-cases/generate-forecast/generate-forecast.use-case';
 import { GenerateForecastRequestDto } from './generate-forecast.request.dto';
 import {
@@ -31,6 +33,7 @@ export class PrediccionController {
    */
   @Post('forecast')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
   async forecast(@Body() body: GenerateForecastRequestDto) {
     try {
       return await this.generateForecast.execute({

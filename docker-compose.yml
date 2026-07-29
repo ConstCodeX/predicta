@@ -28,12 +28,15 @@ services:
       dockerfile: apps/backend/Dockerfile
     restart: unless-stopped
     environment:
-      NODE_ENV:     production
-      PORT:         3001
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-predictape}?schema=public
-      GROQ_API_KEY: ${GROQ_API_KEY:?GROQ_API_KEY es obligatoria}
-      LLM_BASE_URL: ${LLM_BASE_URL:-https://api.groq.com/openai/v1}
-      LLM_MODEL:    ${LLM_MODEL:-gemma2-9b-it}
+      NODE_ENV:      production
+      PORT:          3001
+      DATABASE_URL:  postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-predictape}?schema=public
+      JWT_SECRET:    ${JWT_SECRET:?JWT_SECRET es obligatoria}
+      ADMIN_EMAIL:   ${ADMIN_EMAIL:?ADMIN_EMAIL es obligatoria}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD es obligatoria}
+      GROQ_API_KEY:  ${GROQ_API_KEY:?GROQ_API_KEY es obligatoria}
+      LLM_BASE_URL:  ${LLM_BASE_URL:-https://api.groq.com/openai/v1}
+      LLM_MODEL:     ${LLM_MODEL:-gemma2-9b-it}
     depends_on:
       db:
         condition: service_healthy

@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bot, Loader2, Send, Sparkles, X } from 'lucide-react';
+import { BarChart3, Loader2, Send, Sparkles, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useMapStore } from '../map/store/useMapStore';
 import type { ForecastQuery, ForecastResponse } from '../map/types';
@@ -11,23 +11,23 @@ type Message =
   | { id: string; role: 'error'; text: string };
 
 const SUGGESTIONS = [
-  'Pronóstico Niño Costero en Piura',
-  'Riesgo de huaicos en La Libertad',
-  'Desabastecimiento médico en Loreto',
-  'Lluvias extremas en la selva norte',
+  '¿Qué zonas de Piura son más vulnerables en El Niño 2025?',
+  'Riesgo de huaicos en Ancash y La Libertad',
+  'Predicción de inundaciones en el norte del Perú',
+  'Desabastecimiento de medicamentos en Loreto',
 ];
 
 interface Props {
+  token: string;
   onClose: () => void;
 }
 
-export function AIChatPanel({ onClose }: Props) {
+export function AIChatPanel({ token, onClose }: Props) {
   const setForecast = useMapStore((s) => s.setForecast);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const scrollToBottom = useCallback(() => {
     requestAnimationFrame(() => {
@@ -50,7 +50,10 @@ export function AIChatPanel({ onClose }: Props) {
         const payload: ForecastQuery = { query: trimmed };
         const res = await fetch('/api/v1/ai/forecast', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
           body: JSON.stringify(payload),
         });
 
@@ -61,7 +64,7 @@ export function AIChatPanel({ onClose }: Props) {
 
         const data = (await res.json()) as ForecastResponse;
 
-        // Update map markers simultaneously
+        // Actualizar marcadores del mapa en tiempo real
         setForecast(data);
 
         setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: 'assistant', data }]);
@@ -74,7 +77,7 @@ export function AIChatPanel({ onClose }: Props) {
         setIsLoading(false);
       }
     },
-    [isLoading, setForecast],
+    [isLoading, setForecast, token],
   );
 
   const handleKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -92,7 +95,7 @@ export function AIChatPanel({ onClose }: Props) {
       transition={{ type: 'spring', stiffness: 280, damping: 30 }}
       className="fixed top-0 right-0 z-30 flex h-full flex-col shadow-2xl"
       style={{
-        width: 390,
+        width: 400,
         background: 'rgba(9,9,11,0.96)',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
@@ -111,12 +114,12 @@ export function AIChatPanel({ onClose }: Props) {
             border: '1px solid rgba(96,165,250,0.18)',
           }}
         >
-          <Bot size={15} style={{ color: 'oklch(0.60 0.18 240)' }} />
+          <BarChart3 size={15} style={{ color: 'oklch(0.60 0.18 240)' }} />
         </div>
         <div className="flex flex-col">
-          <span className="text-sm font-bold text-white leading-none">Copiloto IA</span>
+          <span className="text-sm font-bold text-white leading-none">Análisis Predictivo</span>
           <span className="mt-0.5 text-[10px]" style={{ color: 'oklch(0.46 0 0)' }}>
-            Predicta AI · Análisis El Niño Perú
+            Datos INDECI + IA · Fenómeno del Niño Perú
           </span>
         </div>
         <button
@@ -134,19 +137,19 @@ export function AIChatPanel({ onClose }: Props) {
         className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 py-4"
         style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.08) transparent' }}
       >
-        {/* Empty state */}
         {messages.length === 0 && (
           <div className="flex flex-col gap-5 mt-2">
             <div className="flex flex-col items-center gap-2 py-4 text-center">
               <Sparkles size={22} style={{ color: 'oklch(0.48 0 0)' }} />
               <p className="text-xs leading-relaxed" style={{ color: 'oklch(0.48 0 0)' }}>
-                Escribe una consulta y la IA generará un pronóstico de riesgos del Fenómeno del Niño.<br />
-                Los marcadores del mapa se actualizarán en tiempo real.
+                Consulta el comportamiento histórico de El Niño por región.<br />
+                La IA cruza datos INDECI y genera un pronóstico predictivo.<br />
+                Los marcadores del mapa se actualizan en tiempo real.
               </p>
             </div>
             <div className="flex flex-col gap-2">
-              <p className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: 'oklch(0.40 0 0)' }}>
-                Ejemplos
+              <p className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: 'oklch(0.36 0 0)' }}>
+                Consultas frecuentes
               </p>
               {SUGGESTIONS.map((s) => (
                 <button
@@ -155,18 +158,17 @@ export function AIChatPanel({ onClose }: Props) {
                   className="rounded-xl px-3.5 py-2.5 text-left text-xs transition-all hover:bg-white/5"
                   style={{
                     border: '1px solid rgba(255,255,255,0.07)',
-                    color: 'oklch(0.65 0 0)',
+                    color: 'oklch(0.62 0 0)',
                     background: 'rgba(255,255,255,0.02)',
                   }}
                 >
-                  &ldquo;{s}&rdquo;
+                  {s}
                 </button>
               ))}
             </div>
           </div>
         )}
 
-        {/* Message list */}
         <AnimatePresence initial={false}>
           {messages.map((msg) => (
             <motion.div
@@ -189,9 +191,9 @@ export function AIChatPanel({ onClose }: Props) {
               {msg.role === 'assistant' && (
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-1.5">
-                    <Bot size={11} style={{ color: 'oklch(0.50 0 0)' }} />
+                    <BarChart3 size={11} style={{ color: 'oklch(0.50 0 0)' }} />
                     <span className="text-[10px]" style={{ color: 'oklch(0.46 0 0)' }}>
-                      Predicta AI
+                      Predicta · análisis generado
                     </span>
                   </div>
                   <ForecastResponseCard data={msg.data} />
@@ -214,7 +216,6 @@ export function AIChatPanel({ onClose }: Props) {
           ))}
         </AnimatePresence>
 
-        {/* Loading indicator */}
         <AnimatePresence>
           {isLoading && (
             <motion.div
@@ -245,11 +246,10 @@ export function AIChatPanel({ onClose }: Props) {
           }}
         >
           <textarea
-            ref={textareaRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKey}
-            placeholder="Pregunta sobre riesgos del Niño…"
+            placeholder="Ej: ¿Qué pasará en Piura con El Niño 2025?"
             rows={2}
             disabled={isLoading}
             className="flex-1 resize-none bg-transparent text-xs text-white placeholder-zinc-600 outline-none"

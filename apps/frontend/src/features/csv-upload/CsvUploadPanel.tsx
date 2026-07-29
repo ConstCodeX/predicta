@@ -12,10 +12,11 @@ interface UploadResult {
 }
 
 interface Props {
+  token: string;
   onClose: () => void;
 }
 
-export function CsvUploadPanel({ onClose }: Props) {
+export function CsvUploadPanel({ token, onClose }: Props) {
   const [phase, setPhase] = useState<Phase>('idle');
   const [progress, setProgress] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -73,6 +74,7 @@ export function CsvUploadPanel({ onClose }: Props) {
     };
 
     xhr.open('POST', '/api/v1/emergencias/upload');
+    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
     xhr.send(formData);
   }, []);
 

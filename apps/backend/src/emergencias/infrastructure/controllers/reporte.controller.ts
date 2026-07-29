@@ -5,6 +5,7 @@ import {
   Param,
   Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
   BadRequestException,
   NotFoundException,
@@ -13,6 +14,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
+import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
 import { UploadINDECIHistoricalDataUseCase } from '../../application/use-cases/upload-indeci-historical-data/upload-indeci-historical-data.use-case';
 import { ConsultarReportesUseCase } from '../../application/use-cases/consultar-reportes/consultar-reportes.use-case';
 import { ObtenerReportePorIdUseCase } from '../../application/use-cases/obtener-reporte-por-id/obtener-reporte-por-id.use-case';
@@ -34,6 +36,7 @@ export class ReporteController {
    */
   @Post('upload')
   @HttpCode(HttpStatus.CREATED)
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(
     FileInterceptor('file', {
       storage: memoryStorage(),
