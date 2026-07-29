@@ -1,15 +1,5 @@
 name: predictape
 
-# ──────────────────────────────────────────────────────────────────────────────
-# Predicta AI — Configuración de producción para Dokploy
-#
-# Dokploy corre Traefik internamente que ya ocupa los puertos 80 y 443.
-# NUNCA uses "ports: 80/443" — en su lugar usamos labels de Traefik para que
-# él enrute el tráfico hacia el contenedor correcto.
-#
-# Variable obligatoria extra: DOMAIN=tu-subdominio.dokploy.com (o dominio propio)
-# ──────────────────────────────────────────────────────────────────────────────
-
 services:
 
   # ── PostgreSQL 16 ────────────────────────────────────────────────────────────
@@ -28,8 +18,6 @@ services:
       timeout:      5s
       retries:      5
       start_period: 20s
-    networks:
-      - default
 
   # ── Backend NestJS + Prisma ──────────────────────────────────────────────────
   backend:
@@ -47,11 +35,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    # No se expone al exterior; solo accesible desde Nginx dentro de la red Docker
     expose:
       - "3001"
-    networks:
-      - default
 
   # ── Frontend Vite → Nginx ────────────────────────────────────────────────────
   frontend:
@@ -63,35 +48,6 @@ services:
       - "80"
     depends_on:
       - backend
-    networks:
-      - default
-      - dokploy-network      # Red de Traefik — necesaria para que lo descubra
-    labels:
-      # Activa Traefik para este contenedor
-      - "traefik.enable=true"
-      # Indica a Traefik que use la red dokploy-network para conectar
-      - "traefik.docker.network=dokploy-network"
-
-      # ── Router HTTPS ────────────────────────────────────────────────────────
-      - "traefik.http.routers.predictape.rule=Host(`${DOMAIN:?DOMAIN es obligatoria}`)"
-      - "traefik.http.routers.predictape.entrypoints=websecure"
-      - "traefik.http.routers.predictape.tls.certresolver=letsencrypt"
-      - "traefik.http.services.predictape.loadbalancer.server.port=80"
-
-      # ── Router HTTP → redirige a HTTPS ──────────────────────────────────────
-      - "traefik.http.routers.predictape-http.rule=Host(`${DOMAIN}`)"
-      - "traefik.http.routers.predictape-http.entrypoints=web"
-      - "traefik.http.routers.predictape-http.middlewares=predictape-https-redirect"
-      - "traefik.http.middlewares.predictape-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.predictape-https-redirect.redirectscheme.permanent=true"
-
-networks:
-  # Red interna entre los servicios del proyecto
-  default:
-    driver: bridge
-  # Red externa de Traefik gestionada por Dokploy (debe existir previamente)
-  dokploy-network:
-    external: true
 
 volumes:
   postgres_data:
