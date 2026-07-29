@@ -63,7 +63,7 @@ export function MapDashboard() {
 
       {/* Overlays */}
       <ForecastPanel />
-      {alerts.length > 0 && <MapLegend />}
+      <MapLegend />
 
       {/* Empty state hint */}
       {alerts.length === 0 && !timelineMode && (

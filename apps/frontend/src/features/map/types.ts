@@ -1,10 +1,24 @@
 export type NivelRiesgoGlobal = 'ALTO' | 'MEDIO' | 'BAJO';
 
-export type TipoAlerta =
+// Tipos para alertas de pronóstico IA
+export type TipoAlertaForecast =
   | 'DESABASTECIMIENTO'
   | 'LLUVIAS_EXTREMAS'
   | 'INUNDACION'
   | 'MOVIMIENTO_MASA';
+
+// Tipos basados en las familias reales del INDECI
+export type TipoAlertaFamilia =
+  | 'HIDROMETEOROLOGICO'
+  | 'MOVIMIENTO_DE_MASA'
+  | 'BAJAS_TEMPERATURAS'
+  | 'INCENDIO'
+  | 'GEOFISICO'
+  | 'BIOLOGICO'
+  | 'ANTROPICO'
+  | 'TECNOLOGICO';
+
+export type TipoAlerta = TipoAlertaForecast | TipoAlertaFamilia;
 
 export interface AlertaMapa {
   departamento: string;

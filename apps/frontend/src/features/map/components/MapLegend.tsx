@@ -1,19 +1,34 @@
-import { CloudRain, Droplets, Mountain, Package } from 'lucide-react';
+import { Activity, CloudRain, Cpu, Droplets, Flame, Leaf, Mountain, Package, Snowflake, Users } from 'lucide-react';
+import { useMapStore } from '../store/useMapStore';
+import type { TipoAlerta } from '../types';
 
-const ALERT_ITEMS = [
-  { icon: <Droplets size={13} />,  label: 'Inundación',         color: '#3b82f6' },
-  { icon: <CloudRain size={13} />, label: 'Lluvias extremas',   color: '#06b6d4' },
-  { icon: <Mountain size={13} />,  label: 'Movimiento de masa', color: '#f97316' },
-  { icon: <Package size={13} />,   label: 'Desabastecimiento',  color: '#a78bfa' },
+const ALL_TYPES: { tipo: TipoAlerta; label: string; color: string; icon: React.ReactNode }[] = [
+  { tipo: 'INUNDACION',         label: 'Inundación',          color: '#3b82f6', icon: <Droplets size={12} /> },
+  { tipo: 'LLUVIAS_EXTREMAS',   label: 'Lluvias extremas',    color: '#06b6d4', icon: <CloudRain size={12} /> },
+  { tipo: 'MOVIMIENTO_MASA',    label: 'Movimiento de masa',  color: '#f97316', icon: <Mountain size={12} /> },
+  { tipo: 'DESABASTECIMIENTO',  label: 'Desabastecimiento',   color: '#a78bfa', icon: <Package size={12} /> },
+  { tipo: 'HIDROMETEOROLOGICO', label: 'Hidrometeorólogico',  color: '#38bdf8', icon: <CloudRain size={12} /> },
+  { tipo: 'MOVIMIENTO_DE_MASA', label: 'Mov. de masa',        color: '#fb923c', icon: <Mountain size={12} /> },
+  { tipo: 'BAJAS_TEMPERATURAS', label: 'Bajas temperaturas',  color: '#67e8f9', icon: <Snowflake size={12} /> },
+  { tipo: 'INCENDIO',           label: 'Incendio',            color: '#f87171', icon: <Flame size={12} /> },
+  { tipo: 'GEOFISICO',          label: 'Geofísico',           color: '#fbbf24', icon: <Activity size={12} /> },
+  { tipo: 'BIOLOGICO',          label: 'Biológico',           color: '#86efac', icon: <Leaf size={12} /> },
+  { tipo: 'ANTROPICO',          label: 'Antrópico',           color: '#c084fc', icon: <Users size={12} /> },
+  { tipo: 'TECNOLOGICO',        label: 'Tecnológico',         color: '#94a3b8', icon: <Cpu size={12} /> },
 ];
 
-const SEV_SIZES = [8, 10, 13, 17, 22];
-const SEV_LABELS = ['1', '2', '3', '4', '5'];
-
 export function MapLegend() {
+  const alerts = useMapStore((s) => s.alerts);
+
+  // Only show types that are actually present on the map
+  const presentTypes = new Set(alerts.map((a) => a.tipo_alerta));
+  const visible = ALL_TYPES.filter((t) => presentTypes.has(t.tipo));
+
+  if (visible.length === 0) return null;
+
   return (
     <div
-      className="absolute bottom-6 right-4 z-10 flex flex-col gap-3 rounded-xl p-3 shadow-2xl"
+      className="absolute bottom-6 right-4 z-10 flex flex-col gap-2.5 rounded-xl p-3 shadow-2xl"
       style={{
         background: 'rgba(9,9,11,0.82)',
         backdropFilter: 'blur(12px)',
@@ -22,42 +37,17 @@ export function MapLegend() {
         minWidth: 178,
       }}
     >
-      {/* Tipo de alerta */}
-      <div>
-        <p className="mb-2 text-[9px] font-semibold uppercase tracking-widest"
-           style={{ color: 'oklch(0.48 0 0)' }}>
-          Tipo de alerta
-        </p>
-        <ul className="flex flex-col gap-1.5">
-          {ALERT_ITEMS.map(({ icon, label, color }) => (
-            <li key={label} className="flex items-center gap-2">
-              <span style={{ color }}>{icon}</span>
-              <span className="text-[11px]" style={{ color: 'oklch(0.72 0 0)' }}>{label}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div style={{ height: 1, background: 'rgba(255,255,255,0.07)' }} />
-
-      {/* Severidad */}
-      <div>
-        <p className="mb-2 text-[9px] font-semibold uppercase tracking-widest"
-           style={{ color: 'oklch(0.48 0 0)' }}>
-          Severidad
-        </p>
-        <div className="flex items-end gap-2">
-          {SEV_SIZES.map((s, i) => (
-            <div key={i} className="flex flex-col items-center gap-1">
-              <span
-                className="rounded-full"
-                style={{ width: s, height: s, background: 'rgba(255,255,255,0.25)' }}
-              />
-              <span className="text-[9px]" style={{ color: 'oklch(0.5 0 0)' }}>{SEV_LABELS[i]}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+      <p className="text-[9px] font-semibold uppercase tracking-widest" style={{ color: 'oklch(0.48 0 0)' }}>
+        Tipo de alerta
+      </p>
+      <ul className="flex flex-col gap-1.5">
+        {visible.map(({ tipo, label, color, icon }) => (
+          <li key={tipo} className="flex items-center gap-2">
+            <span style={{ color }}>{icon}</span>
+            <span className="text-[11px]" style={{ color: 'oklch(0.72 0 0)' }}>{label}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

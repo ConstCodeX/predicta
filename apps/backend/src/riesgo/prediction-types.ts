@@ -7,12 +7,13 @@ export interface PredictionType {
   icono: string;
 }
 
+// Familias tal como aparecen en la base de datos INDECI (mayúsculas, sin tilde)
 export const PREDICTION_TYPES: Record<string, PredictionType> = {
   HIDRO_GEOLOGICO: {
     id: 'HIDRO_GEOLOGICO',
     label: 'Hidrogeológico',
-    descripcion: 'Inundaciones, huaicos y derrumbes por lluvias extremas',
-    familiasEvento: ['HIDROMETEOROLÓGICO', 'MOVIMIENTO EN MASA', 'INUNDACIÓN'],
+    descripcion: 'Inundaciones, huaicos y deslizamientos por lluvias extremas',
+    familiasEvento: ['HIDROMETEOROLOGICO', 'MOVIMIENTO DE MASA'],
     umbrales: { medio: 30, alto: 60 },
     icono: '💧',
   },
@@ -24,36 +25,36 @@ export const PREDICTION_TYPES: Record<string, PredictionType> = {
     umbrales: { medio: 25, alto: 55 },
     icono: '❄️',
   },
-  INCENDIO_FORESTAL: {
-    id: 'INCENDIO_FORESTAL',
-    label: 'Incendio Forestal',
-    descripcion: 'Incendios de vegetación en periodos de sequía prolongada',
+  INCENDIO: {
+    id: 'INCENDIO',
+    label: 'Incendio',
+    descripcion: 'Incendios forestales, urbanos e industriales',
     familiasEvento: ['INCENDIO'],
     umbrales: { medio: 20, alto: 50 },
     icono: '🔥',
   },
-  SISMO: {
-    id: 'SISMO',
-    label: 'Sismo',
-    descripcion: 'Actividad sísmica y riesgo estructural',
-    familiasEvento: ['SISMO'],
+  GEOFISICO: {
+    id: 'GEOFISICO',
+    label: 'Geofísico',
+    descripcion: 'Sismos, actividad volcánica y tsunamis',
+    familiasEvento: ['GEOFISICO'],
     umbrales: { medio: 15, alto: 40 },
     icono: '🌍',
   },
-  VIENTOS: {
-    id: 'VIENTOS',
-    label: 'Vientos Fuertes',
-    descripcion: 'Ráfagas extremas y tornados locales',
-    familiasEvento: ['VIENTO'],
-    umbrales: { medio: 25, alto: 55 },
-    icono: '💨',
-  },
-  CONTAMINACION: {
-    id: 'CONTAMINACION',
-    label: 'Contaminación',
-    descripcion: 'Contaminación ambiental e intoxicaciones',
-    familiasEvento: ['CONTAMINACIÓN'],
+  BIOLOGICO: {
+    id: 'BIOLOGICO',
+    label: 'Biológico',
+    descripcion: 'Epidemias, plagas y eventos biológicos',
+    familiasEvento: ['BIOLOGICO'],
     umbrales: { medio: 20, alto: 45 },
-    icono: '⚗️',
+    icono: '🦠',
+  },
+  ANTROPICO: {
+    id: 'ANTROPICO',
+    label: 'Antrópico / Tecnológico',
+    descripcion: 'Accidentes, derrames, conflictos y riesgos tecnológicos',
+    familiasEvento: ['ANTROPICO', 'TECNOLOGICO'],
+    umbrales: { medio: 20, alto: 45 },
+    icono: '⚙️',
   },
 };

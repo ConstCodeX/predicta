@@ -91,30 +91,56 @@ export class ReporteController {
    * GET /api/v1/emergencias/timeline
    *
    * Devuelve eventos agrupados por anio+mes para animación temporal.
-   * Filtros opcionales: familiaEvento, anioDesde, anioHasta.
+   * Filtros: familiaEvento, evento, anioDesde, anioHasta.
    */
   @Get('timeline')
   @UseGuards(JwtAuthGuard)
   async timeline(
     @Query('familiaEvento') familiaEvento?: string,
+    @Query('evento') eventoFilter?: string,
     @Query('anioDesde') anioDesdeStr?: string,
     @Query('anioHasta') anioHastaStr?: string,
   ) {
     const anioDesde = anioDesdeStr ? parseInt(anioDesdeStr, 10) : 2019;
     const anioHasta = anioHastaStr ? parseInt(anioHastaStr, 10) : new Date().getFullYear();
 
+    const baseWhere = {
+      anio: { gte: anioDesde, lte: anioHasta },
+      distrito: { not: null as null },
+      ...(familiaEvento ? { familiaEvento } : {}),
+      ...(eventoFilter ? { evento: eventoFilter } : {}),
+    };
+
+    // Main groupBy: frames
     const groups = await this.prisma.reporteEmergencia.groupBy({
       by: ['anio', 'mes', 'departamento', 'distrito', 'familiaEvento'],
-      where: {
-        anio: { gte: anioDesde, lte: anioHasta },
-        ...(familiaEvento ? { familiaEvento } : {}),
-        distrito: { not: null },
-      },
+      where: baseWhere,
       _count: { id: true },
       orderBy: [{ anio: 'asc' }, { mes: 'asc' }],
     });
 
-    // Build frame map: key = "anio-mes"
+    // Distinct familias for the current filter combination
+    const familiaGroups = await this.prisma.reporteEmergencia.groupBy({
+      by: ['familiaEvento'],
+      where: {
+        anio: { gte: anioDesde, lte: anioHasta },
+        familiaEvento: { not: null },
+        ...(eventoFilter ? { evento: eventoFilter } : {}),
+      },
+      orderBy: { familiaEvento: 'asc' },
+    });
+
+    // Distinct eventos for the current familia filter
+    const eventoGroups = await this.prisma.reporteEmergencia.groupBy({
+      by: ['evento'],
+      where: {
+        anio: { gte: anioDesde, lte: anioHasta },
+        ...(familiaEvento ? { familiaEvento } : {}),
+      },
+      orderBy: { evento: 'asc' },
+    });
+
+    // Build frame map
     const frameMap = new Map<
       string,
       { anio: number; mes: number; events: { departamento: string; distrito: string; familiaEvento: string; count: number }[] }
@@ -140,11 +166,18 @@ export class ReporteController {
       (a, b) => a.anio - b.anio || a.mes - b.mes,
     );
 
-    const familias = [...new Set(
-      groups.map((g) => g.familiaEvento).filter(Boolean) as string[],
-    )];
+    const familias = familiaGroups
+      .map((g) => g.familiaEvento)
+      .filter(Boolean) as string[];
 
-    return { frames, familias, total: groups.reduce((s, g) => s + g._count.id, 0) };
+    const eventos = eventoGroups.map((g) => g.evento);
+
+    return {
+      frames,
+      familias,
+      eventos,
+      total: groups.reduce((s, g) => s + g._count.id, 0),
+    };
   }
 
   /**

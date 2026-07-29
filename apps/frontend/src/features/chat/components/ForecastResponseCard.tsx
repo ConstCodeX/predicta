@@ -1,4 +1,4 @@
-import { CheckCircle2, CloudRain, Droplets, Mountain, Package } from 'lucide-react';
+import { Activity, CheckCircle2, CloudRain, Cpu, Droplets, Flame, Leaf, Mountain, Package, Snowflake, Users } from 'lucide-react';
 import type { AlertaMapa, ForecastResponse, NivelRiesgoGlobal, TipoAlerta } from '../../map/types';
 
 const RISK_CONFIG: Record<NivelRiesgoGlobal, { label: string; color: string; bg: string }> = {
@@ -7,21 +7,28 @@ const RISK_CONFIG: Record<NivelRiesgoGlobal, { label: string; color: string; bg:
   BAJO:  { label: 'RIESGO BAJO',  color: '#22c55e', bg: 'rgba(34,197,94,0.1)' },
 };
 
-const TIPO_CONFIG: Record<
-  TipoAlerta,
-  { label: string; color: string; Icon: React.FC<{ size: number }> }
-> = {
-  INUNDACION:        { label: 'Inundación',         color: '#3b82f6', Icon: ({ size }) => <Droplets size={size} /> },
-  LLUVIAS_EXTREMAS:  { label: 'Lluvias extremas',   color: '#06b6d4', Icon: ({ size }) => <CloudRain size={size} /> },
-  MOVIMIENTO_MASA:   { label: 'Movimiento de masa', color: '#f97316', Icon: ({ size }) => <Mountain size={size} /> },
-  DESABASTECIMIENTO: { label: 'Desabastecimiento',  color: '#a78bfa', Icon: ({ size }) => <Package size={size} /> },
+const TIPO_CONFIG: Partial<Record<TipoAlerta, { label: string; color: string; Icon: React.FC<{ size: number }> }>> = {
+  INUNDACION:           { label: 'Inundación',          color: '#3b82f6', Icon: ({ size }) => <Droplets size={size} /> },
+  LLUVIAS_EXTREMAS:     { label: 'Lluvias extremas',    color: '#06b6d4', Icon: ({ size }) => <CloudRain size={size} /> },
+  MOVIMIENTO_MASA:      { label: 'Movimiento de masa',  color: '#f97316', Icon: ({ size }) => <Mountain size={size} /> },
+  DESABASTECIMIENTO:    { label: 'Desabastecimiento',   color: '#a78bfa', Icon: ({ size }) => <Package size={size} /> },
+  HIDROMETEOROLOGICO:   { label: 'Hidrometeorólogico',  color: '#38bdf8', Icon: ({ size }) => <CloudRain size={size} /> },
+  MOVIMIENTO_DE_MASA:   { label: 'Movimiento de masa',  color: '#fb923c', Icon: ({ size }) => <Mountain size={size} /> },
+  BAJAS_TEMPERATURAS:   { label: 'Bajas temperaturas',  color: '#67e8f9', Icon: ({ size }) => <Snowflake size={size} /> },
+  INCENDIO:             { label: 'Incendio',            color: '#f87171', Icon: ({ size }) => <Flame size={size} /> },
+  GEOFISICO:            { label: 'Geofísico',           color: '#fbbf24', Icon: ({ size }) => <Activity size={size} /> },
+  BIOLOGICO:            { label: 'Biológico',           color: '#86efac', Icon: ({ size }) => <Leaf size={size} /> },
+  ANTROPICO:            { label: 'Antrópico',           color: '#c084fc', Icon: ({ size }) => <Users size={size} /> },
+  TECNOLOGICO:          { label: 'Tecnológico',         color: '#94a3b8', Icon: ({ size }) => <Cpu size={size} /> },
 };
+
+const TIPO_DEFAULT = { label: 'Alerta', color: '#94a3b8', Icon: ({ size }: { size: number }) => <Activity size={size} /> };
 
 const SEV_COLOR = ['', '#22c55e', '#84cc16', '#f97316', '#ef4444', '#dc2626'];
 
 function AlertCard({ alert }: { alert: AlertaMapa }) {
   const sev = Math.min(5, Math.max(1, alert.severidad));
-  const tipo = TIPO_CONFIG[alert.tipo_alerta];
+  const tipo = TIPO_CONFIG[alert.tipo_alerta] ?? TIPO_DEFAULT;
 
   return (
     <div

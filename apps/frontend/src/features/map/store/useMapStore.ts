@@ -14,23 +14,24 @@ export interface TimelineFrame {
   events: TimelineEvent[];
 }
 
+// Mapeo de familias INDECI (DB) → TipoAlerta para visualización en mapa
 const FAMILIA_TIPO: Record<string, AlertaMapa['tipo_alerta']> = {
-  'HIDROMETEOROLÓGICO': 'LLUVIAS_EXTREMAS',
-  'INUNDACIÓN': 'INUNDACION',
-  'MOVIMIENTO EN MASA': 'MOVIMIENTO_MASA',
-  'BAJAS TEMPERATURAS': 'INUNDACION',
-  'INCENDIO': 'MOVIMIENTO_MASA',
-  'SISMO': 'MOVIMIENTO_MASA',
-  'VIENTO': 'LLUVIAS_EXTREMAS',
-  'CONTAMINACIÓN': 'DESABASTECIMIENTO',
+  'HIDROMETEOROLOGICO': 'HIDROMETEOROLOGICO',
+  'MOVIMIENTO DE MASA': 'MOVIMIENTO_DE_MASA',
+  'BAJAS TEMPERATURAS': 'BAJAS_TEMPERATURAS',
+  'INCENDIO':           'INCENDIO',
+  'GEOFISICO':          'GEOFISICO',
+  'BIOLOGICO':          'BIOLOGICO',
+  'ANTROPICO':          'ANTROPICO',
+  'TECNOLOGICO':        'TECNOLOGICO',
 };
 
 function timelineToAlerta(e: TimelineEvent): AlertaMapa {
   return {
     departamento: e.departamento,
     distrito: e.distrito,
-    tipo_alerta: FAMILIA_TIPO[e.familiaEvento] ?? 'MOVIMIENTO_MASA',
-    severidad: Math.min(5, Math.max(1, e.count)),
+    tipo_alerta: FAMILIA_TIPO[e.familiaEvento] ?? 'MOVIMIENTO_DE_MASA',
+    severidad: Math.min(3, Math.max(1, Math.ceil(e.count / 3))),
     probabilidad_porcentaje: 50,
     descripcion: `${e.count} evento(s) histórico(s) · ${e.familiaEvento}`,
     acciones_sugeridas: [],
