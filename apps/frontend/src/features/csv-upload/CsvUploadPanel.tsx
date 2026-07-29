@@ -5,10 +5,10 @@ import { useCallback, useRef, useState } from 'react';
 type Phase = 'idle' | 'uploading' | 'success' | 'error';
 
 interface UploadResult {
-  inserted: number;
+  imported: number;
   discarded: number;
   total: number;
-  errors?: number;
+  errors?: Array<{ row: number; message: string }>;
 }
 
 interface Props {
@@ -271,7 +271,7 @@ export function CsvUploadPanel({ onClose }: Props) {
                 <div className="grid grid-cols-3 gap-2">
                   {[
                     { label: 'Total filas',  value: result.total,     color: 'oklch(0.72 0 0)' },
-                    { label: 'Insertadas',   value: result.inserted,  color: 'oklch(0.65 0.17 145)' },
+                    { label: 'Insertadas',   value: result.imported,  color: 'oklch(0.65 0.17 145)' },
                     { label: 'Descartadas',  value: result.discarded, color: 'oklch(0.72 0.18 70)' },
                   ].map(({ label, value, color }) => (
                     <div
