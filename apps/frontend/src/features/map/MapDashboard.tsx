@@ -5,7 +5,7 @@ import { AlertMarkerIcon } from './components/AlertMarkerIcon';
 import { AlertPopup } from './components/AlertPopup';
 import { ForecastPanel } from './components/ForecastPanel';
 import { MapLegend } from './components/MapLegend';
-import { getDeptCoords } from './constants/peru-coords';
+import { getCoords } from './constants/peru-coords';
 import { useMapStore } from './store/useMapStore';
 import type { AlertaMapa } from './types';
 
@@ -15,7 +15,7 @@ export function MapDashboard() {
   const { alerts, selectedAlert, selectedCoords, selectAlert, clearSelection } = useMapStore();
 
   const handleMarkerClick = (alert: AlertaMapa) => {
-    const coords = getDeptCoords(alert.departamento);
+    const coords = getCoords(alert.departamento, alert.distrito);
     if (!coords) return;
     selectAlert(alert, coords);
   };
@@ -29,7 +29,7 @@ export function MapDashboard() {
       >
         {/* Markers */}
         {alerts.map((alert, i) => {
-          const coords = getDeptCoords(alert.departamento);
+          const coords = getCoords(alert.departamento, alert.distrito);
           if (!coords) return null;
           return (
             <Marker key={i} longitude={coords[0]} latitude={coords[1]} anchor="center">

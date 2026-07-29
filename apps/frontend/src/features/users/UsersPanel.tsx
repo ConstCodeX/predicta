@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Loader2, PlusCircle, Shield, UserCheck, UserX } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { SelectField } from '../../components/SelectField';
 
 interface User {
   id: string;
@@ -119,10 +120,15 @@ export function UsersPanel({ token }: Props) {
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-[10px]" style={{ color: 'oklch(0.44 0 0)' }}>Rol</label>
-                <select value={form.role} onChange={(e) => setForm((f) => ({ ...f, role: e.target.value as 'ANALYST' | 'SUPERADMIN' }))} className={inputCls} style={{ ...inputStyle, color: 'white' }}>
-                  <option value="ANALYST">Analista</option>
-                  <option value="SUPERADMIN">Superadmin</option>
-                </select>
+                <SelectField
+                  value={form.role}
+                  onChange={(v) => setForm((f) => ({ ...f, role: v as 'ANALYST' | 'SUPERADMIN' }))}
+                  options={[
+                    { value: 'ANALYST', label: 'Analista Predicta' },
+                    { value: 'SUPERADMIN', label: 'Superadmin' },
+                  ]}
+                  placeholder="Analista Predicta"
+                />
               </div>
             </div>
             {error && <p className="text-[11px]" style={{ color: '#f87171' }}>{error}</p>}
@@ -168,7 +174,7 @@ export function UsersPanel({ token }: Props) {
                         : { background: 'rgba(255,255,255,0.07)', color: 'oklch(0.50 0 0)' }
                       }
                     >
-                      {u.role === 'SUPERADMIN' ? 'Admin' : 'Analista'}
+                      {u.role === 'SUPERADMIN' ? 'Admin' : 'Analista Predicta'}
                     </span>
                     {!u.active && <span className="text-[10px]" style={{ color: 'oklch(0.40 0 0)' }}>· inactivo</span>}
                   </div>

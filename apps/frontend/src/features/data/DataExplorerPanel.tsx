@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Filter, Loader2 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
+import { SelectField } from '../../components/SelectField';
 
 interface Reporte {
   id: string;
@@ -29,9 +30,15 @@ interface Props {
   token: string;
 }
 
-const FAMILIAS = [
-  '', 'BAJAS TEMPERATURAS', 'HIDROMETEOROLÓGICO', 'INCENDIO', 'MOVIMIENTO EN MASA',
-  'INUNDACIÓN', 'SISMO', 'VIENTO', 'CONTAMINACIÓN', 'EXPLOSIÓN',
+const FAMILIA_OPTIONS = [
+  { value: 'BAJAS TEMPERATURAS', label: 'Bajas temperaturas' },
+  { value: 'HIDROMETEOROLÓGICO', label: 'Hidrometeorólogico' },
+  { value: 'INCENDIO', label: 'Incendio' },
+  { value: 'MOVIMIENTO EN MASA', label: 'Movimiento en masa' },
+  { value: 'INUNDACIÓN', label: 'Inundación' },
+  { value: 'SISMO', label: 'Sismo' },
+  { value: 'VIENTO', label: 'Viento' },
+  { value: 'CONTAMINACIÓN', label: 'Contaminación' },
 ];
 
 export function DataExplorerPanel({ token }: Props) {
@@ -70,8 +77,17 @@ export function DataExplorerPanel({ token }: Props) {
   const applyFilters = () => { setPage(1); setApplied({ ...filters }); };
   const clearFilters = () => { const e = { departamento: '', familiaEvento: '', anioDesde: '', anioHasta: '' }; setFilters(e); setPage(1); setApplied(e); };
 
-  const inputCls = "rounded-lg px-3 py-1.5 text-xs text-white outline-none w-full";
-  const inputStyle = { background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' };
+  const inputStyle: React.CSSProperties = {
+    background: 'rgba(255,255,255,0.05)',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: '0.5rem',
+    padding: '0.375rem 0.75rem',
+    fontSize: '0.75rem',
+    color: 'white',
+    outline: 'none',
+    width: '100%',
+    boxSizing: 'border-box' as const,
+  };
 
   return (
     <motion.div
@@ -98,22 +114,18 @@ export function DataExplorerPanel({ token }: Props) {
             onChange={(e) => setFilters((f) => ({ ...f, departamento: e.target.value }))}
             onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
             placeholder="Ej: PIURA"
-            className={inputCls}
             style={inputStyle}
           />
         </div>
 
         <div className="flex flex-col gap-1 min-w-[180px]">
           <label className="text-[10px]" style={{ color: 'oklch(0.44 0 0)' }}>Familia de evento</label>
-          <select
+          <SelectField
             value={filters.familiaEvento}
-            onChange={(e) => setFilters((f) => ({ ...f, familiaEvento: e.target.value }))}
-            className={inputCls}
-            style={{ ...inputStyle, color: filters.familiaEvento ? 'white' : 'oklch(0.40 0 0)' }}
-          >
-            <option value="">Todas</option>
-            {FAMILIAS.slice(1).map((f) => <option key={f} value={f}>{f}</option>)}
-          </select>
+            onChange={(v) => setFilters((f) => ({ ...f, familiaEvento: v }))}
+            options={FAMILIA_OPTIONS}
+            placeholder="Todas"
+          />
         </div>
 
         <div className="flex flex-col gap-1 w-[90px]">
@@ -123,7 +135,6 @@ export function DataExplorerPanel({ token }: Props) {
             value={filters.anioDesde}
             onChange={(e) => setFilters((f) => ({ ...f, anioDesde: e.target.value }))}
             placeholder="2019"
-            className={inputCls}
             style={inputStyle}
           />
         </div>
@@ -135,7 +146,6 @@ export function DataExplorerPanel({ token }: Props) {
             value={filters.anioHasta}
             onChange={(e) => setFilters((f) => ({ ...f, anioHasta: e.target.value }))}
             placeholder="2026"
-            className={inputCls}
             style={inputStyle}
           />
         </div>
