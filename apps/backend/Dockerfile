@@ -29,7 +29,7 @@ RUN pnpm --filter backend build
 
 # Crea bundle de producción con node_modules PLANO (elimina symlinks de pnpm
 # que romperían al copiar a otra imagen sin el store de pnpm)
-RUN pnpm --filter backend deploy --prod /deploy
+RUN pnpm --filter backend deploy --prod --legacy /deploy
 
 # ── Stage 3: runner — imagen mínima de producción ─────────────────────────────
 FROM node:22-alpine AS runner
