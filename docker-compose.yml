@@ -3,25 +3,23 @@ name: predictape
 # ──────────────────────────────────────────────────────────────────────────────
 # Predicta AI — Configuración de producción para Dokploy
 #
-# Requisitos antes del primer despliegue:
-#   1. Crea la migración inicial localmente:
-#      pnpm --filter backend exec prisma migrate dev --name init
-#   2. Commitea la carpeta apps/backend/prisma/migrations/ al repo.
-#   3. Copia .env.example → .env y rellena las variables reales.
+# Dokploy corre Traefik internamente que ya ocupa los puertos 80 y 443.
+# NUNCA uses "ports: 80/443" — en su lugar usamos labels de Traefik para que
+# él enrute el tráfico hacia el contenedor correcto.
 #
-# Dokploy leerá este archivo desde GitHub y gestionará las env vars desde su UI.
+# Variable obligatoria extra: DOMAIN=tu-subdominio.dokploy.com (o dominio propio)
 # ──────────────────────────────────────────────────────────────────────────────
 
 services:
 
-  # ── PostgreSQL 16 ─────────────────────────────────────────────────────────
+  # ── PostgreSQL 16 ────────────────────────────────────────────────────────────
   db:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
       POSTGRES_DB:       ${POSTGRES_DB:-predictape}
       POSTGRES_USER:     ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?La variable POSTGRES_PASSWORD es obligatoria}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD es obligatoria}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -30,42 +28,70 @@ services:
       timeout:      5s
       retries:      5
       start_period: 20s
+    networks:
+      - default
 
-  # ── Backend NestJS + Prisma ────────────────────────────────────────────────
+  # ── Backend NestJS + Prisma ──────────────────────────────────────────────────
   backend:
     build:
       context:    .
       dockerfile: apps/backend/Dockerfile
     restart: unless-stopped
     environment:
-      NODE_ENV:    production
-      PORT:        3001
-      # La URL usa el nombre de servicio Docker "db" como host
-      DATABASE_URL: >-
-        postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-predictape}?schema=public
-      # ── LLM / Groq ──────────────────────────────────────────────────────
-      GROQ_API_KEY: ${GROQ_API_KEY:?La variable GROQ_API_KEY es obligatoria}
+      NODE_ENV:     production
+      PORT:         3001
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-predictape}?schema=public
+      GROQ_API_KEY: ${GROQ_API_KEY:?GROQ_API_KEY es obligatoria}
       LLM_BASE_URL: ${LLM_BASE_URL:-https://api.groq.com/openai/v1}
       LLM_MODEL:    ${LLM_MODEL:-gemma2-9b-it}
     depends_on:
       db:
         condition: service_healthy
-    # No se expone al exterior; solo accesible desde el proxy Nginx
+    # No se expone al exterior; solo accesible desde Nginx dentro de la red Docker
     expose:
       - "3001"
+    networks:
+      - default
 
-  # ── Frontend Vite → Nginx ─────────────────────────────────────────────────
+  # ── Frontend Vite → Nginx ────────────────────────────────────────────────────
   frontend:
     build:
       context:    .
       dockerfile: apps/frontend/Dockerfile
     restart: unless-stopped
-    ports:
-      - "80:80"
-      # Descomenta si configuras SSL/TLS en el servidor:
-      # - "443:443"
+    expose:
+      - "80"
     depends_on:
       - backend
+    networks:
+      - default
+      - dokploy-network      # Red de Traefik — necesaria para que lo descubra
+    labels:
+      # Activa Traefik para este contenedor
+      - "traefik.enable=true"
+      # Indica a Traefik que use la red dokploy-network para conectar
+      - "traefik.docker.network=dokploy-network"
+
+      # ── Router HTTPS ────────────────────────────────────────────────────────
+      - "traefik.http.routers.predictape.rule=Host(`${DOMAIN:?DOMAIN es obligatoria}`)"
+      - "traefik.http.routers.predictape.entrypoints=websecure"
+      - "traefik.http.routers.predictape.tls.certresolver=letsencrypt"
+      - "traefik.http.services.predictape.loadbalancer.server.port=80"
+
+      # ── Router HTTP → redirige a HTTPS ──────────────────────────────────────
+      - "traefik.http.routers.predictape-http.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.predictape-http.entrypoints=web"
+      - "traefik.http.routers.predictape-http.middlewares=predictape-https-redirect"
+      - "traefik.http.middlewares.predictape-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.predictape-https-redirect.redirectscheme.permanent=true"
+
+networks:
+  # Red interna entre los servicios del proyecto
+  default:
+    driver: bridge
+  # Red externa de Traefik gestionada por Dokploy (debe existir previamente)
+  dokploy-network:
+    external: true
 
 volumes:
   postgres_data:
