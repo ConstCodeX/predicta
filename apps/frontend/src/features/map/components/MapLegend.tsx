@@ -1,4 +1,4 @@
-import { Activity, CloudRain, Cpu, Droplets, Flame, Leaf, Mountain, Package, Snowflake, Users } from 'lucide-react';
+import { Activity, CloudRain, Cpu, Droplets, Flame, Heart, Leaf, Mountain, Package, Snowflake, Users } from 'lucide-react';
 import { useMapStore } from '../store/useMapStore';
 import type { TipoAlerta } from '../types';
 
@@ -15,6 +15,8 @@ const ALL_TYPES: { tipo: TipoAlerta; label: string; color: string; icon: React.R
   { tipo: 'BIOLOGICO',          label: 'Biológico',           color: '#86efac', icon: <Leaf size={12} /> },
   { tipo: 'ANTROPICO',          label: 'Antrópico',           color: '#c084fc', icon: <Users size={12} /> },
   { tipo: 'TECNOLOGICO',        label: 'Tecnológico',         color: '#94a3b8', icon: <Cpu size={12} /> },
+  { tipo: 'SALUD_PUBLICA',      label: 'Salud pública',       color: '#f472b6', icon: <Heart size={12} /> },
+  { tipo: 'AGUA_SANEAMIENTO',   label: 'Agua / Saneamiento',  color: '#22d3ee', icon: <Droplets size={12} /> },
 ];
 
 export function MapLegend() {

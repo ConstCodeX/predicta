@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { LLM_ADAPTER_PORT } from '../predicciones/domain/ports/llm-adapter.port';
+import { GroqLLMAdapter } from '../predicciones/infrastructure/adapters/groq-llm.adapter';
 import { REPORTE_REPOSITORY_PORT } from './domain/ports/reporte.repository.port';
 import { CSV_PARSER_PORT } from './domain/ports/csv-parser.port';
 import { PrismaReporteRepository } from './infrastructure/repositories/prisma-reporte.repository';
@@ -11,6 +13,7 @@ import { ReporteController } from './infrastructure/controllers/reporte.controll
 @Module({
   controllers: [ReporteController],
   providers: [
+    { provide: LLM_ADAPTER_PORT, useClass: GroqLLMAdapter },
     { provide: REPORTE_REPOSITORY_PORT, useClass: PrismaReporteRepository },
     { provide: CSV_PARSER_PORT, useClass: IndecCSVParserAdapter },
     UploadINDECIHistoricalDataUseCase,

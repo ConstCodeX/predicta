@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
+import { AppConfigModule } from './app-config/app-config.module';
 import { AuthModule } from './auth/auth.module';
 import { EmergenciasModule } from './emergencias/emergencias.module';
 import { PrediccionesModule } from './predicciones/predicciones.module';
@@ -12,6 +13,7 @@ import { RiesgoModule } from './riesgo/riesgo.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
+    AppConfigModule,
     AuthModule,
     UsersModule,
     AnalyticsModule,

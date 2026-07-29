@@ -1,11 +1,11 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { AnimatePresence } from 'framer-motion';
-import { Layers } from 'lucide-react';
 import { Map, Marker, Popup } from 'react-map-gl/maplibre';
 import { AlertMarkerIcon } from './components/AlertMarkerIcon';
 import { AlertPopup } from './components/AlertPopup';
-import { ForecastPanel } from './components/ForecastPanel';
+import { HeatmapLayer } from './components/HeatmapLayer';
 import { MapLegend } from './components/MapLegend';
+import { MapStatusBar } from './MapStatusBar';
 import { getCoords } from './constants/peru-coords';
 import { useMapStore } from './store/useMapStore';
 import type { AlertaMapa } from './types';
@@ -13,7 +13,12 @@ import type { AlertaMapa } from './types';
 const CARTO_DARK = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
 
 export function MapDashboard() {
-  const { alerts, selectedAlert, selectedCoords, selectAlert, clearSelection, timelineMode } = useMapStore();
+  const {
+    alerts, selectedAlert, selectedCoords,
+    selectAlert, clearSelection,
+    heatmapPoints, timelineMode,
+    setHoveredAlert,
+  } = useMapStore();
 
   const handleMarkerClick = (alert: AlertaMapa) => {
     const coords = getCoords(alert.departamento, alert.distrito);
@@ -28,8 +33,11 @@ export function MapDashboard() {
         style={{ width: '100%', height: '100%' }}
         mapStyle={CARTO_DARK}
       >
-        {/* Markers */}
-        {alerts.map((alert, i) => {
+        {/* Heatmap overlay */}
+        <HeatmapLayer />
+
+        {/* Alert markers — hidden when heatmap is active */}
+        {heatmapPoints.length === 0 ? alerts.map((alert, i) => {
           const coords = getCoords(alert.departamento, alert.distrito);
           if (!coords) return null;
           return (
@@ -38,12 +46,14 @@ export function MapDashboard() {
                 tipo_alerta={alert.tipo_alerta}
                 severidad={alert.severidad}
                 onClick={() => handleMarkerClick(alert)}
+                onHover={() => setHoveredAlert(alert)}
+                onLeave={() => setHoveredAlert(null)}
               />
             </Marker>
           );
-        })}
+        }) : null}
 
-        {/* Popup */}
+        {/* Popup on click */}
         <AnimatePresence>
           {selectedAlert && selectedCoords && (
             <Popup
@@ -61,24 +71,24 @@ export function MapDashboard() {
         </AnimatePresence>
       </Map>
 
-      {/* Overlays */}
-      <ForecastPanel />
+      {/* Map overlays */}
       <MapLegend />
 
+      {/* Bottom status bar — hidden when timeline active */}
+      {!timelineMode && <MapStatusBar />}
+
       {/* Empty state hint */}
-      {alerts.length === 0 && !timelineMode && (
+      {alerts.length === 0 && heatmapPoints.length === 0 && !timelineMode && (
         <div
-          className="absolute bottom-20 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 rounded-full px-4 py-2"
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 rounded-full px-4 py-2 pointer-events-none"
           style={{
             background: 'rgba(9,9,11,0.70)',
             backdropFilter: 'blur(12px)',
             border: '1px solid rgba(255,255,255,0.09)',
-            pointerEvents: 'none',
           }}
         >
-          <Layers size={12} style={{ color: 'oklch(0.46 0 0)' }} />
           <span className="text-[11px]" style={{ color: 'oklch(0.50 0 0)' }}>
-            Usa <strong style={{ color: 'oklch(0.65 0 0)' }}>Predicciones</strong> o <strong style={{ color: 'oklch(0.65 0 0)' }}>Análisis Predictivo</strong> para ver datos en el mapa
+            Selecciona una herramienta en el panel lateral para activar datos en el mapa
           </span>
         </div>
       )}

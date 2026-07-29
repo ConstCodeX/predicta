@@ -2,6 +2,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
   AlertCircle,
   BarChart3,
+  Bot,
+  BotOff,
   ChevronDown,
   Info,
   Loader2,
@@ -34,7 +36,18 @@ const COLOR_BY_OPTIONS = [
   { value: 'lluvia',       label: 'Lluvia estimada' },
 ];
 
-function nivelToTipoAlerta(nivel: NivelRiesgo): AlertaMapa['tipo_alerta'] {
+const TIPO_PREDICCION_ALERTA: Record<string, AlertaMapa['tipo_alerta']> = {
+  HIDRO_GEOLOGICO:  'HIDROMETEOROLOGICO',
+  FRIAJE_HELADA:    'BAJAS_TEMPERATURAS',
+  INCENDIO:         'INCENDIO',
+  GEOFISICO:        'GEOFISICO',
+  BIOLOGICO:        'BIOLOGICO',
+  ANTROPICO:        'ANTROPICO',
+  SALUD_PUBLICA:    'SALUD_PUBLICA',
+  AGUA_SANEAMIENTO: 'AGUA_SANEAMIENTO',
+};
+
+function nivelFallback(nivel: NivelRiesgo): AlertaMapa['tipo_alerta'] {
   if (nivel === 'alto') return 'INUNDACION';
   if (nivel === 'medio') return 'LLUVIAS_EXTREMAS';
   return 'MOVIMIENTO_MASA';
@@ -87,13 +100,14 @@ export function PredictionsPanel({ token, onClose }: Props) {
       setResult(data);
 
       // Push to map as alert markers
+      const tipoAlerta = TIPO_PREDICCION_ALERTA[data.tipo] ?? nivelFallback('medio');
       setForecast({
-        analisis_general: data.resumen,
+        analisis_general: data.resumen ?? '',
         nivel_riesgo_global: 'MEDIO',
         alertas_mapa: data.predicciones.slice(0, 30).map((p) => ({
           departamento: p.departamento,
           distrito: p.distrito,
-          tipo_alerta: nivelToTipoAlerta(p.nivel),
+          tipo_alerta: p.nivel === 'alto' ? tipoAlerta : p.nivel === 'medio' ? tipoAlerta : tipoAlerta,
           severidad: p.nivel === 'alto' ? 5 : p.nivel === 'medio' ? 3 : 1,
           probabilidad_porcentaje: p.probabilidad_pct,
           descripcion: `${p.probabilidad_pct.toFixed(1)}% · X${p.x_base.toFixed(1)} · Pico: ${p.dia_pico}`,
@@ -323,7 +337,7 @@ export function PredictionsPanel({ token, onClose }: Props) {
 
       {/* Summary + selected district detail */}
       <AnimatePresence>
-        {(result?.resumen || selected) && (
+        {(result || selected) && (
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -354,6 +368,17 @@ export function PredictionsPanel({ token, onClose }: Props) {
               <p className="text-[10px] leading-relaxed" style={{ color: 'oklch(0.48 0 0)' }}>
                 {result.resumen}
               </p>
+            )}
+            {result && (
+              <div className="flex items-center gap-1.5">
+                {result.ai_disponible
+                  ? <Bot size={10} style={{ color: '#22c55e' }} />
+                  : <BotOff size={10} style={{ color: 'oklch(0.44 0 0)' }} />
+                }
+                <span className="text-[9px]" style={{ color: result.ai_disponible ? '#22c55e' : 'oklch(0.38 0 0)' }}>
+                  {result.ai_disponible ? 'Análisis con IA' : 'Fallback estadístico (IA no disponible)'}
+                </span>
+              </div>
             )}
           </motion.div>
         )}

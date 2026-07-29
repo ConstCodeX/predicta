@@ -38,10 +38,17 @@ function timelineToAlerta(e: TimelineEvent): AlertaMapa {
   };
 }
 
+export interface HeatmapPoint {
+  departamento: string;
+  distrito: string;
+  count: number;
+}
+
 interface MapState {
   alerts: AlertaMapa[];
   selectedAlert: AlertaMapa | null;
   selectedCoords: [number, number] | null;
+  hoveredAlert: AlertaMapa | null;
   isLoading: boolean;
   error: string | null;
   riskLevel: NivelRiesgoGlobal | null;
@@ -49,23 +56,31 @@ interface MapState {
   timelineMode: boolean;
   timelineFrames: TimelineFrame[];
   timelineIndex: number;
+  heatmapPoints: HeatmapPoint[];
+  heatmapMax: number;
+  heatmapLoading: boolean;
 }
 
 interface MapActions {
   selectAlert: (alert: AlertaMapa, coords: [number, number]) => void;
   clearSelection: () => void;
+  setHoveredAlert: (alert: AlertaMapa | null) => void;
   setForecast: (data: ForecastResponse) => void;
   fetchForecast: (query: ForecastQuery, token: string) => Promise<void>;
   setTimelineFrame: (index: number) => void;
   setTimelineFrames: (frames: TimelineFrame[]) => void;
   activateTimeline: () => void;
   deactivateTimeline: () => void;
+  setHeatmap: (points: HeatmapPoint[], max: number) => void;
+  clearHeatmap: () => void;
+  setHeatmapLoading: (v: boolean) => void;
 }
 
 export const useMapStore = create<MapState & MapActions>((set, get) => ({
   alerts: [],
   selectedAlert: null,
   selectedCoords: null,
+  hoveredAlert: null,
   isLoading: false,
   error: null,
   riskLevel: null,
@@ -73,12 +88,17 @@ export const useMapStore = create<MapState & MapActions>((set, get) => ({
   timelineMode: false,
   timelineFrames: [],
   timelineIndex: 0,
+  heatmapPoints: [],
+  heatmapMax: 0,
+  heatmapLoading: false,
 
   selectAlert: (alert, coords) =>
     set({ selectedAlert: alert, selectedCoords: coords }),
 
   clearSelection: () =>
     set({ selectedAlert: null, selectedCoords: null }),
+
+  setHoveredAlert: (alert) => set({ hoveredAlert: alert }),
 
   setForecast: (data: ForecastResponse) =>
     set({
@@ -139,4 +159,8 @@ export const useMapStore = create<MapState & MapActions>((set, get) => ({
 
   deactivateTimeline: () =>
     set({ timelineMode: false, timelineFrames: [], timelineIndex: 0, alerts: [] }),
+
+  setHeatmap: (points, max) => set({ heatmapPoints: points, heatmapMax: max }),
+  clearHeatmap: () => set({ heatmapPoints: [], heatmapMax: 0 }),
+  setHeatmapLoading: (v) => set({ heatmapLoading: v }),
 }));

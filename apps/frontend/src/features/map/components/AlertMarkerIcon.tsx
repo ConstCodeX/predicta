@@ -5,6 +5,7 @@ import {
   Cpu,
   Droplets,
   Flame,
+  Heart,
   Leaf,
   Mountain,
   Package,
@@ -80,6 +81,16 @@ const ALERT_CONFIG: Record<TipoAlerta, AlertConfig> = {
     ring: 'rgba(148,163,184,0.35)',
     Icon: ({ size }) => <Cpu size={size} />,
   },
+  SALUD_PUBLICA: {
+    color: '#f472b6',
+    ring: 'rgba(244,114,182,0.35)',
+    Icon: ({ size }) => <Heart size={size} />,
+  },
+  AGUA_SANEAMIENTO: {
+    color: '#22d3ee',
+    ring: 'rgba(34,211,238,0.35)',
+    Icon: ({ size }) => <Droplets size={size} />,
+  },
 };
 
 const FALLBACK_CONFIG: AlertConfig = {
@@ -92,9 +103,11 @@ interface Props {
   tipo_alerta: TipoAlerta;
   severidad: number;
   onClick: () => void;
+  onHover?: () => void;
+  onLeave?: () => void;
 }
 
-export function AlertMarkerIcon({ tipo_alerta, severidad, onClick }: Props) {
+export function AlertMarkerIcon({ tipo_alerta, severidad, onClick, onHover, onLeave }: Props) {
   const sev = Math.min(5, Math.max(1, severidad));
   const size = SIZE[sev];
   const { color, ring, Icon } = ALERT_CONFIG[tipo_alerta] ?? FALLBACK_CONFIG;
@@ -104,6 +117,8 @@ export function AlertMarkerIcon({ tipo_alerta, severidad, onClick }: Props) {
   return (
     <button
       onClick={onClick}
+      onMouseEnter={onHover}
+      onMouseLeave={onLeave}
       style={{ width: size, height: size, cursor: 'pointer' }}
       className="relative flex items-center justify-center border-0 bg-transparent p-0"
     >

@@ -57,4 +57,20 @@ export const PREDICTION_TYPES: Record<string, PredictionType> = {
     umbrales: { medio: 20, alto: 45 },
     icono: '⚙️',
   },
+  SALUD_PUBLICA: {
+    id: 'SALUD_PUBLICA',
+    label: 'Salud Pública',
+    descripcion: 'Riesgo de desabastecimiento de medicamentos, dengue, cólera y enfermedades epidémicas asociadas a desastres',
+    familiasEvento: ['BIOLOGICO', 'HIDROMETEOROLOGICO'],
+    umbrales: { medio: 25, alto: 55 },
+    icono: '🏥',
+  },
+  AGUA_SANEAMIENTO: {
+    id: 'AGUA_SANEAMIENTO',
+    label: 'Agua y Saneamiento',
+    descripcion: 'Riesgo de escasez hídrica, contaminación de fuentes y colapso de sistemas de agua potable',
+    familiasEvento: ['HIDROMETEOROLOGICO', 'MOVIMIENTO DE MASA', 'ANTROPICO'],
+    umbrales: { medio: 30, alto: 60 },
+    icono: '🚰',
+  },
 };

@@ -22,8 +22,9 @@ export interface PredictionResponse {
   tipo_label: string;
   ventana_dias: number;
   generado_en: string;
-  resumen: string;
+  resumen: string | null;
   predicciones: DistrictPrediction[];
+  ai_disponible: boolean;
 }
 
 export const NIVEL_COLOR: Record<NivelRiesgo, string> = {

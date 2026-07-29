@@ -41,6 +41,31 @@ export function TimelinePlayer({ token, onClose }: Props) {
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // When familia changes, automatically refresh evento options
+  useEffect(() => {
+    setEvento('');
+    const ctrl = new AbortController();
+    const params = new URLSearchParams();
+    if (familia) params.set('familiaEvento', familia);
+    params.set('anioDesde', anioDesde);
+    params.set('anioHasta', anioHasta);
+
+    fetch(`/api/v1/emergencias/timeline?${params}`, {
+      headers: { Authorization: `Bearer ${token}` },
+      signal: ctrl.signal,
+    })
+      .then((r) => r.json())
+      .then((data: { eventos: string[] }) => {
+        setEventoOptions([
+          { value: '', label: 'Todos los eventos' },
+          ...(data.eventos ?? []).map((e) => ({ value: e, label: e })),
+        ]);
+      })
+      .catch(() => {});
+
+    return () => ctrl.abort();
+  }, [familia, token]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const fetchFrames = useCallback(async (
     familiaFilter: string,
     eventoFilter: string,

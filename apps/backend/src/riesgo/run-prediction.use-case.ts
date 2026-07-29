@@ -76,6 +76,7 @@ export class RunPredictionUseCase {
         generado_en: new Date().toISOString(),
         resumen: 'No se encontraron datos históricos para este tipo de riesgo en la base de datos.',
         predicciones: [],
+        ai_disponible: false,
       };
     }
 

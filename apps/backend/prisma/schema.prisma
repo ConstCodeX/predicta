@@ -25,6 +25,15 @@ model User {
   @@map("users")
 }
 
+model AppConfig {
+  key         String   @id
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt
+
+  @@map("app_config")
+}
+
 model ReporteEmergencia {
   id              String    @id @default(cuid())
 

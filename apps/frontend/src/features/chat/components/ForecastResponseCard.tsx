@@ -1,4 +1,4 @@
-import { Activity, CheckCircle2, CloudRain, Cpu, Droplets, Flame, Leaf, Mountain, Package, Snowflake, Users } from 'lucide-react';
+import { Activity, CheckCircle2, CloudRain, Cpu, Droplets, Flame, Heart, Leaf, Mountain, Package, Snowflake, Users } from 'lucide-react';
 import type { AlertaMapa, ForecastResponse, NivelRiesgoGlobal, TipoAlerta } from '../../map/types';
 
 const RISK_CONFIG: Record<NivelRiesgoGlobal, { label: string; color: string; bg: string }> = {
@@ -20,6 +20,8 @@ const TIPO_CONFIG: Partial<Record<TipoAlerta, { label: string; color: string; Ic
   BIOLOGICO:            { label: 'Biológico',           color: '#86efac', Icon: ({ size }) => <Leaf size={size} /> },
   ANTROPICO:            { label: 'Antrópico',           color: '#c084fc', Icon: ({ size }) => <Users size={size} /> },
   TECNOLOGICO:          { label: 'Tecnológico',         color: '#94a3b8', Icon: ({ size }) => <Cpu size={size} /> },
+  SALUD_PUBLICA:        { label: 'Salud pública',       color: '#f472b6', Icon: ({ size }) => <Heart size={size} /> },
+  AGUA_SANEAMIENTO:     { label: 'Agua / Saneamiento',  color: '#22d3ee', Icon: ({ size }) => <Droplets size={size} /> },
 };
 
 const TIPO_DEFAULT = { label: 'Alerta', color: '#94a3b8', Icon: ({ size }: { size: number }) => <Activity size={size} /> };

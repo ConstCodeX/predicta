@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Inject,
   Post,
   Param,
   Query,
@@ -16,6 +17,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
 import { PrismaService } from '../../../prisma/prisma.service';
+import { ILLMAdapter, LLM_ADAPTER_PORT } from '../../../predicciones/domain/ports/llm-adapter.port';
 import { UploadINDECIHistoricalDataUseCase } from '../../application/use-cases/upload-indeci-historical-data/upload-indeci-historical-data.use-case';
 import { ConsultarReportesUseCase } from '../../application/use-cases/consultar-reportes/consultar-reportes.use-case';
 import { ObtenerReportePorIdUseCase } from '../../application/use-cases/obtener-reporte-por-id/obtener-reporte-por-id.use-case';
@@ -27,6 +29,7 @@ export class ReporteController {
     private readonly consultarReportes: ConsultarReportesUseCase,
     private readonly obtenerPorId: ObtenerReportePorIdUseCase,
     private readonly prisma: PrismaService,
+    @Inject(LLM_ADAPTER_PORT) private readonly llm: ILLMAdapter,
   ) {}
 
   /**
@@ -178,6 +181,66 @@ export class ReporteController {
       eventos,
       total: groups.reduce((s, g) => s + g._count.id, 0),
     };
+  }
+
+  /**
+   * GET /api/v1/emergencias/heatmap
+   *
+   * Devuelve densidad de ocurrencias por departamento+distrito para el mapa de calor.
+   * Si la IA está disponible, también genera un comentario breve.
+   */
+  @Get('heatmap')
+  @UseGuards(JwtAuthGuard)
+  async heatmap(
+    @Query('familiaEvento') familiaEvento?: string,
+    @Query('evento') eventoFilter?: string,
+    @Query('anioDesde') anioDesdeStr?: string,
+    @Query('anioHasta') anioHastaStr?: string,
+  ) {
+    const anioDesde = anioDesdeStr ? parseInt(anioDesdeStr, 10) : 2019;
+    const anioHasta = anioHastaStr ? parseInt(anioHastaStr, 10) : new Date().getFullYear();
+
+    const groups = await this.prisma.reporteEmergencia.groupBy({
+      by: ['departamento', 'distrito'],
+      where: {
+        anio: { gte: anioDesde, lte: anioHasta },
+        ...(familiaEvento ? { familiaEvento } : {}),
+        ...(eventoFilter ? { evento: eventoFilter } : {}),
+        distrito: { not: null },
+      },
+      _count: { id: true },
+      orderBy: { _count: { id: 'desc' } },
+    });
+
+    const points = groups.map((g) => ({
+      departamento: g.departamento,
+      distrito: g.distrito!,
+      count: g._count.id,
+    }));
+
+    const total = points.reduce((s, p) => s + p.count, 0);
+    const max = points[0]?.count ?? 0;
+
+    let commentary: string | null = null;
+    let ai_disponible = false;
+    try {
+      const top5 = points
+        .slice(0, 5)
+        .map((p) => `${p.distrito} (${p.departamento}): ${p.count} eventos`)
+        .join(', ');
+      const tipoLabel = familiaEvento ?? eventoFilter ?? 'todos los tipos';
+      commentary = await this.llm.complete({
+        systemPrompt: 'Eres un analista de riesgos en Perú. Responde en español, máximo 2 oraciones, sin formato markdown.',
+        userMessage: `Mapa de calor "${tipoLabel}" (${anioDesde}-${anioHasta}): ${total} eventos en total. Zonas más afectadas: ${top5}. Indica brevemente el patrón geográfico observado y su implicancia.`,
+        maxTokens: 150,
+        temperature: 0.3,
+      });
+      ai_disponible = true;
+    } catch {
+      // IA no disponible — retornamos sin comentario
+    }
+
+    return { points, total, max, commentary, ai_disponible };
   }
 
   /**

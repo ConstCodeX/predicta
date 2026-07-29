@@ -5,7 +5,9 @@ export type TipoAlertaForecast =
   | 'DESABASTECIMIENTO'
   | 'LLUVIAS_EXTREMAS'
   | 'INUNDACION'
-  | 'MOVIMIENTO_MASA';
+  | 'MOVIMIENTO_MASA'
+  | 'SALUD_PUBLICA'
+  | 'AGUA_SANEAMIENTO';
 
 // Tipos basados en las familias reales del INDECI
 export type TipoAlertaFamilia =
