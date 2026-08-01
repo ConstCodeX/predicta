@@ -1,0 +1,1175 @@
+{
+  "PIURA": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 4072.0,
+        "2022": 12150.0,
+        "2023": 79304.0,
+        "2024": 32246.0,
+        "2025": 1117.0,
+        "2026": 6216.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 2456.0,
+        "2022": 11319.0,
+        "2023": 67332.0,
+        "2024": 30735.0,
+        "2025": 960.0,
+        "2026": 6216.0
+      },
+      "total_2026": 6216.0,
+      "acumulado_SE28_2026": 6216.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 6216.0,
+      "poblacion": 2194928.0,
+      "incidencia_100mil_hab": 283.2,
+      "defunciones": 3.0,
+      "defunciones_dengue": 2.0,
+      "letalidad_pct": 0.05
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 65,
+      "poblacion_total": 1856809.0,
+      "poblacion_menor_5": 179780.0,
+      "poblacion_mayor_60": 206888.0,
+      "camas_hospitalarias_totales": 1135.0,
+      "establecimientos_salud": 1120.0,
+      "deficit_agua_potable_pct": 22.560519814046035,
+      "reservorios_agua": 83.0,
+      "ptap_agua_tratada": 7.0,
+      "anemia_pct": 33.23923580757203,
+      "desnutricion_infantil_pct": 18.014450978487286
+    }
+  },
+  "SAN MARTIN": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 4532.0,
+        "2022": 4270.0,
+        "2023": 6890.0,
+        "2024": 10870.0,
+        "2025": 11867.0,
+        "2026": 6011.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 2329.0,
+        "2022": 2707.0,
+        "2023": 3967.0,
+        "2024": 5835.0,
+        "2025": 9026.0,
+        "2026": 6011.0
+      },
+      "total_2026": 6011.0,
+      "acumulado_SE28_2026": 6011.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 6011.0,
+      "poblacion": 958076.0,
+      "incidencia_100mil_hab": 627.4,
+      "defunciones": 11.0,
+      "defunciones_dengue": 10.0,
+      "letalidad_pct": 0.18
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 78,
+      "poblacion_total": 813381.0,
+      "poblacion_menor_5": 81317.0,
+      "poblacion_mayor_60": 73649.0,
+      "camas_hospitalarias_totales": 896.0,
+      "establecimientos_salud": 704.0,
+      "deficit_agua_potable_pct": 19.52505067053939,
+      "reservorios_agua": 0.0,
+      "ptap_agua_tratada": 10.0,
+      "anemia_pct": 36.59821491827201,
+      "desnutricion_infantil_pct": 12.959512369028781
+    }
+  },
+  "LA LIBERTAD": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 262.0,
+        "2022": 162.0,
+        "2023": 26502.0,
+        "2024": 49931.0,
+        "2025": 208.0,
+        "2026": 4682.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 252.0,
+        "2022": 152.0,
+        "2023": 15690.0,
+        "2024": 49605.0,
+        "2025": 200.0,
+        "2026": 4682.0
+      },
+      "total_2026": 4682.0,
+      "acumulado_SE28_2026": 4682.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 4682.0,
+      "poblacion": 2170675.0,
+      "incidencia_100mil_hab": 215.69,
+      "defunciones": 0.0,
+      "defunciones_dengue": 0.0,
+      "letalidad_pct": 0.0
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 84,
+      "poblacion_total": 1778080.0,
+      "poblacion_menor_5": 162240.0,
+      "poblacion_mayor_60": 213311.0,
+      "camas_hospitalarias_totales": 1870.0,
+      "establecimientos_salud": 612.0,
+      "deficit_agua_potable_pct": 14.365740279486301,
+      "reservorios_agua": 61.0,
+      "ptap_agua_tratada": 1.0,
+      "anemia_pct": 45.06371186735017,
+      "desnutricion_infantil_pct": 13.939760788179386
+    }
+  },
+  "LIMA": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 1190.0,
+        "2022": 938.0,
+        "2023": 30735.0,
+        "2024": 87864.0,
+        "2025": 1660.0,
+        "2026": 4151.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 1178.0,
+        "2022": 924.0,
+        "2023": 27986.0,
+        "2024": 87556.0,
+        "2025": 1644.0,
+        "2026": 4151.0
+      },
+      "total_2026": 4151.0,
+      "acumulado_SE28_2026": 4151.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 4151.0,
+      "poblacion": 11591261.0,
+      "incidencia_100mil_hab": 35.81,
+      "defunciones": 1.0,
+      "defunciones_dengue": 1.0,
+      "letalidad_pct": 0.02
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 171,
+      "poblacion_total": 9485405.0,
+      "poblacion_menor_5": 695343.0,
+      "poblacion_mayor_60": 1208563.0,
+      "camas_hospitalarias_totales": 11301.0,
+      "establecimientos_salud": 5709.0,
+      "deficit_agua_potable_pct": 9.429982431590956,
+      "reservorios_agua": 1001.0,
+      "ptap_agua_tratada": 9.0,
+      "anemia_pct": 36.031397267596056,
+      "desnutricion_infantil_pct": 7.524002462354112
+    }
+  },
+  "UCAYALI": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 3140.0,
+        "2022": 4842.0,
+        "2023": 8174.0,
+        "2024": 740.0,
+        "2025": 1029.0,
+        "2026": 2992.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 1353.0,
+        "2022": 3031.0,
+        "2023": 6438.0,
+        "2024": 547.0,
+        "2025": 349.0,
+        "2026": 2992.0
+      },
+      "total_2026": 2992.0,
+      "acumulado_SE28_2026": 2992.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 2992.0,
+      "poblacion": 660134.0,
+      "incidencia_100mil_hab": 453.24,
+      "defunciones": 4.0,
+      "defunciones_dengue": 4.0,
+      "letalidad_pct": 0.13
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 19,
+      "poblacion_total": 496459.0,
+      "poblacion_menor_5": 56484.0,
+      "poblacion_mayor_60": 38855.0,
+      "camas_hospitalarias_totales": 308.0,
+      "establecimientos_salud": 299.0,
+      "deficit_agua_potable_pct": 36.93977960899893,
+      "reservorios_agua": 11.0,
+      "ptap_agua_tratada": 1.0,
+      "anemia_pct": 54.10682653430192,
+      "desnutricion_infantil_pct": 17.408705237757797
+    }
+  },
+  "LAMBAYEQUE": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 843.0,
+        "2022": 2386.0,
+        "2023": 31460.0,
+        "2024": 9305.0,
+        "2025": 678.0,
+        "2026": 2739.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 606.0,
+        "2022": 2314.0,
+        "2023": 25713.0,
+        "2024": 8964.0,
+        "2025": 638.0,
+        "2026": 2739.0
+      },
+      "total_2026": 2739.0,
+      "acumulado_SE28_2026": 2739.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 2739.0,
+      "poblacion": 1383644.0,
+      "incidencia_100mil_hab": 197.96,
+      "defunciones": 8.0,
+      "defunciones_dengue": 7.0,
+      "letalidad_pct": 0.29
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 38,
+      "poblacion_total": 1197260.0,
+      "poblacion_menor_5": 107141.0,
+      "poblacion_mayor_60": 150270.0,
+      "camas_hospitalarias_totales": 846.0,
+      "establecimientos_salud": 463.0,
+      "deficit_agua_potable_pct": 13.071138349890582,
+      "reservorios_agua": 18.0,
+      "ptap_agua_tratada": 5.0,
+      "anemia_pct": 40.40794187370329,
+      "desnutricion_infantil_pct": 13.676745524784927
+    }
+  },
+  "LORETO": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 5115.0,
+        "2022": 8926.0,
+        "2023": 6582.0,
+        "2024": 7996.0,
+        "2025": 6112.0,
+        "2026": 2557.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 2768.0,
+        "2022": 4992.0,
+        "2023": 5564.0,
+        "2024": 3496.0,
+        "2025": 5256.0,
+        "2026": 2557.0
+      },
+      "total_2026": 2557.0,
+      "acumulado_SE28_2026": 2557.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 2557.0,
+      "poblacion": 1068100.0,
+      "incidencia_100mil_hab": 239.4,
+      "defunciones": 4.0,
+      "defunciones_dengue": 3.0,
+      "letalidad_pct": 0.16
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 53,
+      "poblacion_total": 883510.0,
+      "poblacion_menor_5": 100960.0,
+      "poblacion_mayor_60": 77085.0,
+      "camas_hospitalarias_totales": 828.0,
+      "establecimientos_salud": 733.0,
+      "deficit_agua_potable_pct": 45.09113182263358,
+      "reservorios_agua": 12.0,
+      "ptap_agua_tratada": 3.0,
+      "anemia_pct": 42.682520259122136,
+      "desnutricion_infantil_pct": 22.45435001937047
+    }
+  },
+  "MADRE DE DIOS": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 1333.0,
+        "2022": 3641.0,
+        "2023": 1853.0,
+        "2024": 505.0,
+        "2025": 322.0,
+        "2026": 2204.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 870.0,
+        "2022": 2041.0,
+        "2023": 1705.0,
+        "2024": 430.0,
+        "2025": 213.0,
+        "2026": 2204.0
+      },
+      "total_2026": 2204.0,
+      "acumulado_SE28_2026": 2204.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 2204.0,
+      "poblacion": 212875.0,
+      "incidencia_100mil_hab": 1035.35,
+      "defunciones": 5.0,
+      "defunciones_dengue": 5.0,
+      "letalidad_pct": 0.23
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 11,
+      "poblacion_total": 141070.0,
+      "poblacion_menor_5": 14520.0,
+      "poblacion_mayor_60": 8287.0,
+      "camas_hospitalarias_totales": 171.0,
+      "establecimientos_salud": 217.0,
+      "deficit_agua_potable_pct": 23.78798067529595,
+      "reservorios_agua": 0.0,
+      "ptap_agua_tratada": 3.0,
+      "anemia_pct": 54.47823958266109,
+      "desnutricion_infantil_pct": 9.393084872878712
+    }
+  },
+  "AMAZONAS": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 2369.0,
+        "2022": 3575.0,
+        "2023": 3271.0,
+        "2024": 1517.0,
+        "2025": 1983.0,
+        "2026": 1944.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 1277.0,
+        "2022": 1696.0,
+        "2023": 2289.0,
+        "2024": 1010.0,
+        "2025": 1558.0,
+        "2026": 1944.0
+      },
+      "total_2026": 1944.0,
+      "acumulado_SE28_2026": 1944.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 1944.0,
+      "poblacion": 437466.0,
+      "incidencia_100mil_hab": 444.38,
+      "defunciones": 2.0,
+      "defunciones_dengue": 2.0,
+      "letalidad_pct": 0.1
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 84,
+      "poblacion_total": 379384.0,
+      "poblacion_menor_5": 38682.0,
+      "poblacion_mayor_60": 39300.0,
+      "camas_hospitalarias_totales": 425.0,
+      "establecimientos_salud": 654.0,
+      "deficit_agua_potable_pct": 23.48707726004786,
+      "reservorios_agua": 30.0,
+      "ptap_agua_tratada": 4.0,
+      "anemia_pct": 26.97496460119826,
+      "desnutricion_infantil_pct": 19.312566163934168
+    }
+  },
+  "JUNIN": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 5090.0,
+        "2022": 4157.0,
+        "2023": 3580.0,
+        "2024": 3331.0,
+        "2025": 1687.0,
+        "2026": 1388.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 2707.0,
+        "2022": 2226.0,
+        "2023": 2745.0,
+        "2024": 2651.0,
+        "2025": 1274.0,
+        "2026": 1388.0
+      },
+      "total_2026": 1388.0,
+      "acumulado_SE28_2026": 1388.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 1388.0,
+      "poblacion": 1375909.0,
+      "incidencia_100mil_hab": 100.88,
+      "defunciones": 2.0,
+      "defunciones_dengue": 2.0,
+      "letalidad_pct": 0.14
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 124,
+      "poblacion_total": 1156079.0,
+      "poblacion_menor_5": 100820.0,
+      "poblacion_mayor_60": 136376.0,
+      "camas_hospitalarias_totales": 1330.0,
+      "establecimientos_salud": 889.0,
+      "deficit_agua_potable_pct": 16.72785898456939,
+      "reservorios_agua": 3213.0,
+      "ptap_agua_tratada": 3.0,
+      "anemia_pct": 51.104292019297986,
+      "desnutricion_infantil_pct": 20.74921048141347
+    }
+  },
+  "TUMBES": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 1455.0,
+        "2022": 723.0,
+        "2023": 12890.0,
+        "2024": 5267.0,
+        "2025": 1061.0,
+        "2026": 1129.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 1163.0,
+        "2022": 639.0,
+        "2023": 5524.0,
+        "2024": 4839.0,
+        "2025": 825.0,
+        "2026": 1129.0
+      },
+      "total_2026": 1129.0,
+      "acumulado_SE28_2026": 1129.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 1129.0,
+      "poblacion": 335364.0,
+      "incidencia_100mil_hab": 336.65,
+      "defunciones": 0.0,
+      "defunciones_dengue": 0.0,
+      "letalidad_pct": 0.0
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 13,
+      "poblacion_total": 224863.0,
+      "poblacion_menor_5": 21695.0,
+      "poblacion_mayor_60": 22141.0,
+      "camas_hospitalarias_totales": 232.0,
+      "establecimientos_salud": 109.0,
+      "deficit_agua_potable_pct": 15.93397929670066,
+      "reservorios_agua": 0.0,
+      "ptap_agua_tratada": 3.0,
+      "anemia_pct": 38.43716904408463,
+      "desnutricion_infantil_pct": 10.290771907001155
+    }
+  },
+  "ICA": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 4208.0,
+        "2022": 5084.0,
+        "2023": 16889.0,
+        "2024": 30407.0,
+        "2025": 512.0,
+        "2026": 463.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 4026.0,
+        "2022": 4951.0,
+        "2023": 14528.0,
+        "2024": 30351.0,
+        "2025": 504.0,
+        "2026": 463.0
+      },
+      "total_2026": 463.0,
+      "acumulado_SE28_2026": 463.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 463.0,
+      "poblacion": 1093440.0,
+      "incidencia_100mil_hab": 42.34,
+      "defunciones": 1.0,
+      "defunciones_dengue": 0.0,
+      "letalidad_pct": 0.22
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 43,
+      "poblacion_total": 850765.0,
+      "poblacion_menor_5": 78581.0,
+      "poblacion_mayor_60": 98913.0,
+      "camas_hospitalarias_totales": 1061.0,
+      "establecimientos_salud": 373.0,
+      "deficit_agua_potable_pct": 12.304324632568333,
+      "reservorios_agua": 51.0,
+      "ptap_agua_tratada": 1.0,
+      "anemia_pct": 28.667489346628034,
+      "desnutricion_infantil_pct": 8.51417142997185
+    }
+  },
+  "HUANUCO": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 2811.0,
+        "2022": 1580.0,
+        "2023": 2298.0,
+        "2024": 775.0,
+        "2025": 518.0,
+        "2026": 436.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 1721.0,
+        "2022": 843.0,
+        "2023": 2041.0,
+        "2024": 432.0,
+        "2025": 342.0,
+        "2026": 436.0
+      },
+      "total_2026": 436.0,
+      "acumulado_SE28_2026": 436.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 436.0,
+      "poblacion": 738383.0,
+      "incidencia_100mil_hab": 59.05,
+      "defunciones": 0.0,
+      "defunciones_dengue": 0.0,
+      "letalidad_pct": 0.0
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 84,
+      "poblacion_total": 721047.0,
+      "poblacion_menor_5": 67728.0,
+      "poblacion_mayor_60": 77331.0,
+      "camas_hospitalarias_totales": 536.0,
+      "establecimientos_salud": 457.0,
+      "deficit_agua_potable_pct": 32.21005653162415,
+      "reservorios_agua": 4.0,
+      "ptap_agua_tratada": 4.0,
+      "anemia_pct": 28.781445148382836,
+      "desnutricion_infantil_pct": 16.91647612752983
+    }
+  },
+  "CAJAMARCA": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 4015.0,
+        "2022": 3639.0,
+        "2023": 7451.0,
+        "2024": 2850.0,
+        "2025": 6305.0,
+        "2026": 417.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 1808.0,
+        "2022": 3015.0,
+        "2023": 6133.0,
+        "2024": 2422.0,
+        "2025": 5876.0,
+        "2026": 417.0
+      },
+      "total_2026": 417.0,
+      "acumulado_SE28_2026": 417.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 417.0,
+      "poblacion": 1444740.0,
+      "incidencia_100mil_hab": 28.86,
+      "defunciones": 0.0,
+      "defunciones_dengue": 0.0,
+      "letalidad_pct": 0.0
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 127,
+      "poblacion_total": 1341012.0,
+      "poblacion_menor_5": 123462.0,
+      "poblacion_mayor_60": 160521.0,
+      "camas_hospitalarias_totales": 930.0,
+      "establecimientos_salud": 1350.0,
+      "deficit_agua_potable_pct": 20.666466999187183,
+      "reservorios_agua": 17.0,
+      "ptap_agua_tratada": 7.0,
+      "anemia_pct": 35.980730935101256,
+      "desnutricion_infantil_pct": 24.166000479792128
+    }
+  },
+  "CUSCO": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 1982.0,
+        "2022": 3687.0,
+        "2023": 2630.0,
+        "2024": 2104.0,
+        "2025": 547.0,
+        "2026": 317.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 1146.0,
+        "2022": 2777.0,
+        "2023": 2279.0,
+        "2024": 1968.0,
+        "2025": 478.0,
+        "2026": 317.0
+      },
+      "total_2026": 317.0,
+      "acumulado_SE28_2026": 317.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 317.0,
+      "poblacion": 1400488.0,
+      "incidencia_100mil_hab": 22.63,
+      "defunciones": 1.0,
+      "defunciones_dengue": 1.0,
+      "letalidad_pct": 0.32
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 116,
+      "poblacion_total": 1205527.0,
+      "poblacion_menor_5": 101892.0,
+      "poblacion_mayor_60": 133805.0,
+      "camas_hospitalarias_totales": 1596.0,
+      "establecimientos_salud": 874.0,
+      "deficit_agua_potable_pct": 14.410965132459909,
+      "reservorios_agua": 54.0,
+      "ptap_agua_tratada": 8.0,
+      "anemia_pct": 51.472801680981014,
+      "desnutricion_infantil_pct": 15.892442880190984
+    }
+  },
+  "CALLAO": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 9.0,
+        "2022": 8.0,
+        "2023": 2356.0,
+        "2024": 5756.0,
+        "2025": 86.0,
+        "2026": 280.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 9.0,
+        "2022": 5.0,
+        "2023": 1940.0,
+        "2024": 5739.0,
+        "2025": 85.0,
+        "2026": 280.0
+      },
+      "total_2026": 280.0,
+      "acumulado_SE28_2026": 280.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 280.0,
+      "poblacion": 1239122.0,
+      "incidencia_100mil_hab": 22.6,
+      "defunciones": 0.0,
+      "defunciones_dengue": 0.0,
+      "letalidad_pct": 0.0
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 7,
+      "poblacion_total": 994494.0,
+      "poblacion_menor_5": 78810.0,
+      "poblacion_mayor_60": 123157.0,
+      "camas_hospitalarias_totales": 1143.0,
+      "establecimientos_salud": 473.0,
+      "deficit_agua_potable_pct": 5.143153944837273,
+      "reservorios_agua": 147.0,
+      "ptap_agua_tratada": 0.0,
+      "anemia_pct": 34.038549739487614,
+      "desnutricion_infantil_pct": 7.637692401495635
+    }
+  },
+  "PASCO": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 616.0,
+        "2022": 496.0,
+        "2023": 1156.0,
+        "2024": 683.0,
+        "2025": 101.0,
+        "2026": 155.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 255.0,
+        "2022": 472.0,
+        "2023": 427.0,
+        "2024": 532.0,
+        "2025": 57.0,
+        "2026": 155.0
+      },
+      "total_2026": 155.0,
+      "acumulado_SE28_2026": 155.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 155.0,
+      "poblacion": 264143.0,
+      "incidencia_100mil_hab": 58.68,
+      "defunciones": 0.0,
+      "defunciones_dengue": 0.0,
+      "letalidad_pct": 0.0
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 29,
+      "poblacion_total": 254065.0,
+      "poblacion_menor_5": 22617.0,
+      "poblacion_mayor_60": 24670.0,
+      "camas_hospitalarias_totales": 382.0,
+      "establecimientos_salud": 324.0,
+      "deficit_agua_potable_pct": 30.766437934158585,
+      "reservorios_agua": 18.0,
+      "ptap_agua_tratada": 3.0,
+      "anemia_pct": 50.08494309146477,
+      "desnutricion_infantil_pct": 20.573287790569346
+    }
+  },
+  "ANCASH": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 28.0,
+        "2022": 2145.0,
+        "2023": 11658.0,
+        "2024": 18789.0,
+        "2025": 19.0,
+        "2026": 135.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 8.0,
+        "2022": 2142.0,
+        "2023": 4128.0,
+        "2024": 18564.0,
+        "2025": 19.0,
+        "2026": 135.0
+      },
+      "total_2026": 135.0,
+      "acumulado_SE28_2026": 135.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 135.0,
+      "poblacion": 1201423.0,
+      "incidencia_100mil_hab": 11.24,
+      "defunciones": 0.0,
+      "defunciones_dengue": 0.0,
+      "letalidad_pct": 0.0
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 166,
+      "poblacion_total": 1083519.0,
+      "poblacion_menor_5": 92974.0,
+      "poblacion_mayor_60": 147261.0,
+      "camas_hospitalarias_totales": 831.0,
+      "establecimientos_salud": 531.0,
+      "deficit_agua_potable_pct": 15.941662178289445,
+      "reservorios_agua": 44.0,
+      "ptap_agua_tratada": 7.0,
+      "anemia_pct": 46.752306909606574,
+      "desnutricion_infantil_pct": 16.871336151646627
+    }
+  },
+  "AYACUCHO": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 1663.0,
+        "2022": 782.0,
+        "2023": 695.0,
+        "2024": 362.0,
+        "2025": 39.0,
+        "2026": 73.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 1200.0,
+        "2022": 444.0,
+        "2023": 548.0,
+        "2024": 283.0,
+        "2025": 21.0,
+        "2026": 73.0
+      },
+      "total_2026": 73.0,
+      "acumulado_SE28_2026": 73.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 73.0,
+      "poblacion": 664795.0,
+      "incidencia_100mil_hab": 10.98,
+      "defunciones": 0.0,
+      "defunciones_dengue": 0.0,
+      "letalidad_pct": 0.0
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 124,
+      "poblacion_total": 616176.0,
+      "poblacion_menor_5": 54200.0,
+      "poblacion_mayor_60": 73258.0,
+      "camas_hospitalarias_totales": 939.0,
+      "establecimientos_salud": 652.0,
+      "deficit_agua_potable_pct": 11.269796435677469,
+      "reservorios_agua": 16.0,
+      "ptap_agua_tratada": 4.0,
+      "anemia_pct": 34.791900303624296,
+      "desnutricion_infantil_pct": 19.775104440281677
+    }
+  },
+  "PUNO": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 51.0,
+        "2022": 25.0,
+        "2023": 267.0,
+        "2024": 201.0,
+        "2025": 0.0,
+        "2026": 22.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 1.0,
+        "2022": 16.0,
+        "2023": 112.0,
+        "2024": 201.0,
+        "2025": 0.0,
+        "2026": 22.0
+      },
+      "total_2026": 22.0,
+      "acumulado_SE28_2026": 22.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 22.0,
+      "poblacion": 1202840.0,
+      "incidencia_100mil_hab": 1.83,
+      "defunciones": 0.0,
+      "defunciones_dengue": 0.0,
+      "letalidad_pct": 0.0
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 110,
+      "poblacion_total": 1172697.0,
+      "poblacion_menor_5": 89662.0,
+      "poblacion_mayor_60": 152249.0,
+      "camas_hospitalarias_totales": 1072.0,
+      "establecimientos_salud": 662.0,
+      "deficit_agua_potable_pct": 43.310146837351,
+      "reservorios_agua": 7.0,
+      "ptap_agua_tratada": 5.0,
+      "anemia_pct": 54.80302604831938,
+      "desnutricion_infantil_pct": 14.516779180236666
+    }
+  },
+  "APURIMAC": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 0.0,
+        "2022": 0.0,
+        "2023": 0.0,
+        "2024": 11.0,
+        "2025": 2.0,
+        "2026": 10.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 0.0,
+        "2022": 0.0,
+        "2023": 0.0,
+        "2024": 11.0,
+        "2025": 2.0,
+        "2026": 10.0
+      },
+      "total_2026": 10.0,
+      "acumulado_SE28_2026": 10.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 10.0,
+      "poblacion": 419757.0,
+      "incidencia_100mil_hab": 2.38,
+      "defunciones": 0.0,
+      "defunciones_dengue": 0.0,
+      "letalidad_pct": 0.0
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 85,
+      "poblacion_total": 405759.0,
+      "poblacion_menor_5": 35677.0,
+      "poblacion_mayor_60": 51207.0,
+      "camas_hospitalarias_totales": 488.0,
+      "establecimientos_salud": 610.0,
+      "deficit_agua_potable_pct": 10.090510708257858,
+      "reservorios_agua": 23.0,
+      "ptap_agua_tratada": 0.0,
+      "anemia_pct": 40.80345846146112,
+      "desnutricion_infantil_pct": 20.294357333574855
+    }
+  },
+  "MOQUEGUA": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 0.0,
+        "2022": 0.0,
+        "2023": 0.0,
+        "2024": 0.0,
+        "2025": 0.0,
+        "2026": 1.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 0.0,
+        "2022": 0.0,
+        "2023": 0.0,
+        "2024": 0.0,
+        "2025": 0.0,
+        "2026": 1.0
+      },
+      "total_2026": 1.0,
+      "acumulado_SE28_2026": 1.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 1.0,
+      "poblacion": 205533.0,
+      "incidencia_100mil_hab": 0.49,
+      "defunciones": 0.0,
+      "defunciones_dengue": 0.0,
+      "letalidad_pct": 0.0
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 21,
+      "poblacion_total": 174863.0,
+      "poblacion_menor_5": 13024.0,
+      "poblacion_mayor_60": 23137.0,
+      "camas_hospitalarias_totales": 205.0,
+      "establecimientos_salud": 130.0,
+      "deficit_agua_potable_pct": 10.028288348055336,
+      "reservorios_agua": 23.0,
+      "ptap_agua_tratada": 4.0,
+      "anemia_pct": 28.370204376689184,
+      "desnutricion_infantil_pct": 5.469438649960255
+    }
+  },
+  "AREQUIPA": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 7.0,
+        "2022": 0.0,
+        "2023": 0.0,
+        "2024": 21.0,
+        "2025": 0.0,
+        "2026": 0.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 6.0,
+        "2022": 0.0,
+        "2023": 0.0,
+        "2024": 20.0,
+        "2025": 0.0,
+        "2026": 0.0
+      },
+      "total_2026": 0.0,
+      "acumulado_SE28_2026": 0.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 0.0,
+      "poblacion": 1655634.0,
+      "incidencia_100mil_hab": 0.0,
+      "defunciones": 0.0,
+      "defunciones_dengue": 0.0,
+      "letalidad_pct": 0.0
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 109,
+      "poblacion_total": 1382730.0,
+      "poblacion_menor_5": 109771.0,
+      "poblacion_mayor_60": 172180.0,
+      "camas_hospitalarias_totales": 1908.0,
+      "establecimientos_salud": 795.0,
+      "deficit_agua_potable_pct": 9.624560203669551,
+      "reservorios_agua": 143.0,
+      "ptap_agua_tratada": 11.0,
+      "anemia_pct": 39.033458882562044,
+      "desnutricion_infantil_pct": 8.179789710126345
+    }
+  },
+  "TACNA": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 0.0,
+        "2022": 0.0,
+        "2023": 0.0,
+        "2024": 0.0,
+        "2025": 0.0,
+        "2026": 0.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 0.0,
+        "2022": 0.0,
+        "2023": 0.0,
+        "2024": 0.0,
+        "2025": 0.0,
+        "2026": 0.0
+      },
+      "total_2026": 0.0,
+      "acumulado_SE28_2026": 0.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 0.0,
+      "poblacion": 406379.0,
+      "incidencia_100mil_hab": 0.0,
+      "defunciones": 0.0,
+      "defunciones_dengue": 0.0,
+      "letalidad_pct": 0.0
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 28,
+      "poblacion_total": 329332.0,
+      "poblacion_menor_5": 23824.0,
+      "poblacion_mayor_60": 35156.0,
+      "camas_hospitalarias_totales": 355.0,
+      "establecimientos_salud": 295.0,
+      "deficit_agua_potable_pct": 7.7522766313294795,
+      "reservorios_agua": 16.0,
+      "ptap_agua_tratada": 3.0,
+      "anemia_pct": 30.985177449236637,
+      "desnutricion_infantil_pct": 3.692145956621282
+    }
+  },
+  "HUANCAVELICA": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 0.0,
+        "2022": 0.0,
+        "2023": 0.0,
+        "2024": 0.0,
+        "2025": 0.0,
+        "2026": 0.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 0.0,
+        "2022": 0.0,
+        "2023": 0.0,
+        "2024": 0.0,
+        "2025": 0.0,
+        "2026": 0.0
+      },
+      "total_2026": 0.0,
+      "acumulado_SE28_2026": 0.0
+    },
+    "epidemiologia": {
+      "fuente": "Defunciones_Dengue.xlsx (MINSA-CDC)",
+      "casos_2026": 0.0,
+      "poblacion": 318937.0,
+      "incidencia_100mil_hab": 0.0,
+      "defunciones": 0.0,
+      "defunciones_dengue": 0.0,
+      "letalidad_pct": 0.0
+    },
+    "capacidad_y_exposicion": {
+      "fuente": "DATA_MAESTRA_UNIFICADA_RIESGOS_PERU (agregado por depto)",
+      "n_distritos": 102,
+      "poblacion_total": 347639.0,
+      "poblacion_menor_5": 31715.0,
+      "poblacion_mayor_60": 45411.0,
+      "camas_hospitalarias_totales": 417.0,
+      "establecimientos_salud": 471.0,
+      "deficit_agua_potable_pct": 19.507305995420534,
+      "reservorios_agua": 2.0,
+      "ptap_agua_tratada": 2.0,
+      "anemia_pct": 47.615954204594416,
+      "desnutricion_infantil_pct": 27.830016630159445
+    }
+  },
+  "TOTAL": {
+    "casos": {
+      "fuente": "Casos_Dengue.xlsx (MINSA-CDC)",
+      "total_por_anio": {
+        "2021": 44791.0,
+        "2022": 63216.0,
+        "2023": 256641.0,
+        "2024": 271531.0,
+        "2025": 35853.0,
+        "2026": 38322.0
+      },
+      "acumulado_SE28_por_anio": {
+        "2021": 27139.0,
+        "2022": 46706.0,
+        "2023": 197089.0,
+        "2024": 256191.0,
+        "2025": 29327.0,
+        "2026": 38322.0
+      },
+      "total_2026": 38322.0,
+      "acumulado_SE28_2026": 38322.0
+    }
+  }
+}

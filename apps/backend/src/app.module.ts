@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import * as path from 'path';
 import { PrismaModule } from './prisma/prisma.module';
 import { AppConfigModule } from './app-config/app-config.module';
 import { AuthModule } from './auth/auth.module';
@@ -12,7 +13,14 @@ import { EscenariosModule } from './escenarios/escenarios.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      // Único .env en la raíz del monorepo. Fallback al local si existiera.
+      envFilePath: [
+        path.resolve(process.cwd(), '../../.env'),
+        path.resolve(process.cwd(), '.env'),
+      ],
+    }),
     PrismaModule,
     AppConfigModule,
     AuthModule,

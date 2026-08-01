@@ -7,3 +7,7 @@ dist/
 coverage/
 *.log
 prisma/migrations/dev
+
+# CSVs subidos en runtime (conservar la carpeta con .gitkeep)
+apps/backend/data/uploads/*
+!apps/backend/data/uploads/.gitkeep

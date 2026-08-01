@@ -3,6 +3,8 @@ export interface LLMCompletionRequest {
   userMessage: string;
   maxTokens?: number;
   temperature?: number;
+  /** Override del modelo por request (ej. definido en el .md del agente). */
+  model?: string;
 }
 
 export interface ILLMAdapter {
