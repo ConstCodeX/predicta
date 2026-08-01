@@ -9,14 +9,14 @@ interface Props {
 }
 
 const ACTIVE_TOOLS: { id: MapTool; icon: React.ReactNode; label: string; color: string }[] = [
-  { id: 'predictions', icon: <BarChart2 size={15} />, label: 'Predicciones', color: '#14b8a6' },
+  { id: 'predictions', icon: <BarChart2 size={15} />, label: 'Predicciones Dengue', color: '#14b8a6' },
+  { id: 'heatmap',     icon: <Flame size={15} />,     label: 'Mapa de calor',       color: '#f97316' },
 ];
 
 const SOON_TOOLS: { id: MapTool; icon: React.ReactNode; label: string }[] = [
-  { id: 'heatmap',   icon: <Flame size={15} />,         label: 'Mapa de calor' },
-  { id: 'timeline',  icon: <History size={15} />,        label: 'Línea de tiempo' },
-  { id: 'scenarios', icon: <Crosshair size={15} />,      label: 'Escenarios' },
-  { id: 'chat',      icon: <MessageSquare size={15} />,  label: 'Asistente IA' },
+  { id: 'timeline',  icon: <History size={15} />,       label: 'Línea de tiempo' },
+  { id: 'scenarios', icon: <Crosshair size={15} />,     label: 'Escenarios' },
+  { id: 'chat',      icon: <MessageSquare size={15} />, label: 'Asistente IA' },
 ];
 
 export function MapToolbar({ activeTool, onToggle }: Props) {

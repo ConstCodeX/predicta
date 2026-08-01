@@ -452,6 +452,8 @@ function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: 
 
   const runWith = useCallback(async (p: SEIRParametros, overrideRegion?: string) => {
     setLoading(true);
+    setResult(null);
+    onResult?.(null as unknown as SEIRModelResponse); // limpia el overlay del mapa al iniciar
     try {
       const res = await fetch('/api/v1/riesgo/seir-model', {
         method: 'POST',
@@ -461,7 +463,10 @@ function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: 
       if (res.ok) {
         const data = (await res.json()) as SEIRModelResponse;
         setResult(data);
-        onResult?.(data);
+        // Solo propagamos al mapa si Gemma generó la respuesta (no mock fallback)
+        if ((data as Record<string, unknown>)['generado_por'] !== 'mock') {
+          onResult?.(data);
+        }
       }
     } finally {
       setLoading(false);
@@ -495,9 +500,20 @@ function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: 
 
   const kpis = result?.kpis;
   const nivel = kpis ? RIESGO_SEIR[kpis.nivel_riesgo] : null;
+  const esMock = result && (result as Record<string, unknown>)['generado_por'] === 'mock';
 
   return (
     <div className="space-y-5">
+      {/* Aviso cuando el resultado es mock (Gemma no disponible) */}
+      {esMock && (
+        <div className="flex items-start gap-2.5 rounded-xl px-3.5 py-3"
+          style={{ background: 'rgba(234,179,8,0.07)', border: '1px solid rgba(234,179,8,0.20)' }}>
+          <BotOff size={12} style={{ color: '#eab308', flexShrink: 0, marginTop: 1 }} />
+          <p className="text-[11px] leading-relaxed" style={{ color: '#fde68a' }}>
+            Gemma no disponible — los datos mostrados son estimaciones estáticas de referencia, no un pronóstico real. Configura <strong>GEMINI_API_KEY</strong> para activar el modelo.
+          </p>
+        </div>
+      )}
       {/* Presets row + gear */}
       <div className="flex items-center gap-2">
         <div className="flex flex-1 gap-1 p-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)' }}>
@@ -870,17 +886,7 @@ interface Props {
 }
 
 export function UnifiedPredictionsPanel({ token, onClose, onResult, onSubTabChange }: Props) {
-  const [activeCategory, setActiveCategory] = useState(SEIR_TAB_ID);
-  const [tipos, setTipos] = useState<PredictionType[]>([]);
-  const isSeir = activeCategory === SEIR_TAB_ID;
-  const currentTipo = tipos.find((t) => t.id === activeCategory);
   const { selectedDepartamento, setSelectedDepartamento } = useMapStore();
-
-  useEffect(() => {
-    void fetch('/api/v1/riesgo/tipos', { headers: { Authorization: `Bearer ${token}` } })
-      .then((r) => r.json())
-      .then((data) => setTipos(data as PredictionType[]));
-  }, [token]);
 
   return (
     <div className="h-full flex flex-col overflow-hidden"
@@ -890,13 +896,9 @@ export function UnifiedPredictionsPanel({ token, onClose, onResult, onSubTabChan
       <div className="flex items-center gap-3 px-5 py-3.5 flex-shrink-0"
         style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="flex-1 min-w-0">
-          <h1 className="text-[15px] font-semibold text-white tracking-tight">Predicciones</h1>
+          <h1 className="text-[15px] font-semibold text-white tracking-tight">Predicciones · Dengue</h1>
           <p className="text-[11px] mt-0.5" style={{ color: 'oklch(0.40 0 0)' }}>
-            {isSeir
-              ? 'Modelo epidémico Dengue · Dengue Perú'
-              : currentTipo
-                ? `${currentTipo.icono} ${currentTipo.label}`
-                : 'Sistema de riesgo predictivo · Perú'}
+            Modelo epidémico SEIR · Generado por Gemma via AI Studio
           </p>
         </div>
         <button onClick={onClose} className="rounded-full p-1.5" style={{ color: 'oklch(0.46 0 0)' }}
@@ -906,12 +908,13 @@ export function UnifiedPredictionsPanel({ token, onClose, onResult, onSubTabChan
         </button>
       </div>
 
-      {/* Region chip — shown when user clicks a dept on the map */}
+      {/* Region chip */}
       {selectedDepartamento && (
         <div className="flex flex-shrink-0 items-center gap-2 px-5 py-2"
           style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', background: 'rgba(20,184,166,0.06)' }}>
           <span className="text-[10px]" style={{ color: 'oklch(0.46 0 0)' }}>Región activa:</span>
-          <span className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold" style={{ background: 'rgba(20,184,166,0.15)', color: '#14b8a6', border: '1px solid rgba(20,184,166,0.25)' }}>
+          <span className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
+            style={{ background: 'rgba(20,184,166,0.15)', color: '#14b8a6', border: '1px solid rgba(20,184,166,0.25)' }}>
             {selectedDepartamento}
           </span>
           <button onClick={() => setSelectedDepartamento(null)}
@@ -924,45 +927,15 @@ export function UnifiedPredictionsPanel({ token, onClose, onResult, onSubTabChan
         </div>
       )}
 
-      {/* Category tabs (scrollable pills) */}
-      <div className="flex flex-shrink-0 gap-1.5 px-5 py-2.5 overflow-x-auto"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', scrollbarWidth: 'none' }}>
-        {/* SEIR tab — always last */}
-        <button onClick={() => setActiveCategory(SEIR_TAB_ID)}
-          className="flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium flex-shrink-0 transition-colors"
-          style={{ background: isSeir ? '#14b8a6' : 'rgba(255,255,255,0.05)', color: isSeir ? 'white' : 'oklch(0.54 0 0)', border: `1px solid ${isSeir ? 'transparent' : 'rgba(255,255,255,0.08)'}` }}>
-          <Activity size={11} />
-          <span>Dengue</span>
-        </button>
-        {tipos.map((t) => {
-          const active = activeCategory === t.id;
-          return (
-            <button key={t.id} onClick={() => setActiveCategory(t.id)}
-              className="flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-medium flex-shrink-0 transition-colors"
-              style={{ background: active ? '#14b8a6' : 'rgba(255,255,255,0.05)', color: active ? 'white' : 'oklch(0.54 0 0)', border: `1px solid ${active ? 'transparent' : 'rgba(255,255,255,0.08)'}` }}>
-              <span>{t.icono}</span>
-              <span>{t.label}</span>
-            </button>
-          );
-        })}
-      </div>
-
       {/* Content area */}
       <div className="flex-1 overflow-y-auto px-5 py-4"
         style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.07) transparent' }}>
-        <AnimatePresence mode="wait">
-          {isSeir ? (
-            <motion.div key="seir"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-              <SEIRContent token={token} onResult={onResult} onSubTabChange={onSubTabChange} externalDepartamento={selectedDepartamento} />
-            </motion.div>
-          ) : (
-            <motion.div key={activeCategory}
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-              <ClimateContent token={token} selectedTipo={activeCategory} tipos={tipos} departamento={selectedDepartamento} />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <SEIRContent
+          token={token}
+          onResult={onResult}
+          onSubTabChange={onSubTabChange}
+          externalDepartamento={selectedDepartamento}
+        />
       </div>
     </div>
   );

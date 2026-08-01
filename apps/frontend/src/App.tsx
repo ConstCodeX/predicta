@@ -30,7 +30,13 @@ export default function App() {
   };
 
   const handleToggleTool = (tool: MapTool) => {
-    setActiveTool((prev) => (prev === tool ? null : tool));
+    setActiveTool((prev) => {
+      if (prev === tool) {
+        if (tool === 'predictions') setSeirResult(null); // limpia overlay al cerrar
+        return null;
+      }
+      return tool;
+    });
   };
 
   const isMapView       = view === 'map';
@@ -96,7 +102,7 @@ export default function App() {
               <UnifiedPredictionsPanel
                 token={token}
                 onClose={() => setActiveTool(null)}
-                onResult={setSeirResult}
+                onResult={(r) => setSeirResult(r ?? null)}
                 onSubTabChange={setSeirSubTab}
               />
             </motion.div>
