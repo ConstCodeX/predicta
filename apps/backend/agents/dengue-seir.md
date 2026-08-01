@@ -1,5 +1,5 @@
 ---
-model: gemma-4-31b-it
+model: gemini-2.0-flash
 temperature: 0.15
 max_tokens: 4096
 ---
