@@ -22,7 +22,7 @@ COPY apps/backend/prisma ./apps/backend/prisma
 # Instala TODAS las deps (incluyendo devDeps; necesarias para nest build)
 RUN pnpm install --frozen-lockfile --filter backend
 
-# Copia código fuente
+# Copia código fuente, agentes y datasets
 COPY apps/backend ./apps/backend
 
 # Genera Prisma client antes de compilar TypeScript (evita errores de tipos)
@@ -51,6 +51,10 @@ COPY --from=builder /deploy/package.json ./package.json
 # Artefactos de compilación y schema de Prisma
 COPY --from=builder /app/apps/backend/dist       ./dist
 COPY --from=builder /app/apps/backend/prisma     ./prisma
+
+# Agentes (.md) y datos estáticos (dengue_context.json, etc.)
+COPY --from=builder /app/apps/backend/agents     ./agents
+COPY --from=builder /app/apps/backend/data       ./data
 
 # Prisma CLI está en devDependencies; la instalamos globalmente para poder
 # ejecutar "prisma migrate deploy" y "prisma generate" en producción.

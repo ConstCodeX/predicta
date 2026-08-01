@@ -507,41 +507,58 @@ function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: 
         </div>
       )}
 
-      {/* Presets row + gear */}
-      <div className="flex items-center gap-2">
-        <div className="flex flex-1 gap-1 p-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)' }}>
-          {SEIR_SCENARIOS.map((s) => {
-            const active = activePreset === s.key;
+      {/* Controles principales */}
+      <div className="space-y-2">
+        {/* Fila 1: preset escenario + gear + spinner */}
+        <div className="flex items-center gap-2">
+          <div className="flex flex-1 gap-1 p-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)' }}>
+            {SEIR_SCENARIOS.map((s) => {
+              const active = activePreset === s.key;
+              return (
+                <button key={s.key} onClick={() => selectPreset(s.key)}
+                  className="flex-1 rounded-lg py-2.5 text-xs font-medium transition-all"
+                  style={{ background: active ? 'rgba(255,255,255,0.11)' : 'transparent', color: active ? 'white' : 'oklch(0.44 0 0)' }}>
+                  {s.label}
+                </button>
+              );
+            })}
+          </div>
+          <button onClick={() => setShowParams(true)} title="Configurar parámetros"
+            className="rounded-xl p-2 flex-shrink-0 transition-colors"
+            style={{ color: 'oklch(0.50 0 0)', border: '1px solid rgba(255,255,255,0.08)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; e.currentTarget.style.color = 'white'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'oklch(0.50 0 0)'; }}>
+            <Settings2 size={14} />
+          </button>
+          {loading && <Loader2 size={13} className="animate-spin flex-shrink-0" style={{ color: 'oklch(0.44 0 0)' }} />}
+        </div>
+
+        {/* Fila 2: toggle El Niño — cambia y ejecuta el modelo inmediatamente */}
+        <div className="flex gap-1.5">
+          {[
+            { valor: false, label: 'Sin El Niño', color: '#22c55e', preset: 'neutro' as const },
+            { valor: true,  label: 'Con El Niño', color: '#ef4444', preset: 'fuerte' as const },
+          ].map((o) => {
+            const active = o.valor ? params.enos_intensidad !== 'neutro' : params.enos_intensidad === 'neutro';
             return (
-              <button key={s.key} onClick={() => selectPreset(s.key)}
-                className="flex-1 rounded-lg py-2.5 text-xs font-medium transition-all"
-                style={{ background: active ? 'rgba(255,255,255,0.11)' : 'transparent', color: active ? 'white' : 'oklch(0.44 0 0)' }}>
-                {s.label}
+              <button key={String(o.valor)}
+                onClick={() => {
+                  const p = { ...PRESETS[o.preset], anomalia_lluvias_pct: params.anomalia_lluvias_pct };
+                  setParams(p);
+                  void runWith(p);
+                }}
+                disabled={loading}
+                className="flex-1 rounded-xl py-2 text-xs font-semibold transition-all disabled:opacity-40"
+                style={{
+                  background: active ? `${o.color}18` : 'rgba(255,255,255,0.04)',
+                  border: `1px solid ${active ? `${o.color}45` : 'rgba(255,255,255,0.07)'}`,
+                  color: active ? o.color : 'oklch(0.46 0 0)',
+                }}>
+                {o.label}
               </button>
             );
           })}
-          {/* ENOS badge */}
-          {(() => {
-            const enos = RIESGO_SEIR[params.enos_intensidad === 'fuerte' ? 'critico' : params.enos_intensidad === 'moderado' ? 'moderado' : 'bajo'];
-            return (
-              <button onClick={() => setShowParams(true)}
-                className="ml-1 flex items-center gap-1.5 rounded-lg px-3 py-2.5 text-xs"
-                style={{ background: `${enos.color}15`, border: `1px solid ${enos.color}35`, color: enos.color }}>
-                <span className="text-[9px] font-semibold">
-                  El Niño: {params.enos_intensidad === 'neutro' ? 'Sin' : 'Con'}
-                </span>
-              </button>
-            );
-          })()}
         </div>
-        <button onClick={() => setShowParams(true)} title="Configurar parámetros"
-          className="rounded-xl p-2 flex-shrink-0 transition-colors"
-          style={{ color: 'oklch(0.50 0 0)', border: '1px solid rgba(255,255,255,0.08)' }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; e.currentTarget.style.color = 'white'; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'oklch(0.50 0 0)'; }}>
-          <Settings2 size={14} />
-        </button>
-        {loading && <Loader2 size={13} className="animate-spin flex-shrink-0" style={{ color: 'oklch(0.44 0 0)' }} />}
       </div>
 
       {/* 4 KPIs */}
