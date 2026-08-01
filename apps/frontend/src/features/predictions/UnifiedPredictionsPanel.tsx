@@ -131,7 +131,7 @@ function ProgBar({ label, value, color = '#22c55e' }: { label: string; value: nu
 function ParamsModal({ params, region, loading, onParamsChange, onRegionChange, onApply, onClose }: {
   params: SEIRParametros; region: string; loading: boolean;
   onParamsChange: (p: SEIRParametros) => void; onRegionChange: (r: string) => void;
-  onApply: () => void; onClose: () => void;
+  onApply: (p: SEIRParametros, r: string) => void; onClose: () => void;
 }) {
   const set = <K extends keyof SEIRParametros>(k: K, v: SEIRParametros[K]) =>
     onParamsChange({ ...params, [k]: v });
@@ -219,7 +219,7 @@ function ParamsModal({ params, region, loading, onParamsChange, onRegionChange, 
             style={{ background: 'rgba(255,255,255,0.05)', color: 'oklch(0.50 0 0)', border: '1px solid rgba(255,255,255,0.07)' }}>
             Cancelar
           </button>
-          <button onClick={() => { onApply(); onClose(); }} disabled={loading}
+          <button onClick={() => { onApply(params, region); onClose(); }} disabled={loading}
             className="flex-1 rounded-xl py-2 text-sm font-medium disabled:opacity-50"
             style={{ background: 'oklch(0.60 0.18 240)', color: 'white' }}>
             {loading ? 'Ejecutando…' : 'Aplicar y ejecutar modelo'}
@@ -607,7 +607,8 @@ function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: 
         {showParams && (
           <ParamsModal params={params} region={region} loading={loading}
             onParamsChange={setParams} onRegionChange={setRegion}
-            onApply={() => void runWith(params)} onClose={() => setShowParams(false)} />
+            onApply={(p, r) => { setParams(p); setRegion(r); void runWith(p, r); }}
+            onClose={() => setShowParams(false)} />
         )}
       </AnimatePresence>
       <AnimatePresence>
