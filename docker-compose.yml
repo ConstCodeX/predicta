@@ -36,6 +36,7 @@ services:
       ADMIN_NAME:     ${ADMIN_NAME:-Super Admin}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
       GEMINI_API_KEY:    ${GEMINI_API_KEY:-}
+      LLM_MODEL:         ${LLM_MODEL:-gemini-2.0-flash}
       GEMINI_USE_SEARCH: ${GEMINI_USE_SEARCH:-false}
       GEMINI_THINKING:   ${GEMINI_THINKING:-false}
     depends_on:

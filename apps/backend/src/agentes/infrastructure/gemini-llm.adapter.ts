@@ -33,7 +33,7 @@ export class GeminiLLMAdapter implements ILLMAdapter {
 
   constructor(private readonly config: ConfigService) {
     const apiKey = this.config.get<string>('GEMINI_API_KEY') ?? '';
-    this.model = this.config.get<string>('LLM_MODEL') ?? 'gemma-4-31b-it';
+    this.model = this.config.get<string>('LLM_MODEL') ?? 'gemini-2.0-flash';
     this.useSearch = this.config.get<string>('GEMINI_USE_SEARCH') === 'true';
     this.useThinking = this.config.get<string>('GEMINI_THINKING') === 'true';
 
