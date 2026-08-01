@@ -16,6 +16,8 @@ WORKDIR /app
 # Manifiestos primero → mejor cache de capas Docker
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 COPY apps/backend/package.json ./apps/backend/
+# Schema necesario antes del install porque postinstall corre "prisma generate"
+COPY apps/backend/prisma ./apps/backend/prisma
 
 # Instala TODAS las deps (incluyendo devDeps; necesarias para nest build)
 RUN pnpm install --frozen-lockfile --filter backend
