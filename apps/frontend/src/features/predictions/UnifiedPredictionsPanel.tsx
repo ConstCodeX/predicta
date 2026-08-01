@@ -450,13 +450,13 @@ function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: 
   const [chartExpanded, setChartExpanded] = useState(false);
   const hasAutoRun = useRef(false);
 
-  const runWith = useCallback(async (p: SEIRParametros) => {
+  const runWith = useCallback(async (p: SEIRParametros, overrideRegion?: string) => {
     setLoading(true);
     try {
       const res = await fetch('/api/v1/riesgo/seir-model', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ region, ventana_semanas: 16, parametros: p }),
+        body: JSON.stringify({ region: overrideRegion ?? region, ventana_semanas: 16, parametros: p }),
       });
       if (res.ok) {
         const data = (await res.json()) as SEIRModelResponse;
@@ -475,15 +475,15 @@ function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: 
     void runWith(p);
   };
 
-  // Sync region when user clicks a departamento on the map, then re-run
+  // Sync region when user clicks a departamento on the map and re-run immediately
   useEffect(() => {
     if (!externalDepartamento) return;
     const matched = REGIONES.find((r) =>
       r.toUpperCase().startsWith(externalDepartamento.toUpperCase()),
     );
-    if (matched && matched !== region) {
+    if (matched) {
       setRegion(matched);
-      void runWith(params);
+      void runWith(params, matched);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [externalDepartamento]);
