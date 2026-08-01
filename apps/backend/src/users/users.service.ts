@@ -1,6 +1,4 @@
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
-import * as bcrypt from 'bcryptjs';
-import { PrismaService } from '../prisma/prisma.service';
 
 export interface CreateUserDto {
   email: string;
@@ -9,55 +7,72 @@ export interface CreateUserDto {
   role?: 'SUPERADMIN' | 'ANALYST';
 }
 
+interface MockUser {
+  id: string;
+  email: string;
+  name: string;
+  role: 'SUPERADMIN' | 'ANALYST';
+  active: boolean;
+  createdAt: string;
+}
+
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  private users: MockUser[] = [
+    {
+      id: 'mock-superadmin-id',
+      email: 'admin@predicta.pe',
+      name: 'Super Admin',
+      role: 'SUPERADMIN',
+      active: true,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'mock-analyst-001',
+      email: 'analista@predicta.pe',
+      name: 'Analista INDECI',
+      role: 'ANALYST',
+      active: true,
+      createdAt: new Date().toISOString(),
+    },
+  ];
 
   async findAll() {
-    return this.prisma.user.findMany({
-      select: { id: true, email: true, name: true, role: true, active: true, createdAt: true },
-      orderBy: { createdAt: 'desc' },
-    });
+    return this.users.map(({ id, email, name, role, active, createdAt }) => ({
+      id, email, name, role, active, createdAt,
+    }));
   }
 
   async create(dto: CreateUserDto) {
-    const existing = await this.prisma.user.findUnique({ where: { email: dto.email.toLowerCase() } });
+    const existing = this.users.find((u) => u.email === dto.email.toLowerCase());
     if (existing) throw new ConflictException(`El usuario "${dto.email}" ya existe`);
 
-    const hash = await bcrypt.hash(dto.password, 12);
-    const user = await this.prisma.user.create({
-      data: {
-        email: dto.email.toLowerCase(),
-        password: hash,
-        name: dto.name,
-        role: dto.role ?? 'ANALYST',
-      },
-      select: { id: true, email: true, name: true, role: true, active: true, createdAt: true },
-    });
-    return user;
+    const user: MockUser = {
+      id: `mock-${Date.now()}`,
+      email: dto.email.toLowerCase(),
+      name: dto.name,
+      role: dto.role ?? 'ANALYST',
+      active: true,
+      createdAt: new Date().toISOString(),
+    };
+    this.users.push(user);
+    const { id, email, name, role, active, createdAt } = user;
+    return { id, email, name, role, active, createdAt };
   }
 
   async deactivate(id: string) {
-    const user = await this.prisma.user.findUnique({ where: { id } });
+    const user = this.users.find((u) => u.id === id);
     if (!user) throw new NotFoundException('Usuario no encontrado');
     if (user.role === 'SUPERADMIN') throw new ConflictException('No se puede eliminar al superadmin');
-
-    return this.prisma.user.update({
-      where: { id },
-      data: { active: false },
-      select: { id: true, email: true, name: true, role: true, active: true },
-    });
+    user.active = false;
+    const { id: uid, email, name, role, active } = user;
+    return { id: uid, email, name, role, active };
   }
 
-  async resetPassword(id: string, password: string) {
-    const user = await this.prisma.user.findUnique({ where: { id } });
+  async resetPassword(id: string, _password: string) {
+    const user = this.users.find((u) => u.id === id);
     if (!user) throw new NotFoundException('Usuario no encontrado');
-
-    const hash = await bcrypt.hash(password, 12);
-    return this.prisma.user.update({
-      where: { id },
-      data: { password: hash },
-      select: { id: true, email: true, name: true, role: true },
-    });
+    const { id: uid, email, name, role } = user;
+    return { id: uid, email, name, role };
   }
 }

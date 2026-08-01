@@ -1,0 +1,168 @@
+{
+  "_contract": {
+    "source": "Predicta AI Engine + SENAMHI / INDECI",
+    "description": "Respuesta del motor de forecast IA: análisis general, alertas georeferenciadas, gráficos y métricas. Se genera dinámicamente según la consulta del usuario.",
+    "endpoint": "POST https://api.predicta.pe/v1/ai/forecast  { query, departamento?, familiaEvento?, anioDesde?, anioHasta? }",
+    "auth": "Bearer token interno",
+    "notes": "analisis_general es texto libre. nivel_riesgo_global: ALTO|MEDIO|BAJO. severidad: 1-5. probabilidad_porcentaje: 0-100."
+  },
+  "analisis_general": "El análisis histórico de emergencias en el Perú (2010–2025) revela un patrón estacional marcado: enero a marzo concentran el 42% de los eventos hidrometorológicos anuales, con picos extraordinarios en años de Fenómeno El Niño (2017 registró +58% sobre la media). Loreto, Piura y Puno son los departamentos con mayor frecuencia acumulada. Se observa una tendencia creciente de eventos extremos en la última década, consistente con los proyecciones climáticas regionales.",
+  "nivel_riesgo_global": "ALTO",
+  "metricas_clave": [
+    { "label": "Eventos 2025",       "valor": "7,430",  "tendencia": "DOWN"   },
+    { "label": "Depts en alerta",    "valor": "14",     "tendencia": "UP"     },
+    { "label": "Pico histórico",     "valor": "2017",   "tendencia": "STABLE" },
+    { "label": "Eventos pico",       "valor": "12,340", "tendencia": "STABLE" }
+  ],
+  "charts": [
+    {
+      "tipo": "LINE",
+      "titulo": "Eventos por año (2010–2025)",
+      "unidad": "eventos",
+      "datos": [
+        { "label": "2010", "valor": 9450  },
+        { "label": "2011", "valor": 10230 },
+        { "label": "2012", "valor": 9870  },
+        { "label": "2013", "valor": 8540  },
+        { "label": "2014", "valor": 7890  },
+        { "label": "2015", "valor": 6780  },
+        { "label": "2016", "valor": 5430  },
+        { "label": "2017", "valor": 12340 },
+        { "label": "2018", "valor": 9870  },
+        { "label": "2019", "valor": 8760  },
+        { "label": "2020", "valor": 6540  },
+        { "label": "2021", "valor": 7890  },
+        { "label": "2022", "valor": 8230  },
+        { "label": "2023", "valor": 9450  },
+        { "label": "2024", "valor": 8560  },
+        { "label": "2025", "valor": 7430  }
+      ]
+    },
+    {
+      "tipo": "PIE",
+      "titulo": "Distribución por familia de evento",
+      "datos": [
+        { "label": "HIDROMETEOROLOGICO", "valor": 62450 },
+        { "label": "MOVIMIENTO DE MASA", "valor": 28310 },
+        { "label": "BAJAS TEMPERATURAS", "valor": 21890 },
+        { "label": "INCENDIO",           "valor": 15230 },
+        { "label": "GEOFISICO",          "valor": 8450  },
+        { "label": "Otros",              "valor": 8900  }
+      ]
+    },
+    {
+      "tipo": "BAR",
+      "titulo": "Top 8 departamentos más afectados",
+      "unidad": "eventos",
+      "datos": [
+        { "label": "PIURA",        "valor": 12450 },
+        { "label": "LORETO",       "valor": 11230 },
+        { "label": "PUNO",         "valor": 10890 },
+        { "label": "CUSCO",        "valor": 9870  },
+        { "label": "AYACUCHO",     "valor": 8450  },
+        { "label": "JUNIN",        "valor": 7890  },
+        { "label": "AMAZONAS",     "valor": 7230  },
+        { "label": "APURIMAC",     "valor": 6780  }
+      ]
+    }
+  ],
+  "alertas_mapa": [
+    {
+      "departamento": "PIURA",
+      "distrito": "PIURA",
+      "tipo_alerta": "LLUVIAS_EXTREMAS",
+      "severidad": 5,
+      "probabilidad_porcentaje": 87,
+      "descripcion": "Riesgo crítico de inundaciones. Piura registra el mayor historial de lluvias extremas del norte, con 12,450 eventos acumulados. El sistema de drenaje urbano es insuficiente para eventos >200mm/día.",
+      "acciones_sugeridas": [
+        "Activar COE provincial nivel 3",
+        "Pre-posicionar equipos de rescate en puntos críticos",
+        "Emitir alerta temprana a distritos de Castilla y Cura Mori",
+        "Coordinar con EPS Grau el suministro de agua potable de emergencia"
+      ]
+    },
+    {
+      "departamento": "LORETO",
+      "distrito": "IQUITOS",
+      "tipo_alerta": "INUNDACION",
+      "severidad": 5,
+      "probabilidad_porcentaje": 82,
+      "descripcion": "Iquitos presenta el mayor riesgo de inundación fluvial del país. El río Amazonas y sus afluentes pueden desbordar en 48-72 horas si persisten las lluvias en la cuenca alta.",
+      "acciones_sugeridas": [
+        "Monitorear nivel del río Amazonas en estación Iquitos cada 6 horas",
+        "Evacuar preventivamente asentamientos en ribera del Itaya",
+        "Activar albergues temporales en colegios de zona alta",
+        "Coordinar con DIRESA Loreto el stock de medicamentos de emergencia"
+      ]
+    },
+    {
+      "departamento": "PUNO",
+      "distrito": "AZANGARO",
+      "tipo_alerta": "BAJAS_TEMPERATURAS",
+      "severidad": 4,
+      "probabilidad_porcentaje": 90,
+      "descripcion": "Azangaro es el distrito con mayor historial de heladas del país. Las temperaturas nocturnas pueden alcanzar -12°C durante julio-agosto, afectando ganado alpaquero y cultivos de papa.",
+      "acciones_sugeridas": [
+        "Distribuir kits de abrigo a familias vulnerables",
+        "Activar comedores escolares con protocolos de frío",
+        "Emitir alerta a ganaderos para resguardar alpacas en corrales techados",
+        "Coordinar con MINSA la apertura de casas de calor"
+      ]
+    },
+    {
+      "departamento": "SAN MARTIN",
+      "distrito": "TARAPOTO",
+      "tipo_alerta": "BIOLOGICO",
+      "severidad": 4,
+      "probabilidad_porcentaje": 72,
+      "descripcion": "Alto riesgo de brote de dengue en Tarapoto. El índice aédico supera el 5% en los últimos muestreos. Las lluvias recientes han generado criaderos activos en zona urbana.",
+      "acciones_sugeridas": [
+        "Intensificar jornadas de descacharrado en sectores 3, 7 y 12",
+        "Activar brigadas de fumigación en la periferia urbana",
+        "Fortalecer la vigilancia epidemiológica en el Hospital II MINSA Tarapoto",
+        "Comunicar a la población sobre síntomas y centros de atención"
+      ]
+    },
+    {
+      "departamento": "UCAYALI",
+      "distrito": "PUCALLPA",
+      "tipo_alerta": "INCENDIO",
+      "severidad": 4,
+      "probabilidad_porcentaje": 78,
+      "descripcion": "Pucallpa concentra el mayor historial de incendios forestales de la Amazonía peruana. La temporada seca (julio-septiembre) eleva el riesgo crítico. Las quemas agrícolas no controladas son el principal detonante.",
+      "acciones_sugeridas": [
+        "Activar brigadas forestales del SERFOR en zonas de interfaz bosque-agricultura",
+        "Coordinar con la FAO el monitoreo satelital de puntos de calor",
+        "Emitir restricción temporal de quemas agrícolas en radio 50km",
+        "Pre-posicionar maquinaria pesada de AUTODEMA"
+      ]
+    },
+    {
+      "departamento": "AYACUCHO",
+      "distrito": "HUAMANGA",
+      "tipo_alerta": "MOVIMIENTO_MASA",
+      "severidad": 3,
+      "probabilidad_porcentaje": 58,
+      "descripcion": "Huamanga presenta riesgo moderado de deslizamientos en laderas de la cuenca del Mantaro. Los suelos arcillosos saturados por lluvias aumentan la susceptibilidad.",
+      "acciones_sugeridas": [
+        "Inspeccionar taludes en la carretera Los Libertadores",
+        "Actualizar el inventario de zonas de riesgo en 8 sectores críticos",
+        "Coordinar con el MTC el monitoreo de la red vial departamental"
+      ]
+    },
+    {
+      "departamento": "AREQUIPA",
+      "distrito": "AREQUIPA",
+      "tipo_alerta": "AGUA_SANEAMIENTO",
+      "severidad": 3,
+      "probabilidad_porcentaje": 65,
+      "descripcion": "Déficit hídrico en la cuenca del río Chili. Los reservorios del sistema Aguada Blanca se encuentran al 38% de su capacidad. Riesgo de restricciones en el suministro urbano.",
+      "acciones_sugeridas": [
+        "Implementar racionamiento preventivo por sectores",
+        "Acelerar la limpieza del canal de La Tomilla",
+        "Coordinar con SEDAPAR el plan de contingencia hídrica",
+        "Evaluar la activación de pozos de emergencia"
+      ]
+    }
+  ]
+}

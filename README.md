@@ -6,32 +6,90 @@ Sistema de inteligencia geoespacial para la prevención y análisis del Fenómen
 
 ## Tabla de contenidos
 
-1. [Visión general](#visión-general)
-2. [Arquitectura del sistema](#arquitectura-del-sistema)
-3. [Requisitos previos](#requisitos-previos)
-4. [Variables de entorno](#variables-de-entorno)
-5. [Configuración del modelo LLM](#configuración-del-modelo-llm)
-6. [Instalación y desarrollo local](#instalación-y-desarrollo-local)
-7. [Despliegue con Docker y Dokploy](#despliegue-con-docker-y-dokploy)
-8. [Importación de datos INDECI (CSV)](#importación-de-datos-indeci-csv)
-9. [Guía de herramientas del mapa](#guía-de-herramientas-del-mapa)
-10. [Modelos predictivos](#modelos-predictivos)
-11. [Escenarios de riesgo](#escenarios-de-riesgo)
-12. [Administración SUPERADMIN](#administración-superadmin)
-13. [Estructura del proyecto](#estructura-del-proyecto)
-14. [API Reference](#api-reference)
+1. [Levantar localmente (modo mock)](#levantar-localmente-modo-mock)
+2. [Levantar con base de datos](#levantar-con-base-de-datos)
+3. [Arquitectura del sistema](#arquitectura-del-sistema)
+4. [Contratos de APIs externas (mock)](#contratos-de-apis-externas-mock)
+5. [API Reference](#api-reference)
+6. [Despliegue con Docker y Dokploy](#despliegue-con-docker-y-dokploy)
+7. [Estructura del proyecto](#estructura-del-proyecto)
 
 ---
 
-## Visión general
+## Levantar localmente (modo mock)
 
-Predicta AI ingiere datos históricos de emergencias del INDECI (formato CSV oficial), los almacena en PostgreSQL y los expone a través de:
+**Sin base de datos ni API keys externas.** El backend sirve datos simulados desde archivos JSON que mapean los contratos de las APIs externas (INDECI, SENAMHI, IA).
 
-- **Mapa interactivo** con marcadores por alerta, mapa de calor y línea de tiempo animada
-- **Motor predictivo** con análisis estadístico (Poisson) y síntesis LLM (Groq/LLaMA)
-- **Escenarios de riesgo** configurables por tipo de fenómeno, intensidad y departamento
-- **Asistente IA** conversacional para consultas libres sobre datos históricos
-- **Panel de administración** para gestión de usuarios, datos y configuración del modelo
+### Requisitos
+
+| Herramienta | Versión mínima |
+|---|---|
+| Node.js | 20 LTS |
+| pnpm | 9+ |
+
+```bash
+# 1. Clonar e instalar dependencias
+git clone <repo-url> && cd predictape
+pnpm install
+
+# 2. El .env del backend ya existe con valores de desarrollo
+#    Si quieres personalizarlo:
+#    cp apps/backend/.env.example apps/backend/.env
+
+# 3. Levantar backend (puerto 3001)
+pnpm --filter backend start:dev
+
+# 4. Levantar frontend (puerto 5173) — en otra terminal
+pnpm --filter frontend dev
+```
+
+El frontend queda disponible en `http://localhost:5173`.
+
+**Credenciales por defecto:**
+- Email: `admin@predicta.pe`
+- Password: `admin123`
+
+> En modo mock el backend no requiere PostgreSQL ni Groq API key. Todos los datos se leen desde `apps/backend/src/mocks/data/*.json`.
+
+---
+
+## Levantar con base de datos
+
+Para trabajar con datos reales del INDECI (CSV SINPAD) necesitas PostgreSQL y opcionalmente una API key de Groq.
+
+### Requisitos adicionales
+
+| Herramienta | Versión mínima |
+|---|---|
+| Docker + Docker Compose | 24+ |
+| PostgreSQL | 15+ |
+
+### Pasos
+
+```bash
+# 1. Configurar variables de entorno
+cp apps/backend/.env.example apps/backend/.env
+# Editar .env: descomentar DATABASE_URL y GROQ_API_KEY
+
+# 2. Levantar PostgreSQL con Docker
+docker compose up -d db
+
+# 3. Ejecutar migraciones de Prisma
+pnpm --filter backend exec prisma migrate deploy
+
+# 4. Levantar backend
+pnpm --filter backend start:dev
+
+# 5. Levantar frontend
+pnpm --filter frontend dev
+```
+
+### Importar datos INDECI
+
+1. Inicia sesión con rol SUPERADMIN
+2. Ve a **Administración → CSV**
+3. Sube el archivo `.csv` exportado del SINPAD
+4. Haz clic en **Importar**
 
 ---
 
@@ -50,121 +108,318 @@ apps/
 │       ├── analytics/     Análisis estadístico por región
 │       └── admin/         Panel SUPERADMIN
 │
-└── backend/      NestJS + TypeScript + Prisma + PostgreSQL
+└── backend/      NestJS + TypeScript (gateway → APIs externas)
     └── src/
-        ├── app-config/    Configuración editable (AppConfigService @Global)
-        ├── auth/          JWT + Guards
-        ├── users/         CRUD usuarios, roles (USER / SUPERADMIN)
-        ├── emergencias/   Ingestión CSV, historial, heatmap
-        ├── predicciones/  Motor LLM (ILLMAdapter / GroqLLMAdapter)
-        ├── riesgo/        Casos de uso de predicción por tipo
-        ├── escenarios/    Análisis de escenarios de fenómenos
-        └── analytics/     Endpoints de estadísticas agregadas
+        ├── mocks/data/    JSON de contratos mock (ver sección siguiente)
+        ├── app-config/    Configuración editable (in-memory en mock)
+        ├── auth/          JWT + Guards (env vars en mock)
+        ├── users/         CRUD usuarios (in-memory en mock)
+        ├── emergencias/   Heatmap, timeline, CSV upload
+        ├── predicciones/  Forecast IA (mock JSON)
+        ├── riesgo/        Predicciones por tipo de riesgo (mock JSON)
+        ├── escenarios/    Análisis de escenarios (mock JSON)
+        └── analytics/     Estadísticas agregadas (mock JSON)
 ```
 
-**Arquitectura hexagonal en backend:**
-- `Domain` — entidades, value objects, puertos (interfaces)
-- `Application` — casos de uso (AnalyzeScenarioUseCase, RunPredictionUseCase)
-- `Infrastructure` — controladores REST, repositorios Prisma, adapters de IA
+**Filosofía del backend — Gateway:**
+El backend actúa como gateway hacia APIs externas especializadas (INDECI/SINPAD, SENAMHI, motor IA). En modo mock los servicios leen directamente de los JSON en `mocks/data/`. Cuando se integren las APIs reales, cada servicio reemplaza la lectura de JSON por una llamada HTTP al endpoint documentado en el campo `_contract` de cada archivo.
 
 ---
 
-## Requisitos previos
+## Contratos de APIs externas (mock)
 
-| Herramienta | Versión mínima |
-|---|---|
-| Node.js | 20 LTS |
-| pnpm | 9+ |
-| Docker + Docker Compose | 24+ |
-| PostgreSQL | 15+ (o usar el contenedor Docker) |
+Los archivos en `apps/backend/src/mocks/data/` documentan los contratos de las APIs externas que el backend consumirá en producción. Cada archivo tiene un campo `_contract` con el endpoint real, la fuente y las notas de integración.
+
+| Archivo | API externa | Descripción |
+|---|---|---|
+| `analytics-summary.json` | INDECI / SINPAD | Resumen estadístico de emergencias históricas |
+| `predictions.json` | SENAMHI + Motor IA | Predicciones de riesgo por tipo de fenómeno y ventana temporal |
+| `scenarios.json` | SENAMHI + INDECI Risk Engine | Análisis de zonas por escenario e intensidad |
+| `heatmap.json` | INDECI / SINPAD | Densidad de emergencias por distrito para mapa de calor |
+| `timeline.json` | INDECI / SINPAD | Frames temporales (año+mes) para animación del mapa |
+| `emergencias.json` | INDECI / SINPAD | Listado paginado de reportes históricos |
+| `forecast.json` | Predicta AI Engine | Forecast IA con alertas georreferenciadas, gráficos y métricas |
+
+### Ejemplo de contrato (`analytics-summary.json`):
+
+```json
+{
+  "_contract": {
+    "source": "INDECI / SINPAD",
+    "endpoint": "GET https://sinpad.indeci.gob.pe/api/v1/reportes/summary",
+    "auth": "Bearer token (API key INDECI)",
+    "notes": "Actualización diaria. Filtro por año disponible."
+  },
+  "kpis": { ... },
+  "porFamiliaEvento": [ ... ]
+}
+```
 
 ---
 
-## Variables de entorno
+## API Reference
 
-Crea `apps/backend/.env` con los siguientes valores:
+Base URL: `http://localhost:3001/api` (dev)
+
+Todos los endpoints requieren `Authorization: Bearer <jwt_token>` excepto `/v1/auth/login`.
+
+### Autenticación
+
+| Método | Endpoint | Body | Descripción |
+|---|---|---|---|
+| POST | `/v1/auth/login` | `{ email, password }` | Login → JWT |
+
+### Emergencias
+
+| Método | Endpoint | Query params | Descripción |
+|---|---|---|---|
+| GET | `/v1/emergencias` | `departamento, familiaEvento, evento, page, pageSize` | Listado paginado |
+| GET | `/v1/emergencias/heatmap` | `familiaEvento, evento` | Densidad por zona |
+| GET | `/v1/emergencias/timeline` | `familiaEvento, evento, anioDesde, anioHasta` | Frames para animación |
+| POST | `/v1/emergencias/upload` | `multipart: file (.csv)` | Subir CSV INDECI |
+
+### Predicciones
+
+| Método | Endpoint | Body | Descripción |
+|---|---|---|---|
+| GET | `/v1/riesgo/tipos` | — | Lista de tipos disponibles |
+| POST | `/v1/riesgo/predict` | `{ tipo, ventana_dias? }` | Predicción por tipo |
+
+**Tipos disponibles:** `HIDRO_GEOLOGICO`, `FRIAJE_HELADA`, `INCENDIO`, `GEOFISICO`, `BIOLOGICO`, `ANTROPICO`, `SALUD_PUBLICA`, `AGUA_SANEAMIENTO`
+
+### Escenarios
+
+| Método | Endpoint | Body | Descripción |
+|---|---|---|---|
+| GET | `/v1/escenarios/tipos` | — | Lista de escenarios |
+| POST | `/v1/escenarios/analyze` | `{ escenarioId, intensidad, departamento? }` | Analizar escenario |
+
+**escenarioId disponibles:** `HELADAS`, `LLUVIAS_INTENSAS`, `HUAICOS`, `GRANIZADAS`, `SISMO`, `INCENDIO_FORESTAL`, `SEQUIA`, `EPIDEMIA`, `OLA_CALOR`  
+**intensidad:** `normal` | `moderado` | `extremo`
+
+### Forecast IA
+
+| Método | Endpoint | Body | Descripción |
+|---|---|---|---|
+| POST | `/v1/ai/forecast` | `{ query, departamento?, familiaEvento?, anioDesde?, anioHasta? }` | Forecast con alertas y gráficos |
+
+### Análisis
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| GET | `/v1/analytics/summary` | Estadísticas globales (KPIs, por familia, año, depto, mes) |
+
+### Configuración (SUPERADMIN)
+
+| Método | Endpoint | Body | Descripción |
+|---|---|---|---|
+| GET | `/v1/config` | — | Listar parámetros |
+| PUT | `/v1/config/:key` | `{ value, description? }` | Actualizar |
+| DELETE | `/v1/config/:key` | — | Eliminar |
+
+### Usuarios (SUPERADMIN)
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| GET | `/v1/users` | Listar usuarios |
+| POST | `/v1/users` | Crear usuario |
+| PATCH | `/v1/users/:id/deactivate` | Desactivar |
+| PATCH | `/v1/users/:id/reset-password` | Reset de contraseña |
+
+---
+
+## Conectar tu API real
+
+Esta sección documenta **exactamente dónde y cómo** reemplazar los mocks por llamadas a una API real, endpoint por endpoint.
+
+### Paso 1 — Variable de entorno base URL (frontend)
+
+El frontend hace fetch directamente a `/api/...` (ruta relativa). El proxy de Vite redirige al backend local durante desarrollo.
+
+**Archivo:** `apps/frontend/vite.config.ts`
+```ts
+server: {
+  proxy: {
+    '/api': 'http://localhost:3001',   // ← cambia aquí si tu API corre en otro host
+  }
+}
+```
+
+En producción, Nginx/Dokploy hace el proxy. No hay hardcoded URLs en el frontend.
+
+---
+
+### Paso 2 — Reemplazar mocks en el backend
+
+Cada módulo del backend tiene un archivo donde lee el JSON mock. Reemplaza ese bloque por una llamada `HttpService` (Axios) a tu API real.
+
+#### `POST /api/v1/riesgo/predict` — Predicciones por tipo de riesgo
+
+**Archivo:** `apps/backend/src/riesgo/run-prediction.use-case.ts`
+
+```ts
+// ── MOCK (borrar) ──────────────────────────────────────────────
+const raw = fs.readFileSync(path.join(__dirname, '../mocks/data/predictions.json'), 'utf8');
+const { _contract: _c, ...entries } = JSON.parse(raw);
+return entries[tipo] ?? entries['HIDRO_GEOLOGICO'];
+
+// ── REAL API (reemplazar con) ──────────────────────────────────
+const response = await this.httpService.axiosRef.post<PredictionResponse>(
+  `${process.env.PREDICTION_API_URL}/predict`,
+  { tipo, ventana_dias },
+  { headers: { Authorization: `Bearer ${process.env.PREDICTION_API_KEY}` } }
+);
+return response.data;
+```
+
+**Campos esperados por el frontend** (`PredictionResponse`):
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `tipo` | `string` | ID del tipo (ej. `HIDRO_GEOLOGICO`) |
+| `tipo_label` | `string` | Nombre legible |
+| `ventana_dias` | `number` | Días de la ventana analizada |
+| `resumen` | `string \| null` | Texto de análisis general |
+| `ai_disponible` | `boolean` | Si el análisis usó IA o estadística |
+| `predicciones[]` | array | Lista de distritos (ver abajo) |
+
+**Campos por distrito** (`DistrictPrediction`):
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `distrito` | `string` | Nombre del distrito |
+| `departamento` | `string` | Nombre del departamento |
+| `probabilidad_pct` | `number` | 0–100, probabilidad de ocurrencia |
+| `x_base` | `number` | Multiplicador respecto a línea base histórica |
+| `lluvia_estimada_mm` | `number` | Lluvia acumulada estimada en mm |
+| `dia_pico` | `string` | Fecha ISO de día pico (ej. `2026-08-12`) |
+| `nivel` | `"bajo" \| "medio" \| "alto"` | Nivel de riesgo |
+
+---
+
+#### `GET /api/v1/riesgo/tipos` — Lista de tipos disponibles
+
+**Archivo:** `apps/backend/src/riesgo/riesgo.controller.ts`
+
+```ts
+// ── MOCK ──────────────────────────────────────────────────────
+return PREDICTION_TYPES_MOCK;
+
+// ── REAL API ──────────────────────────────────────────────────
+const { data } = await this.httpService.axiosRef.get(`${process.env.PREDICTION_API_URL}/tipos`);
+return data;
+```
+
+**Campos esperados** (`PredictionType[]`):
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `id` | `string` | Clave única (`HIDRO_GEOLOGICO`, `INCENDIO`, etc.) |
+| `label` | `string` | Nombre visible |
+| `descripcion` | `string` | Descripción corta |
+| `icono` | `string` | Emoji o código de icono |
+
+---
+
+#### `POST /api/v1/riesgo/seir-model` — Modelo epidémico Dengue
+
+**Archivo:** `apps/backend/src/riesgo/riesgo.controller.ts` (endpoint `seir-model`)
+
+```ts
+// ── MOCK ──────────────────────────────────────────────────────
+const preset = enos_intensidad === 'fuerte' ? 'critico'
+             : enos_intensidad === 'moderado' ? 'moderado'
+             : 'optimista';
+return this.seirData[preset];
+
+// ── REAL API ──────────────────────────────────────────────────
+const { data } = await this.httpService.axiosRef.post(
+  `${process.env.SEIR_API_URL}/model`,
+  { region, ventana_semanas, parametros },
+  { headers: { Authorization: `Bearer ${process.env.SEIR_API_KEY}` } }
+);
+return data;
+```
+
+**Request body esperado:**
+```json
+{
+  "region": "PIURA — Piura / Sullana",
+  "ventana_semanas": 16,
+  "parametros": {
+    "enos_intensidad": "neutro | moderado | fuerte",
+    "anomalia_lluvias_pct": 0,
+    "eficiencia_control_vectorial_pct": 80
+  }
+}
+```
+
+**Response esperada** (`SEIRModelResponse`) — campos que usa el frontend:
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `region` | `string` | Región analizada |
+| `escenario` | `string` | Nombre del escenario (ej. `Optimista`) |
+| `ventana_semanas` | `number` | Semanas de proyección |
+| `kpis.casos_proyectados_total` | `number` | Total casos proyectados |
+| `kpis.pico_semana` | `number` | Semana del pico epidémico |
+| `kpis.maximo_semanal_casos` | `number` | Casos en la semana pico |
+| `kpis.saturacion_hospitalaria_pct` | `number` | % saturación (>100 = colapso) |
+| `kpis.nivel_riesgo` | `"bajo" \| "moderado" \| "critico"` | Nivel general |
+| `kpis.impacto_economico_soles` | `number` | Impacto económico en S/ |
+| `kpis.ahorro_preventivo_soles` | `number` | Ahorro si se actúa preventivamente |
+| `kpis.rt_maximo` | `number` | Número reproductivo básico máximo |
+| `kpis.camas_disponibles` | `number` | Camas hospitalarias disponibles |
+| `proyeccion_semanal[]` | array | Una entrada por semana (ver abajo) |
+| `humanitario` | object | Fallecidos, heridos, desplazados, etc. |
+| `economico` | object | Impacto en cultivos e infraestructura |
+| `distribucion_geografica[]` | array | Ciudades con `ciudad, lat, lng, casos, pct` |
+| `alertas[]` | `string[]` | Textos de alerta para mostrar al usuario |
+
+**Campos por semana** (`proyeccion_semanal[]`):
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `semana` | `number` | Número de semana (1–16) |
+| `casos_proyectados` | `number` | Casos nuevos proyectados |
+| `hospitalizados_requeridos` | `number` | Hospitalizaciones requeridas |
+| `tasa_rt` | `number` | Rt de esa semana |
+| `es_historico` | `boolean` | `true` = datos reales, `false` = proyección |
+
+---
+
+#### `POST /api/v1/ai/forecast` — Forecast IA
+
+**Archivo:** `apps/backend/src/predicciones/infrastructure/controllers/prediccion.controller.ts`
+
+```ts
+// ── MOCK ──────────────────────────────────────────────────────
+return this.mockForecast;
+
+// ── REAL API (Groq / LLM) ─────────────────────────────────────
+// Ya está parcialmente implementado en groq-llm.adapter.ts
+// Solo descomentar y configurar GROQ_API_KEY en .env
+```
+
+---
+
+### Paso 3 — Variables de entorno necesarias
+
+Agregar a `apps/backend/.env`:
 
 ```env
-# Base de datos
-DATABASE_URL="postgresql://predicta:predicta@localhost:5432/predictape"
+# URLs de APIs externas (vacías = usa mock)
+PREDICTION_API_URL=https://tu-api.com/v1
+PREDICTION_API_KEY=tu-key
+SEIR_API_URL=https://tu-seir-api.com/v1
+SEIR_API_KEY=tu-key
 
-# JWT
-JWT_SECRET="cambia-este-secreto-por-uno-seguro"
-
-# Groq LLM (obtén tu clave en console.groq.com)
-GROQ_API_KEY="gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-GROQ_MODEL="llama-3.1-8b-instant"
+# IA (ya existe en .env.example)
+GROQ_API_KEY=tu-groq-key
 ```
 
-> **Nota:** Si `GROQ_API_KEY` no está configurada o la IA no responde, el sistema usa automáticamente el **fallback estadístico Poisson** — el servidor nunca falla. El campo `ai_disponible: false` en la respuesta indica cuándo se usó el fallback.
+### Paso 4 — Verificar contratos
 
----
-
-## Configuración del modelo LLM
-
-Predicta usa Groq con LLaMA 3.1 (8B) por defecto. Para cambiar el modelo:
-
-1. Establece `GROQ_MODEL` en `.env` con el identificador del modelo deseado:
-   - `llama-3.1-8b-instant` (rápido, recomendado)
-   - `llama-3.3-70b-versatile` (más preciso, más lento)
-   - `mixtral-8x7b-32768` (buena relación calidad/velocidad)
-
-2. Reinicia el backend.
-
-### Prompts editables desde la UI
-
-Los prompts del sistema que usa la IA son editables en **Administración → Config IA** (requiere rol SUPERADMIN). Los prompts configurables son:
-
-| Clave | Descripción |
-|---|---|
-| `prompt.predict.system` | Prompt de sistema para análisis predictivo por distrito |
-| `prompt.heatmap.commentary` | Prompt para el comentario del mapa de calor |
-
-Si se elimina un prompt desde la UI, el sistema revierte al prompt predeterminado del código automáticamente.
-
----
-
-## Instalación y desarrollo local
+Cada archivo JSON en `apps/backend/src/mocks/data/` tiene un campo `_contract` con el endpoint real documentado. Ese campo es el contrato que tu API debe cumplir.
 
 ```bash
-# Clonar y entrar al proyecto
-git clone <repo-url> && cd predictape
-
-# Instalar dependencias (monorepo pnpm)
-pnpm install
-
-# Levantar la base de datos con Docker
-docker compose up -d postgres
-
-# Migrar la base de datos
-pnpm --filter backend prisma migrate deploy
-
-# Iniciar backend (puerto 3000)
-pnpm --filter backend dev
-
-# Iniciar frontend (puerto 5173)
-pnpm --filter frontend dev
-```
-
-El frontend hace proxy hacia `http://localhost:3000` — configurado en `vite.config.ts`.
-
-### Crear el primer SUPERADMIN
-
-```bash
-# Desde apps/backend
-npx ts-node -e "
-const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcryptjs');
-const prisma = new PrismaClient();
-prisma.user.create({
-  data: {
-    email: 'admin@predicta.pe',
-    name: 'Administrador',
-    password: bcrypt.hashSync('cambia-tu-clave', 10),
-    role: 'SUPERADMIN',
-  }
-}).then(console.log).finally(() => prisma.\$disconnect());
-"
+# Ver todos los contratos definidos
+grep -r '"endpoint"' apps/backend/src/mocks/data/
 ```
 
 ---
@@ -175,172 +430,24 @@ prisma.user.create({
 # Build y levantar todos los servicios
 docker compose up -d --build
 
-# Ver logs del backend
+# Ver logs
 docker compose logs -f backend
 
 # Ejecutar migraciones en producción
 docker compose exec backend npx prisma migrate deploy
 ```
 
-**Estructura Docker Compose:**
-- `postgres` — PostgreSQL 15 con volumen persistente
-- `backend` — NestJS en puerto 3000 (interno)
-- `frontend` — Nginx sirviendo el build de Vite en puerto 80
+**Variables de entorno requeridas en producción:**
 
-**Dokploy:** Apunta a `docker-compose.yml` en la raíz del repositorio. Configura las variables de entorno desde el panel de Dokploy (equivalen a `apps/backend/.env`).
-
----
-
-## Importación de datos INDECI (CSV)
-
-Los datos históricos de emergencias provienen del **SINPAD/INDECI** en formato CSV oficial.
-
-### Columnas esperadas
-
-| Columna | Descripción |
-|---|---|
-| `DEPARTAMENTO` | Nombre del departamento en mayúsculas |
-| `DISTRITO` | Nombre del distrito |
-| `FAMILIA EVENTO` | Categoría INDECI (ver familias soportadas) |
-| `EVENTO` | Tipo específico de evento |
-| `AÑO` | Año del evento (numérico) |
-| `MES` | Mes del evento (1–12) |
-
-### Familias INDECI soportadas
-
-`HIDROMETEOROLOGICO`, `MOVIMIENTO DE MASA`, `BAJAS TEMPERATURAS`, `INCENDIO`, `GEOFISICO`, `BIOLOGICO`, `ANTROPICO`, `TECNOLOGICO`
-
-### Procedimiento de importación
-
-1. Inicia sesión con rol **SUPERADMIN**
-2. Ve a **Administración → CSV**
-3. Selecciona el archivo `.csv` exportado del SINPAD
-4. Haz clic en **Importar**
-
-El sistema realiza validación de columnas, normaliza los textos y hace upsert de registros para evitar duplicados en importaciones sucesivas.
-
-> Para conjuntos grandes de datos (>50,000 filas), el proceso puede tardar 30–60 segundos. La UI muestra el progreso.
-
----
-
-## Guía de herramientas del mapa
-
-El mapa es la pantalla principal de Predicta. La barra vertical flotante izquierda contiene las herramientas:
-
-### Predicciones (ícono estrella)
-
-Genera predicciones de riesgo para los próximos 30, 60 o 90 días por tipo de riesgo:
-
-| Tipo | Datos base | Descripción |
-|---|---|---|
-| HIDRO_GEOLOGICO | HIDROMETEOROLOGICO + MOVIMIENTO DE MASA | Lluvias, huaicos, deslizamientos |
-| HELADAS_FRIAJE | BAJAS TEMPERATURAS | Friaje, heladas en sierra |
-| INCENDIOS | INCENDIO | Incendios forestales y urbanos |
-| GEOFISICO | GEOFISICO | Sismos, tsunamis |
-| SALUD_PUBLICA | BIOLOGICO + HIDROMETEOROLOGICO | Dengue, desabastecimiento medicamentos |
-| AGUA_SANEAMIENTO | HIDROMETEOROLOGICO + MOVIMIENTO DE MASA + ANTROPICO | Escasez hídrica, contaminación |
-
-Los distritos con mayor riesgo aparecen como marcadores en el mapa. El color indica el nivel: rojo (alto), naranja (medio), azul (bajo).
-
-### Mapa de calor (ícono llama)
-
-Visualiza la densidad histórica de eventos por zona:
-1. Selecciona familia de evento y/o tipo específico
-2. Ajusta el rango de años
-3. Haz clic en **Generar** — el mapa muestra un heatmap de concentración
-
-### Línea de tiempo (ícono reloj)
-
-Animación histórica mes a mes del heatmap de emergencias:
-1. Filtra por familia de evento (el tipo de evento se actualiza automáticamente)
-2. Define el rango de años
-3. Presiona **▶** para reproducir o arrastra el slider
-
-El mapa de calor cambia de color conforme avanzan los meses. La escala de color es consistente a través de toda la línea de tiempo (el máximo se calcula sobre todos los frames al cargar).
-
-### Escenarios (ícono mira)
-
-Analiza zonas en riesgo según un fenómeno específico y su intensidad:
-
-1. Selecciona el **tipo de escenario**: Heladas, Lluvias Intensas, Huaicos, Granizadas, Sismo, Incendio Forestal, Sequía, Epidemia/Dengue, Ola de Calor
-2. Elige la **intensidad**: Normal / Moderado / Extremo
-3. Filtra opcionalmente por **departamento**
-4. Haz clic en **Analizar escenario**
-
-El resultado muestra las zonas históricamente más afectadas en el mapa de calor, con estadísticas de promedio anual y máximo histórico por distrito. Si la IA está disponible, incluye un análisis textual del patrón de riesgo.
-
-### Asistente IA (ícono chat)
-
-Chat conversacional con acceso a los datos históricos de emergencias. Puedes hacer preguntas como:
-- "¿Cuáles son los distritos con más heladas en Puno?"
-- "¿En qué meses hay más riesgo de huaicos en Cusco?"
-- "¿Cómo ha evolucionado el dengue en los últimos 10 años?"
-
----
-
-## Modelos predictivos
-
-### Motor principal: LLM (Groq/LLaMA)
-
-Cuando la IA está disponible, el sistema:
-1. Consulta los últimos 5 años de datos históricos filtrados por tipo de predicción
-2. Construye un contexto JSON con eventos por distrito
-3. Envía al LLM el prompt del sistema (editable desde la UI) + los datos
-4. Parsea la respuesta JSON con probabilidades y descripciones por distrito
-5. Retorna `ai_disponible: true`
-
-### Fallback estadístico: Distribución de Poisson
-
-Si el LLM falla por cualquier razón (timeout, API key inválida, cuota agotada):
-
-```
-λ = (eventos_anuales / 12) × (ventana_días / 30) × factor_estacional
-P(ocurrencia) = (1 - e^(-λ)) × 100
+```env
+JWT_SECRET=<secreto-seguro>
+ADMIN_EMAIL=admin@tudominio.pe
+ADMIN_PASSWORD=<password-seguro>
+POSTGRES_PASSWORD=<password-db>
+GROQ_API_KEY=<api-key-groq>
 ```
 
-El factor estacional ajusta la probabilidad según el mes actual (ej. verano vs. invierno para heladas).
-
-El servidor **nunca lanza un error** por fallo de IA — retorna `ai_disponible: false` con predicciones estadísticas válidas.
-
----
-
-## Escenarios de riesgo
-
-Los escenarios cruzan datos históricos de múltiples familias de eventos INDECI para identificar zonas con patrones recurrentes. Cada escenario tiene umbrales de inclusión según la intensidad seleccionada:
-
-| Escenario | Familias base | Umbral extremo (eventos/año) |
-|---|---|---|
-| Heladas | BAJAS TEMPERATURAS | 10+ |
-| Lluvias Intensas | HIDROMETEOROLOGICO | 18+ |
-| Huaicos | MOVIMIENTO DE MASA | 8+ |
-| Granizadas | HIDROMETEOROLOGICO + BAJAS TEMPERATURAS | 6+ |
-| Sismo | GEOFISICO | 5+ |
-| Incendio Forestal | INCENDIO | 10+ |
-| Sequía | HIDROMETEOROLOGICO | 5+ |
-| Epidemia/Dengue | BIOLOGICO | 8+ |
-| Ola de Calor | HIDROMETEOROLOGICO | 5+ |
-
-Los resultados se visualizan como heatmap en el mapa principal con código de color por nivel (normal/moderado/extremo).
-
----
-
-## Administración SUPERADMIN
-
-Acceso desde **Administración** en la barra de navegación superior (visible solo para SUPERADMIN).
-
-### CSV
-Importación masiva de datos INDECI. Ver [sección de importación](#importación-de-datos-indeci-csv).
-
-### Usuarios
-- Listado de todos los usuarios registrados
-- Cambio de rol (USER / SUPERADMIN)
-- Desactivación de cuentas
-
-### Config IA
-Edición en tiempo real de los prompts del sistema:
-- Los cambios se guardan en la tabla `app_config` (PostgreSQL)
-- El botón **Resetear** elimina el registro de DB y revierte al default del código
-- Sin necesidad de reiniciar el servidor
+**Dokploy:** Apunta a `docker-compose.yml` en la raíz. Configura las variables desde el panel de Dokploy.
 
 ---
 
@@ -350,114 +457,44 @@ Edición en tiempo real de los prompts del sistema:
 predictape/
 ├── apps/
 │   ├── backend/
-│   │   ├── prisma/
-│   │   │   ├── schema.prisma
-│   │   │   └── migrations/
-│   │   └── src/
-│   │       ├── app.module.ts
-│   │       ├── app-config/       # Configuración editable DB (@Global)
-│   │       ├── auth/             # JWT, Guards, estrategias
-│   │       ├── users/            # Gestión de usuarios
-│   │       ├── emergencias/      # CSV, historial, heatmap, timeline
-│   │       ├── predicciones/     # ILLMAdapter, GroqLLMAdapter
-│   │       ├── riesgo/           # Tipos predictivos, Poisson fallback
-│   │       ├── escenarios/       # Análisis de fenómenos por intensidad
-│   │       └── analytics/        # Estadísticas agregadas
+│   │   ├── src/
+│   │   │   ├── mocks/data/        # JSONs de contratos mock
+│   │   │   ├── app-config/        # Config editable (in-memory / DB)
+│   │   │   ├── auth/              # JWT, Guards
+│   │   │   ├── users/             # CRUD usuarios
+│   │   │   ├── emergencias/       # Heatmap, timeline, CSV
+│   │   │   ├── predicciones/      # Forecast IA
+│   │   │   ├── riesgo/            # Tipos predictivos
+│   │   │   ├── escenarios/        # Fenómenos por intensidad
+│   │   │   └── analytics/         # Estadísticas agregadas
+│   │   ├── prisma/schema.prisma   # Schema DB (para integración real)
+│   │   └── .env.example
 │   └── frontend/
-│       ├── index.html
-│       ├── vite.config.ts
-│       └── src/
-│           ├── App.tsx
-│           ├── components/       # TopNav, UI atoms
-│           └── features/
-│               ├── map/          # MapDashboard, MapToolbar, store
-│               ├── predictions/  # PredictionsPanel
-│               ├── heatmap/      # HeatmapPanel
-│               ├── escenarios/   # ScenariosPanel
-│               ├── chat/         # AIChatPanel
-│               ├── data/         # DataExplorerPanel
-│               ├── analytics/    # AnalyticsPanel
-│               ├── auth/         # LoginPage, useAuthStore
-│               ├── admin/        # AdminPanel, CsvUpload, PromptConfig
-│               └── config/       # PromptConfigPanel
+│       └── src/features/
+│           ├── map/               # MapDashboard, store Zustand
+│           ├── predictions/       # PredictionsPanel
+│           ├── heatmap/           # HeatmapPanel
+│           ├── escenarios/        # ScenariosPanel
+│           ├── chat/              # AIChatPanel
+│           ├── analytics/         # AnalyticsPanel
+│           └── admin/             # AdminPanel
 ├── docker-compose.yml
 └── README.md
 ```
 
 ---
 
-## API Reference
-
-Base URL: `http://localhost:3000` (dev) | tu dominio en producción
-
-Todos los endpoints requieren `Authorization: Bearer <jwt_token>` excepto `/v1/auth/login`.
-
-### Autenticación
-
-| Método | Endpoint | Descripción |
-|---|---|---|
-| POST | `/v1/auth/login` | Login con email/password → JWT |
-| GET | `/v1/auth/me` | Perfil del usuario actual |
-
-### Emergencias
-
-| Método | Endpoint | Descripción |
-|---|---|---|
-| GET | `/v1/emergencias` | Historial paginado con filtros |
-| GET | `/v1/emergencias/heatmap` | Densidad por zona (familiaEvento, anioDesde/Hasta) |
-| GET | `/v1/emergencias/timeline` | Frames mes a mes para animación |
-| POST | `/v1/emergencias/upload-csv` | Importar CSV INDECI (multipart/form-data) |
-
-### Predicciones
-
-| Método | Endpoint | Descripción |
-|---|---|---|
-| POST | `/v1/riesgo/predict` | Predicción por tipo y ventana temporal |
-| GET | `/v1/riesgo/tipos` | Lista de tipos de predicción disponibles |
-
-### Escenarios
-
-| Método | Endpoint | Descripción |
-|---|---|---|
-| GET | `/v1/escenarios/tipos` | Lista de escenarios disponibles |
-| POST | `/v1/escenarios/analyze` | Analizar escenario `{ escenarioId, intensidad, departamento? }` |
-
-### Análisis IA
-
-| Método | Endpoint | Descripción |
-|---|---|---|
-| POST | `/v1/ai/forecast` | Forecast de alertas para el mapa |
-| POST | `/v1/ai/chat` | Pregunta libre al asistente |
-
-### Configuración (SUPERADMIN)
-
-| Método | Endpoint | Descripción |
-|---|---|---|
-| GET | `/v1/config` | Listar todos los parámetros |
-| PUT | `/v1/config/:key` | Actualizar valor `{ value, description? }` |
-| DELETE | `/v1/config/:key` | Eliminar (revierte al default del código) |
-
-### Usuarios (SUPERADMIN)
-
-| Método | Endpoint | Descripción |
-|---|---|---|
-| GET | `/v1/users` | Listar usuarios |
-| PATCH | `/v1/users/:id` | Actualizar rol o estado |
-| DELETE | `/v1/users/:id` | Eliminar usuario |
-
----
-
-## Tecnologías clave
+## Stack tecnológico
 
 | Capa | Tecnología |
 |---|---|
 | Frontend | Vite 5, React 18, TypeScript, Tailwind CSS v4, Framer Motion |
 | Mapa | MapLibre GL v4, react-map-gl v7 |
 | Estado | Zustand |
-| Backend | NestJS 10, TypeScript, Prisma ORM |
-| Base de datos | PostgreSQL 15 |
-| IA | Groq Cloud API, LLaMA 3.1, OpenAI SDK compatible |
-| Auth | JWT (jsonwebtoken), bcryptjs |
+| Backend | NestJS 10, TypeScript |
+| Base de datos | PostgreSQL 15 + Prisma ORM (opcional en desarrollo) |
+| IA | Groq Cloud API / LLaMA 3.1 (opcional en desarrollo) |
+| Auth | JWT, bcryptjs |
 | Contenedores | Docker, Docker Compose, Dokploy |
 
 ---

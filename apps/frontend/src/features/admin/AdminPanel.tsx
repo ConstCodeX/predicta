@@ -18,7 +18,7 @@ interface Props {
 }
 
 export function AdminPanel({ token, onClose }: Props) {
-  const [tab, setTab] = useState<AdminTab>('csv');
+  const [tab, setTab] = useState<AdminTab>('users');
 
   return (
     <div
@@ -63,7 +63,7 @@ export function AdminPanel({ token, onClose }: Props) {
       <div className="flex-1 relative overflow-hidden">
         {tab === 'csv'    && <CsvUploadPanel token={token} onClose={onClose} />}
         {tab === 'users'  && <UsersPanel token={token} />}
-        {tab === 'config' && <PromptConfigPanel token={token} onClose={() => setTab('csv')} />}
+        {tab === 'config' && <PromptConfigPanel token={token} onClose={() => setTab('users')} />}
       </div>
     </div>
   );

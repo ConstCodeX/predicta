@@ -1,28 +1,32 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+
+export interface ConfigEntry {
+  key: string;
+  value: string;
+  description: string | null;
+}
 
 @Injectable()
 export class AppConfigService {
-  constructor(private readonly prisma: PrismaService) {}
+  private store: Map<string, ConfigEntry> = new Map();
 
   async get(key: string, defaultValue: string): Promise<string> {
-    const cfg = await this.prisma.appConfig.findUnique({ where: { key } });
-    return cfg?.value ?? defaultValue;
+    return this.store.get(key)?.value ?? defaultValue;
   }
 
   async set(key: string, value: string, description?: string): Promise<void> {
-    await this.prisma.appConfig.upsert({
-      where: { key },
-      update: { value, ...(description !== undefined ? { description } : {}) },
-      create: { key, value, description: description ?? null },
+    this.store.set(key, {
+      key,
+      value,
+      description: description ?? this.store.get(key)?.description ?? null,
     });
   }
 
   async delete(key: string): Promise<void> {
-    await this.prisma.appConfig.deleteMany({ where: { key } });
+    this.store.delete(key);
   }
 
-  async listAll(): Promise<{ key: string; value: string; description: string | null }[]> {
-    return this.prisma.appConfig.findMany({ orderBy: { key: 'asc' } });
+  async listAll(): Promise<ConfigEntry[]> {
+    return [...this.store.values()].sort((a, b) => a.key.localeCompare(b.key));
   }
 }

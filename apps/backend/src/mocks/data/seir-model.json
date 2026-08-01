@@ -1,0 +1,272 @@
+{
+  "_contract": {
+    "source": "Predicta AI Engine — Modelo Dengue Determinista",
+    "description": "Proyección epidémica semanal basada en modelo SEIR con vector (dengue/malaria). Calibrado con brote El Niño Yaku 2023-2024 en Piura. Parámetros climáticos de SENAMHI, datos hospitalarios de MINSA.",
+    "endpoint": "POST https://api.predicta.pe/v1/riesgo/seir-model",
+    "auth": "Bearer token interno",
+    "request_schema": {
+      "region": "string — departamento o 'departamento — ciudad'",
+      "ventana_semanas": "number — 12 o 16",
+      "parametros": {
+        "anomalia_lluvias_pct": "number — porcentaje sobre la media histórica SENAMHI (-50 a 500)",
+        "anomalia_temperatura_c": "number — anomalía térmica en °C (-3 a 5)",
+        "enos_intensidad": "'neutro' | 'moderado' | 'fuerte'",
+        "racionamiento_agua_pct": "number — % de hogares almacenando agua en contenedores (0-100)",
+        "eficiencia_control_vectorial_pct": "number — cobertura de fumigación/abatización (0-100)",
+        "desabastecimiento_insumos_pct": "number — % de insumos faltantes (0-100)",
+        "serotipo_dominante": "'DEN-1' | 'DEN-2' | 'DEN-3' | 'DEN-4'"
+      }
+    },
+    "notes": "Los 3 presets (optimista/moderado/critico) mapean a enos_intensidad (neutro/moderado/fuerte). El modelo ajusta R0 y parámetros de transmisión según las anomalías climáticas."
+  },
+
+  "optimista": {
+    "region": "PIURA",
+    "escenario": "Optimista",
+    "generado_en": "2026-08-01T00:00:00.000Z",
+    "ventana_semanas": 16,
+    "parametros_usados": {
+      "anomalia_lluvias_pct": 0,
+      "anomalia_temperatura_c": 0.5,
+      "enos_intensidad": "neutro",
+      "racionamiento_agua_pct": 15,
+      "eficiencia_control_vectorial_pct": 80,
+      "desabastecimiento_insumos_pct": 5,
+      "serotipo_dominante": "DEN-1"
+    },
+    "kpis": {
+      "casos_proyectados_total": 3240,
+      "pico_semana": 12,
+      "maximo_semanal_casos": 420,
+      "saturacion_hospitalaria_pct": 42,
+      "nivel_riesgo": "bajo",
+      "impacto_economico_soles": 18400000,
+      "impacto_economico_usd": 4900000,
+      "ahorro_preventivo_soles": 12800000,
+      "rt_maximo": 1.8,
+      "camas_disponibles": 450
+    },
+    "proyeccion_semanal": [
+      { "semana": 1,  "casos_proyectados": 42,  "hospitalizados_requeridos": 4,  "tasa_rt": 1.2, "es_historico": true  },
+      { "semana": 2,  "casos_proyectados": 58,  "hospitalizados_requeridos": 6,  "tasa_rt": 1.3, "es_historico": true  },
+      { "semana": 3,  "casos_proyectados": 71,  "hospitalizados_requeridos": 7,  "tasa_rt": 1.4, "es_historico": true  },
+      { "semana": 4,  "casos_proyectados": 89,  "hospitalizados_requeridos": 9,  "tasa_rt": 1.5, "es_historico": true  },
+      { "semana": 5,  "casos_proyectados": 112, "hospitalizados_requeridos": 11, "tasa_rt": 1.6, "es_historico": false },
+      { "semana": 6,  "casos_proyectados": 145, "hospitalizados_requeridos": 15, "tasa_rt": 1.7, "es_historico": false },
+      { "semana": 7,  "casos_proyectados": 188, "hospitalizados_requeridos": 19, "tasa_rt": 1.8, "es_historico": false },
+      { "semana": 8,  "casos_proyectados": 235, "hospitalizados_requeridos": 24, "tasa_rt": 1.8, "es_historico": false },
+      { "semana": 9,  "casos_proyectados": 290, "hospitalizados_requeridos": 29, "tasa_rt": 1.7, "es_historico": false },
+      { "semana": 10, "casos_proyectados": 340, "hospitalizados_requeridos": 34, "tasa_rt": 1.6, "es_historico": false },
+      { "semana": 11, "casos_proyectados": 390, "hospitalizados_requeridos": 39, "tasa_rt": 1.5, "es_historico": false },
+      { "semana": 12, "casos_proyectados": 420, "hospitalizados_requeridos": 42, "tasa_rt": 1.4, "es_historico": false },
+      { "semana": 13, "casos_proyectados": 380, "hospitalizados_requeridos": 38, "tasa_rt": 1.2, "es_historico": false },
+      { "semana": 14, "casos_proyectados": 310, "hospitalizados_requeridos": 31, "tasa_rt": 1.0, "es_historico": false },
+      { "semana": 15, "casos_proyectados": 230, "hospitalizados_requeridos": 23, "tasa_rt": 0.9, "es_historico": false },
+      { "semana": 16, "casos_proyectados": 160, "hospitalizados_requeridos": 16, "tasa_rt": 0.8, "es_historico": false }
+    ],
+    "humanitario": {
+      "fallecidos_estimados": 12,
+      "heridos_graves": 89,
+      "personas_desplazadas": 0,
+      "personas_en_riesgo": 3240,
+      "acceso_agua_potable_pct": 94,
+      "personal_salud_por_1000hab": 1.2,
+      "albergues_requeridos": 0
+    },
+    "economico": {
+      "impacto_total_soles": 18400000,
+      "costo_atencion_soles": 12600000,
+      "inversion_preventiva_soles": 5800000,
+      "cultivos": {
+        "arroz_has": 640,
+        "mango_has": 180,
+        "platano_has": 120,
+        "total_valor_soles": 3200000
+      },
+      "infraestructura": {
+        "carreteras_afectadas_km": 8,
+        "puentes_danados": 0,
+        "viviendas_afectadas": 240
+      }
+    },
+    "alertas": [],
+    "notas_metodologicas": "Escenario base con control vectorial efectivo. Sin anomalía El Niño. R0 estimado: 1.4. Tasa de hospitalización: 10% de casos confirmados. Capacidad hospitalaria Piura: 450 camas disponibles.",
+    "distribucion_geografica": [
+      { "ciudad": "Piura",      "lat": -5.1945, "lng": -80.6328, "casos": 1296, "pct": 0.40 },
+      { "ciudad": "Sullana",    "lat": -4.9027, "lng": -80.6847, "casos":  810, "pct": 0.25 },
+      { "ciudad": "Catacaos",   "lat": -5.2664, "lng": -80.6736, "casos":  389, "pct": 0.12 },
+      { "ciudad": "Chulucanas", "lat": -5.0998, "lng": -80.1650, "casos":  324, "pct": 0.10 },
+      { "ciudad": "Paita",      "lat": -5.0891, "lng": -81.1141, "casos":  259, "pct": 0.08 },
+      { "ciudad": "Talara",     "lat": -4.5774, "lng": -81.2726, "casos":  162, "pct": 0.05 }
+    ]
+  },
+
+  "moderado": {
+    "region": "PIURA",
+    "escenario": "Moderado",
+    "generado_en": "2026-08-01T00:00:00.000Z",
+    "ventana_semanas": 16,
+    "parametros_usados": {
+      "anomalia_lluvias_pct": 60,
+      "anomalia_temperatura_c": 1.5,
+      "enos_intensidad": "moderado",
+      "racionamiento_agua_pct": 35,
+      "eficiencia_control_vectorial_pct": 40,
+      "desabastecimiento_insumos_pct": 20,
+      "serotipo_dominante": "DEN-2"
+    },
+    "kpis": {
+      "casos_proyectados_total": 11480,
+      "pico_semana": 10,
+      "maximo_semanal_casos": 2890,
+      "saturacion_hospitalaria_pct": 142,
+      "nivel_riesgo": "moderado",
+      "impacto_economico_soles": 54600000,
+      "impacto_economico_usd": 14560000,
+      "ahorro_preventivo_soles": 38200000,
+      "rt_maximo": 4.2,
+      "camas_disponibles": 450
+    },
+    "proyeccion_semanal": [
+      { "semana": 1,  "casos_proyectados": 142,  "hospitalizados_requeridos": 18,  "tasa_rt": 1.8, "es_historico": true  },
+      { "semana": 2,  "casos_proyectados": 198,  "hospitalizados_requeridos": 25,  "tasa_rt": 2.1, "es_historico": true  },
+      { "semana": 3,  "casos_proyectados": 285,  "hospitalizados_requeridos": 36,  "tasa_rt": 2.4, "es_historico": true  },
+      { "semana": 4,  "casos_proyectados": 420,  "hospitalizados_requeridos": 53,  "tasa_rt": 2.8, "es_historico": true  },
+      { "semana": 5,  "casos_proyectados": 680,  "hospitalizados_requeridos": 86,  "tasa_rt": 3.2, "es_historico": false },
+      { "semana": 6,  "casos_proyectados": 1050, "hospitalizados_requeridos": 133, "tasa_rt": 3.6, "es_historico": false },
+      { "semana": 7,  "casos_proyectados": 1580, "hospitalizados_requeridos": 200, "tasa_rt": 4.0, "es_historico": false },
+      { "semana": 8,  "casos_proyectados": 2100, "hospitalizados_requeridos": 265, "tasa_rt": 4.2, "es_historico": false },
+      { "semana": 9,  "casos_proyectados": 2650, "hospitalizados_requeridos": 335, "tasa_rt": 4.1, "es_historico": false },
+      { "semana": 10, "casos_proyectados": 2890, "hospitalizados_requeridos": 365, "tasa_rt": 3.8, "es_historico": false },
+      { "semana": 11, "casos_proyectados": 2700, "hospitalizados_requeridos": 341, "tasa_rt": 3.2, "es_historico": false },
+      { "semana": 12, "casos_proyectados": 2200, "hospitalizados_requeridos": 278, "tasa_rt": 2.6, "es_historico": false },
+      { "semana": 13, "casos_proyectados": 1650, "hospitalizados_requeridos": 208, "tasa_rt": 2.0, "es_historico": false },
+      { "semana": 14, "casos_proyectados": 1100, "hospitalizados_requeridos": 139, "tasa_rt": 1.5, "es_historico": false },
+      { "semana": 15, "casos_proyectados": 680,  "hospitalizados_requeridos": 86,  "tasa_rt": 1.1, "es_historico": false },
+      { "semana": 16, "casos_proyectados": 380,  "hospitalizados_requeridos": 48,  "tasa_rt": 0.9, "es_historico": false }
+    ],
+    "humanitario": {
+      "fallecidos_estimados": 78,
+      "heridos_graves": 720,
+      "personas_desplazadas": 4800,
+      "personas_en_riesgo": 11480,
+      "acceso_agua_potable_pct": 74,
+      "personal_salud_por_1000hab": 0.8,
+      "albergues_requeridos": 12
+    },
+    "economico": {
+      "impacto_total_soles": 54600000,
+      "costo_atencion_soles": 38200000,
+      "inversion_preventiva_soles": 16400000,
+      "cultivos": {
+        "arroz_has": 3800,
+        "mango_has": 1100,
+        "platano_has": 720,
+        "total_valor_soles": 22400000
+      },
+      "infraestructura": {
+        "carreteras_afectadas_km": 74,
+        "puentes_danados": 4,
+        "viviendas_afectadas": 1840
+      }
+    },
+    "alertas": [
+      "Riesgo de colapso hospitalario en semanas 9–13 (142% de capacidad)",
+      "DEN-2 activo: mayor riesgo de dengue grave en población sin inmunidad"
+    ],
+    "notas_metodologicas": "Escenario El Niño moderado. Anomalía de lluvia +60% genera criaderos adicionales. R0 estimado: 3.2. Tasa de hospitalización: 12.6% de casos confirmados. Requiere activar hospitales de campaña.",
+    "distribucion_geografica": [
+      { "ciudad": "Piura",      "lat": -5.1945, "lng": -80.6328, "casos": 4592, "pct": 0.40 },
+      { "ciudad": "Sullana",    "lat": -4.9027, "lng": -80.6847, "casos": 2870, "pct": 0.25 },
+      { "ciudad": "Catacaos",   "lat": -5.2664, "lng": -80.6736, "casos": 1378, "pct": 0.12 },
+      { "ciudad": "Chulucanas", "lat": -5.0998, "lng": -80.1650, "casos": 1148, "pct": 0.10 },
+      { "ciudad": "Paita",      "lat": -5.0891, "lng": -81.1141, "casos":  918, "pct": 0.08 },
+      { "ciudad": "Talara",     "lat": -4.5774, "lng": -81.2726, "casos":  574, "pct": 0.05 }
+    ]
+  },
+
+  "critico": {
+    "region": "PIURA",
+    "escenario": "El Niño / Crítico",
+    "generado_en": "2026-08-01T00:00:00.000Z",
+    "ventana_semanas": 16,
+    "parametros_usados": {
+      "anomalia_lluvias_pct": 180,
+      "anomalia_temperatura_c": 2.8,
+      "enos_intensidad": "fuerte",
+      "racionamiento_agua_pct": 55,
+      "eficiencia_control_vectorial_pct": 20,
+      "desabastecimiento_insumos_pct": 45,
+      "serotipo_dominante": "DEN-2"
+    },
+    "kpis": {
+      "casos_proyectados_total": 26123,
+      "pico_semana": 10,
+      "maximo_semanal_casos": 12246,
+      "saturacion_hospitalaria_pct": 263,
+      "nivel_riesgo": "critico",
+      "impacto_economico_soles": 109700000,
+      "impacto_economico_usd": 29260000,
+      "ahorro_preventivo_soles": 76900000,
+      "rt_maximo": 10.55,
+      "camas_disponibles": 450
+    },
+    "proyeccion_semanal": [
+      { "semana": 1,  "casos_proyectados": 245,   "hospitalizados_requeridos": 31,  "tasa_rt": 2.8,  "es_historico": true  },
+      { "semana": 2,  "casos_proyectados": 480,   "hospitalizados_requeridos": 61,  "tasa_rt": 4.2,  "es_historico": true  },
+      { "semana": 3,  "casos_proyectados": 890,   "hospitalizados_requeridos": 112, "tasa_rt": 6.1,  "es_historico": true  },
+      { "semana": 4,  "casos_proyectados": 1650,  "hospitalizados_requeridos": 208, "tasa_rt": 8.0,  "es_historico": true  },
+      { "semana": 5,  "casos_proyectados": 3200,  "hospitalizados_requeridos": 403, "tasa_rt": 9.2,  "es_historico": false },
+      { "semana": 6,  "casos_proyectados": 5800,  "hospitalizados_requeridos": 731, "tasa_rt": 10.1, "es_historico": false },
+      { "semana": 7,  "casos_proyectados": 8400,  "hospitalizados_requeridos": 1059,"tasa_rt": 10.4, "es_historico": false },
+      { "semana": 8,  "casos_proyectados": 10500, "hospitalizados_requeridos": 1323,"tasa_rt": 10.5, "es_historico": false },
+      { "semana": 9,  "casos_proyectados": 11800, "hospitalizados_requeridos": 1487,"tasa_rt": 10.5, "es_historico": false },
+      { "semana": 10, "casos_proyectados": 12246, "hospitalizados_requeridos": 1543,"tasa_rt": 10.55,"es_historico": false },
+      { "semana": 11, "casos_proyectados": 10900, "hospitalizados_requeridos": 1373,"tasa_rt": 9.8,  "es_historico": false },
+      { "semana": 12, "casos_proyectados": 8200,  "hospitalizados_requeridos": 1033,"tasa_rt": 8.2,  "es_historico": false },
+      { "semana": 13, "casos_proyectados": 5400,  "hospitalizados_requeridos": 680, "tasa_rt": 6.0,  "es_historico": false },
+      { "semana": 14, "casos_proyectados": 3100,  "hospitalizados_requeridos": 391, "tasa_rt": 4.1,  "es_historico": false },
+      { "semana": 15, "casos_proyectados": 1650,  "hospitalizados_requeridos": 208, "tasa_rt": 2.8,  "es_historico": false },
+      { "semana": 16, "casos_proyectados": 780,   "hospitalizados_requeridos": 98,  "tasa_rt": 1.8,  "es_historico": false }
+    ],
+    "humanitario": {
+      "fallecidos_estimados": 284,
+      "heridos_graves": 3200,
+      "personas_desplazadas": 21000,
+      "personas_en_riesgo": 26123,
+      "acceso_agua_potable_pct": 46,
+      "personal_salud_por_1000hab": 0.3,
+      "albergues_requeridos": 48
+    },
+    "economico": {
+      "impacto_total_soles": 109700000,
+      "costo_atencion_soles": 82800000,
+      "inversion_preventiva_soles": 26900000,
+      "cultivos": {
+        "arroz_has": 10800,
+        "mango_has": 3600,
+        "platano_has": 2400,
+        "total_valor_soles": 68400000
+      },
+      "infraestructura": {
+        "carreteras_afectadas_km": 310,
+        "puentes_danados": 16,
+        "viviendas_afectadas": 7200
+      }
+    },
+    "alertas": [
+      "ALERTA ROJA — Colapso hospitalario proyectado: 263% de capacidad. Activar Plan Nacional de Contingencia.",
+      "Desabastecimiento crítico de insumos (45%): déficit de sueros, paracetamol y reactivos diagnósticos",
+      "DEN-2 activo: riesgo elevado de dengue grave en adultos sin inmunidad previa"
+    ],
+    "notas_metodologicas": "Calibrado con brote El Niño Yaku 2023-2024 en Piura. Anomalía de lluvia +180% (SENAMHI). R0 estimado: 8.4. El pico en Sem 10 supera 27× la capacidad hospitalaria disponible.",
+    "distribucion_geografica": [
+      { "ciudad": "Piura",      "lat": -5.1945, "lng": -80.6328, "casos": 10449, "pct": 0.40 },
+      { "ciudad": "Sullana",    "lat": -4.9027, "lng": -80.6847, "casos":  6531, "pct": 0.25 },
+      { "ciudad": "Catacaos",   "lat": -5.2664, "lng": -80.6736, "casos":  3135, "pct": 0.12 },
+      { "ciudad": "Chulucanas", "lat": -5.0998, "lng": -80.1650, "casos":  2612, "pct": 0.10 },
+      { "ciudad": "Paita",      "lat": -5.0891, "lng": -81.1141, "casos":  2090, "pct": 0.08 },
+      { "ciudad": "Talara",     "lat": -4.5774, "lng": -81.2726, "casos":  1306, "pct": 0.05 }
+    ]
+  }
+}

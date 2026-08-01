@@ -2,6 +2,8 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { AnimatePresence } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { Map, Marker, Popup, type MapRef } from 'react-map-gl/maplibre';
+import { SEIRMapOverlay, SEIRTimelineBar } from '../seir-model/SEIRMapOverlay';
+import type { SEIRModelResponse } from '../seir-model/seir-types';
 import { AlertMarkerIcon } from './components/AlertMarkerIcon';
 import { AlertPopup } from './components/AlertPopup';
 import { HeatmapLayer } from './components/HeatmapLayer';
@@ -43,7 +45,24 @@ function PulseMarker({ coords }: { coords: [number, number] }) {
   );
 }
 
-export function MapDashboard() {
+// Region center coordinates for fly-to
+const REGION_CENTERS: Record<string, [number, number]> = {
+  PIURA:       [-80.63, -5.19],
+  LORETO:      [-73.25, -3.75],
+  'SAN MARTIN': [-76.37, -6.49],
+  UCAYALI:     [-74.55, -8.39],
+  TUMBES:      [-80.45, -3.57],
+  'LA LIBERTAD': [-79.00, -8.12],
+  LAMBAYEQUE:  [-79.84, -6.70],
+  LIMA:        [-77.04, -12.04],
+};
+
+interface MapDashboardProps {
+  seirData?: SEIRModelResponse | null;
+  seirSubTab?: 'epidemico' | 'humanitario' | 'economico';
+}
+
+export function MapDashboard({ seirData, seirSubTab = 'epidemico' }: MapDashboardProps = {}) {
   const mapRef = useRef<MapRef>(null);
 
   const {
@@ -66,6 +85,16 @@ export function MapDashboard() {
       essential: true,
     });
   }, [flyTarget?.seq]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Fly to the SEIR region when data arrives
+  useEffect(() => {
+    if (!seirData || !mapRef.current) return;
+    const regionKey = seirData.region.split(' — ')[0].toUpperCase();
+    const coords = REGION_CENTERS[regionKey];
+    if (coords) {
+      mapRef.current.flyTo({ center: coords, zoom: 9, duration: 1600, essential: true });
+    }
+  }, [seirData?.region]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleMarkerClick = (alert: AlertaMapa) => {
     const coords = getCoords(alert.departamento, alert.distrito);
@@ -130,6 +159,9 @@ export function MapDashboard() {
           );
         }) : null}
 
+        {/* SEIR epidemic spread overlay */}
+        {seirData && <SEIRMapOverlay data={seirData} activeTab={seirSubTab} />}
+
         {/* Fly target pulse */}
         {flyTarget && <PulseMarker coords={flyTarget.coords} />}
 
@@ -192,9 +224,14 @@ export function MapDashboard() {
       {/* Map overlays */}
       <MapLegend />
 
+      {/* SEIR timeline bar — bottom of the map half */}
+      <AnimatePresence>
+        {seirData && <SEIRTimelineBar data={seirData} />}
+      </AnimatePresence>
+
       {!timelineMode && <MapStatusBar />}
 
-      {alerts.length === 0 && heatmapPoints.length === 0 && !timelineMode && (
+      {alerts.length === 0 && heatmapPoints.length === 0 && !timelineMode && !seirData && (
         <div
           className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 rounded-full px-4 py-2 pointer-events-none"
           style={{

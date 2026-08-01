@@ -1,0 +1,374 @@
+{
+  "_contract": {
+    "source": "SENAMHI + INDECI Risk Engine",
+    "description": "Análisis de zonas históricamente afectadas por escenario de fenómeno e intensidad",
+    "endpoint": "POST https://api.senamhi.gob.pe/v1/escenarios/analyze  { escenarioId, intensidad, departamento? }",
+    "auth": "Bearer token (API key SENAMHI)",
+    "notes": "intensidad: normal|moderado|extremo. nivel zona: normal|moderado|extremo. promedio_anual = eventos/año histórico."
+  },
+
+  "HELADAS_normal": {
+    "intensidad": "normal",
+    "total_zonas": 42,
+    "resumen_estadistico": { "total_historico": 18450, "departamentos_afectados": 8 },
+    "commentary": "Las zonas del altiplano puneño presentan heladas recurrentes cada invierno. El patrón muestra mayor concentración en julio-agosto, con impacto en ganadería alpaquera y cultivos de papa.",
+    "ai_disponible": true,
+    "zonas_afectadas": [
+      { "departamento": "PUNO",         "distrito": "AZANGARO",    "promedio_anual": 8.2,  "maximo_anual": 14, "anios_con_eventos": 18, "nivel": "moderado", "count": 82  },
+      { "departamento": "PUNO",         "distrito": "HUANCANE",    "promedio_anual": 7.8,  "maximo_anual": 13, "anios_con_eventos": 17, "nivel": "moderado", "count": 78  },
+      { "departamento": "PUNO",         "distrito": "MELGAR",      "promedio_anual": 7.2,  "maximo_anual": 12, "anios_con_eventos": 16, "nivel": "moderado", "count": 72  },
+      { "departamento": "CUSCO",        "distrito": "ESPINAR",     "promedio_anual": 6.5,  "maximo_anual": 11, "anios_con_eventos": 15, "nivel": "moderado", "count": 65  },
+      { "departamento": "PUNO",         "distrito": "PUNO",        "promedio_anual": 6.1,  "maximo_anual": 10, "anios_con_eventos": 14, "nivel": "normal",   "count": 61  },
+      { "departamento": "CUSCO",        "distrito": "CANAS",       "promedio_anual": 5.8,  "maximo_anual": 9,  "anios_con_eventos": 14, "nivel": "normal",   "count": 58  },
+      { "departamento": "APURIMAC",     "distrito": "ANTABAMBA",   "promedio_anual": 5.2,  "maximo_anual": 8,  "anios_con_eventos": 13, "nivel": "normal",   "count": 52  },
+      { "departamento": "HUANCAVELICA", "distrito": "CASTROVIRREYNA","promedio_anual": 4.8, "maximo_anual": 7,  "anios_con_eventos": 12, "nivel": "normal",   "count": 48  },
+      { "departamento": "AYACUCHO",     "distrito": "LUCANAS",     "promedio_anual": 4.2,  "maximo_anual": 7,  "anios_con_eventos": 11, "nivel": "normal",   "count": 42  },
+      { "departamento": "JUNIN",        "distrito": "JUNIN",       "promedio_anual": 3.8,  "maximo_anual": 6,  "anios_con_eventos": 10, "nivel": "normal",   "count": 38  }
+    ]
+  },
+
+  "HELADAS_moderado": {
+    "intensidad": "moderado",
+    "total_zonas": 28,
+    "resumen_estadistico": { "total_historico": 18450, "departamentos_afectados": 7 },
+    "commentary": "Escenario moderado de heladas activa 28 zonas críticas en la sierra sur. Azangaro y Huancané concentran el mayor historial con picos de 13-14 eventos por año. Se recomienda activar planes de contingencia para población alpaquera.",
+    "ai_disponible": true,
+    "zonas_afectadas": [
+      { "departamento": "PUNO",         "distrito": "AZANGARO",    "promedio_anual": 8.2,  "maximo_anual": 14, "anios_con_eventos": 18, "nivel": "extremo",  "count": 82  },
+      { "departamento": "PUNO",         "distrito": "HUANCANE",    "promedio_anual": 7.8,  "maximo_anual": 13, "anios_con_eventos": 17, "nivel": "extremo",  "count": 78  },
+      { "departamento": "PUNO",         "distrito": "MELGAR",      "promedio_anual": 7.2,  "maximo_anual": 12, "anios_con_eventos": 16, "nivel": "moderado", "count": 72  },
+      { "departamento": "CUSCO",        "distrito": "ESPINAR",     "promedio_anual": 6.5,  "maximo_anual": 11, "anios_con_eventos": 15, "nivel": "moderado", "count": 65  },
+      { "departamento": "CUSCO",        "distrito": "CANAS",       "promedio_anual": 5.8,  "maximo_anual": 9,  "anios_con_eventos": 14, "nivel": "moderado", "count": 58  },
+      { "departamento": "APURIMAC",     "distrito": "ANTABAMBA",   "promedio_anual": 5.2,  "maximo_anual": 8,  "anios_con_eventos": 13, "nivel": "moderado", "count": 52  }
+    ]
+  },
+
+  "HELADAS_extremo": {
+    "intensidad": "extremo",
+    "total_zonas": 18,
+    "resumen_estadistico": { "total_historico": 18450, "departamentos_afectados": 5 },
+    "commentary": "En escenario extremo, solo las 18 zonas con mayor historial de heladas severas permanecen en riesgo crítico. El altiplano puneño es el epicentro, con temperaturas que pueden caer a -15°C en situaciones de friaje extraordinario.",
+    "ai_disponible": true,
+    "zonas_afectadas": [
+      { "departamento": "PUNO",         "distrito": "AZANGARO",    "promedio_anual": 8.2,  "maximo_anual": 14, "anios_con_eventos": 18, "nivel": "extremo",  "count": 82  },
+      { "departamento": "PUNO",         "distrito": "HUANCANE",    "promedio_anual": 7.8,  "maximo_anual": 13, "anios_con_eventos": 17, "nivel": "extremo",  "count": 78  },
+      { "departamento": "PUNO",         "distrito": "MELGAR",      "promedio_anual": 7.2,  "maximo_anual": 12, "anios_con_eventos": 16, "nivel": "extremo",  "count": 72  },
+      { "departamento": "CUSCO",        "distrito": "ESPINAR",     "promedio_anual": 6.5,  "maximo_anual": 11, "anios_con_eventos": 15, "nivel": "extremo",  "count": 65  }
+    ]
+  },
+
+  "LLUVIAS_INTENSAS_normal": {
+    "intensidad": "normal",
+    "total_zonas": 65,
+    "resumen_estadistico": { "total_historico": 62450, "departamentos_afectados": 15 },
+    "commentary": "Las lluvias intensas afectan principalmente la vertiente amazónica y el norte costero. Loreto y Piura lideran el historial. El patrón estacional muestra picos en enero-marzo.",
+    "ai_disponible": true,
+    "zonas_afectadas": [
+      { "departamento": "LORETO",      "distrito": "IQUITOS",      "promedio_anual": 22.4, "maximo_anual": 38, "anios_con_eventos": 20, "nivel": "extremo",  "count": 224 },
+      { "departamento": "PIURA",       "distrito": "PIURA",        "promedio_anual": 18.6, "maximo_anual": 42, "anios_con_eventos": 20, "nivel": "extremo",  "count": 186 },
+      { "departamento": "SAN MARTIN",  "distrito": "TARAPOTO",     "promedio_anual": 16.2, "maximo_anual": 28, "anios_con_eventos": 19, "nivel": "extremo",  "count": 162 },
+      { "departamento": "PIURA",       "distrito": "CASTILLA",     "promedio_anual": 14.8, "maximo_anual": 35, "anios_con_eventos": 18, "nivel": "moderado", "count": 148 },
+      { "departamento": "UCAYALI",     "distrito": "PUCALLPA",     "promedio_anual": 12.4, "maximo_anual": 22, "anios_con_eventos": 17, "nivel": "moderado", "count": 124 },
+      { "departamento": "AMAZONAS",    "distrito": "BAGUA GRANDE", "promedio_anual": 10.8, "maximo_anual": 19, "anios_con_eventos": 16, "nivel": "moderado", "count": 108 },
+      { "departamento": "TUMBES",      "distrito": "TUMBES",       "promedio_anual": 9.6,  "maximo_anual": 24, "anios_con_eventos": 15, "nivel": "moderado", "count": 96  },
+      { "departamento": "LA LIBERTAD", "distrito": "TRUJILLO",     "promedio_anual": 7.2,  "maximo_anual": 18, "anios_con_eventos": 14, "nivel": "normal",   "count": 72  },
+      { "departamento": "CAJAMARCA",   "distrito": "CAJAMARCA",    "promedio_anual": 6.5,  "maximo_anual": 12, "anios_con_eventos": 13, "nivel": "normal",   "count": 65  },
+      { "departamento": "ANCASH",      "distrito": "HUARAZ",       "promedio_anual": 5.8,  "maximo_anual": 10, "anios_con_eventos": 12, "nivel": "normal",   "count": 58  }
+    ]
+  },
+
+  "LLUVIAS_INTENSAS_moderado": {
+    "intensidad": "moderado",
+    "total_zonas": 45,
+    "resumen_estadistico": { "total_historico": 62450, "departamentos_afectados": 12 },
+    "commentary": "El escenario moderado de lluvias intensas concentra el riesgo en las cuencas de mayor acumulación. Loreto y Piura encabezan la lista con promedios anuales críticos que superan los 18 eventos por año.",
+    "ai_disponible": true,
+    "zonas_afectadas": [
+      { "departamento": "LORETO",      "distrito": "IQUITOS",      "promedio_anual": 22.4, "maximo_anual": 38, "anios_con_eventos": 20, "nivel": "extremo",  "count": 224 },
+      { "departamento": "PIURA",       "distrito": "PIURA",        "promedio_anual": 18.6, "maximo_anual": 42, "anios_con_eventos": 20, "nivel": "extremo",  "count": 186 },
+      { "departamento": "SAN MARTIN",  "distrito": "TARAPOTO",     "promedio_anual": 16.2, "maximo_anual": 28, "anios_con_eventos": 19, "nivel": "extremo",  "count": 162 },
+      { "departamento": "PIURA",       "distrito": "CASTILLA",     "promedio_anual": 14.8, "maximo_anual": 35, "anios_con_eventos": 18, "nivel": "extremo",  "count": 148 },
+      { "departamento": "UCAYALI",     "distrito": "PUCALLPA",     "promedio_anual": 12.4, "maximo_anual": 22, "anios_con_eventos": 17, "nivel": "moderado", "count": 124 }
+    ]
+  },
+
+  "LLUVIAS_INTENSAS_extremo": {
+    "intensidad": "extremo",
+    "total_zonas": 30,
+    "resumen_estadistico": { "total_historico": 62450, "departamentos_afectados": 10 },
+    "commentary": "Escenario de Niño Costero: Piura registró 42 eventos en un solo año (2017). Iquitos supera los 38 eventos anuales en años extremos. Se activan 30 zonas en nivel crítico.",
+    "ai_disponible": true,
+    "zonas_afectadas": [
+      { "departamento": "PIURA",       "distrito": "PIURA",        "promedio_anual": 18.6, "maximo_anual": 42, "anios_con_eventos": 20, "nivel": "extremo",  "count": 186 },
+      { "departamento": "LORETO",      "distrito": "IQUITOS",      "promedio_anual": 22.4, "maximo_anual": 38, "anios_con_eventos": 20, "nivel": "extremo",  "count": 224 },
+      { "departamento": "PIURA",       "distrito": "CASTILLA",     "promedio_anual": 14.8, "maximo_anual": 35, "anios_con_eventos": 18, "nivel": "extremo",  "count": 148 },
+      { "departamento": "TUMBES",      "distrito": "TUMBES",       "promedio_anual": 9.6,  "maximo_anual": 24, "anios_con_eventos": 15, "nivel": "moderado", "count": 96  }
+    ]
+  },
+
+  "HUAICOS_normal": {
+    "intensidad": "normal",
+    "total_zonas": 50,
+    "resumen_estadistico": { "total_historico": 28310, "departamentos_afectados": 14 },
+    "commentary": "Los huaicos y deslizamientos se concentran en quebradas de la sierra central y norte. Ayacucho, Junín y Cusco encabezan el historial. El riesgo aumenta dramáticamente durante la temporada de lluvias.",
+    "ai_disponible": true,
+    "zonas_afectadas": [
+      { "departamento": "AYACUCHO",   "distrito": "HUAMANGA",     "promedio_anual": 12.4, "maximo_anual": 22, "anios_con_eventos": 18, "nivel": "extremo",  "count": 124 },
+      { "departamento": "JUNIN",      "distrito": "SATIPO",       "promedio_anual": 10.8, "maximo_anual": 18, "anios_con_eventos": 17, "nivel": "extremo",  "count": 108 },
+      { "departamento": "CUSCO",      "distrito": "LA CONVENCION","promedio_anual": 9.6,  "maximo_anual": 16, "anios_con_eventos": 16, "nivel": "moderado", "count": 96  },
+      { "departamento": "ANCASH",     "distrito": "HUAYLAS",      "promedio_anual": 8.2,  "maximo_anual": 14, "anios_con_eventos": 15, "nivel": "moderado", "count": 82  },
+      { "departamento": "HUANUCO",    "distrito": "LEONCIO PRADO","promedio_anual": 7.5,  "maximo_anual": 12, "anios_con_eventos": 14, "nivel": "moderado", "count": 75  },
+      { "departamento": "LA LIBERTAD","distrito": "OTUZCO",       "promedio_anual": 6.2,  "maximo_anual": 10, "anios_con_eventos": 13, "nivel": "normal",   "count": 62  }
+    ]
+  },
+
+  "HUAICOS_moderado": {
+    "intensidad": "moderado",
+    "total_zonas": 32,
+    "resumen_estadistico": { "total_historico": 28310, "departamentos_afectados": 10 },
+    "commentary": "Las zonas de mayor riesgo moderado a extremo de huaicos incluyen 32 distritos con promedios anuales por encima de 3 eventos. La cuenca del Mantaro y los ríos amazónicos son los corredores más críticos.",
+    "ai_disponible": true,
+    "zonas_afectadas": [
+      { "departamento": "AYACUCHO",   "distrito": "HUAMANGA",     "promedio_anual": 12.4, "maximo_anual": 22, "anios_con_eventos": 18, "nivel": "extremo",  "count": 124 },
+      { "departamento": "JUNIN",      "distrito": "SATIPO",       "promedio_anual": 10.8, "maximo_anual": 18, "anios_con_eventos": 17, "nivel": "extremo",  "count": 108 },
+      { "departamento": "CUSCO",      "distrito": "LA CONVENCION","promedio_anual": 9.6,  "maximo_anual": 16, "anios_con_eventos": 16, "nivel": "moderado", "count": 96  },
+      { "departamento": "ANCASH",     "distrito": "HUAYLAS",      "promedio_anual": 8.2,  "maximo_anual": 14, "anios_con_eventos": 15, "nivel": "moderado", "count": 82  }
+    ]
+  },
+
+  "HUAICOS_extremo": {
+    "intensidad": "extremo",
+    "total_zonas": 18,
+    "resumen_estadistico": { "total_historico": 28310, "departamentos_afectados": 7 },
+    "commentary": "En escenario extremo, Huamanga concentra 22 eventos en un año pico. Las zonas de alto riesgo requieren planes de evacuación activados y rutas alternas identificadas previamente.",
+    "ai_disponible": true,
+    "zonas_afectadas": [
+      { "departamento": "AYACUCHO",   "distrito": "HUAMANGA",     "promedio_anual": 12.4, "maximo_anual": 22, "anios_con_eventos": 18, "nivel": "extremo",  "count": 124 },
+      { "departamento": "JUNIN",      "distrito": "SATIPO",       "promedio_anual": 10.8, "maximo_anual": 18, "anios_con_eventos": 17, "nivel": "extremo",  "count": 108 }
+    ]
+  },
+
+  "GRANIZADAS_normal": {
+    "intensidad": "normal",
+    "total_zonas": 38,
+    "resumen_estadistico": { "total_historico": 8240, "departamentos_afectados": 11 },
+    "commentary": "Granizadas recurrentes en la sierra central y sur, con mayor impacto en cultivos de maíz y papa. Junín y Huancavelica presentan el mayor historial de eventos.",
+    "ai_disponible": true,
+    "zonas_afectadas": [
+      { "departamento": "JUNIN",        "distrito": "HUANCAYO",    "promedio_anual": 4.8, "maximo_anual": 8, "anios_con_eventos": 15, "nivel": "moderado", "count": 48 },
+      { "departamento": "HUANCAVELICA", "distrito": "HUANCAVELICA","promedio_anual": 4.2, "maximo_anual": 7, "anios_con_eventos": 14, "nivel": "moderado", "count": 42 },
+      { "departamento": "AYACUCHO",     "distrito": "HUAMANGA",    "promedio_anual": 3.8, "maximo_anual": 6, "anios_con_eventos": 13, "nivel": "normal",   "count": 38 },
+      { "departamento": "APURIMAC",     "distrito": "ANDAHUAYLAS", "promedio_anual": 3.2, "maximo_anual": 5, "anios_con_eventos": 12, "nivel": "normal",   "count": 32 }
+    ]
+  },
+
+  "GRANIZADAS_moderado": {
+    "intensidad": "moderado",
+    "total_zonas": 22,
+    "resumen_estadistico": { "total_historico": 8240, "departamentos_afectados": 8 },
+    "commentary": "Las granizadas moderadas a extremas afectan principalmente la cuenca del Mantaro. Los episodios más intensos ocurren en la transición entre lluvias (noviembre-diciembre).",
+    "ai_disponible": false,
+    "zonas_afectadas": [
+      { "departamento": "JUNIN",        "distrito": "HUANCAYO",    "promedio_anual": 4.8, "maximo_anual": 8, "anios_con_eventos": 15, "nivel": "moderado", "count": 48 },
+      { "departamento": "HUANCAVELICA", "distrito": "HUANCAVELICA","promedio_anual": 4.2, "maximo_anual": 7, "anios_con_eventos": 14, "nivel": "moderado", "count": 42 }
+    ]
+  },
+
+  "GRANIZADAS_extremo": {
+    "intensidad": "extremo",
+    "total_zonas": 12,
+    "resumen_estadistico": { "total_historico": 8240, "departamentos_afectados": 5 },
+    "commentary": "En escenario extremo, las granizadas pueden alcanzar hasta 8 eventos por año en Huancayo, generando pérdidas agrícolas significativas y daños en infraestructura rural.",
+    "ai_disponible": false,
+    "zonas_afectadas": [
+      { "departamento": "JUNIN",        "distrito": "HUANCAYO",    "promedio_anual": 4.8, "maximo_anual": 8, "anios_con_eventos": 15, "nivel": "extremo",  "count": 48 }
+    ]
+  },
+
+  "SISMO_normal": {
+    "intensidad": "normal",
+    "total_zonas": 20,
+    "resumen_estadistico": { "total_historico": 8450, "departamentos_afectados": 12 },
+    "commentary": "El litoral peruano mantiene actividad sísmica permanente. Lima, Ica y Arequipa registran mayor frecuencia de eventos por su posición sobre la zona de subducción de la placa de Nazca.",
+    "ai_disponible": false,
+    "zonas_afectadas": [
+      { "departamento": "ICA",          "distrito": "ICA",          "promedio_anual": 4.2, "maximo_anual": 8, "anios_con_eventos": 18, "nivel": "moderado", "count": 42 },
+      { "departamento": "LIMA",         "distrito": "LIMA",         "promedio_anual": 3.8, "maximo_anual": 7, "anios_con_eventos": 17, "nivel": "moderado", "count": 38 },
+      { "departamento": "AREQUIPA",     "distrito": "AREQUIPA",     "promedio_anual": 3.5, "maximo_anual": 6, "anios_con_eventos": 16, "nivel": "normal",   "count": 35 },
+      { "departamento": "MOQUEGUA",     "distrito": "MOQUEGUA",     "promedio_anual": 2.8, "maximo_anual": 5, "anios_con_eventos": 14, "nivel": "normal",   "count": 28 }
+    ]
+  },
+
+  "SISMO_moderado": {
+    "intensidad": "moderado",
+    "total_zonas": 12,
+    "resumen_estadistico": { "total_historico": 8450, "departamentos_afectados": 8 },
+    "commentary": "Las zonas de mayor riesgo sísmico moderado a extremo incluyen el corredor Ica-Lima-Ancash. La acumulación de estrés tectónico en la zona de contacto Nazca-Sudamericana es el factor determinante.",
+    "ai_disponible": false,
+    "zonas_afectadas": [
+      { "departamento": "ICA",          "distrito": "ICA",          "promedio_anual": 4.2, "maximo_anual": 8, "anios_con_eventos": 18, "nivel": "extremo",  "count": 42 },
+      { "departamento": "LIMA",         "distrito": "LIMA",         "promedio_anual": 3.8, "maximo_anual": 7, "anios_con_eventos": 17, "nivel": "moderado", "count": 38 }
+    ]
+  },
+
+  "SISMO_extremo": {
+    "intensidad": "extremo",
+    "total_zonas": 8,
+    "resumen_estadistico": { "total_historico": 8450, "departamentos_afectados": 5 },
+    "commentary": "En escenario extremo (equivalente al sismo de Pisco 2007, Mw 8.0), Ica y Lima concentran el mayor riesgo. Se requieren planes de continuidad para hospitales y sistemas de agua potable.",
+    "ai_disponible": false,
+    "zonas_afectadas": [
+      { "departamento": "ICA",          "distrito": "ICA",          "promedio_anual": 4.2, "maximo_anual": 8, "anios_con_eventos": 18, "nivel": "extremo",  "count": 42 }
+    ]
+  },
+
+  "INCENDIO_FORESTAL_normal": {
+    "intensidad": "normal",
+    "total_zonas": 35,
+    "resumen_estadistico": { "total_historico": 15230, "departamentos_afectados": 13 },
+    "commentary": "Los incendios forestales se intensifican en la temporada seca (julio-septiembre) en la Amazonía. Ucayali, San Martín y Madre de Dios lideran el historial.",
+    "ai_disponible": true,
+    "zonas_afectadas": [
+      { "departamento": "UCAYALI",      "distrito": "PUCALLPA",          "promedio_anual": 14.2, "maximo_anual": 24, "anios_con_eventos": 17, "nivel": "extremo",  "count": 142 },
+      { "departamento": "SAN MARTIN",   "distrito": "TARAPOTO",          "promedio_anual": 12.8, "maximo_anual": 20, "anios_con_eventos": 16, "nivel": "moderado", "count": 128 },
+      { "departamento": "MADRE DE DIOS","distrito": "PUERTO MALDONADO",  "promedio_anual": 10.4, "maximo_anual": 18, "anios_con_eventos": 15, "nivel": "moderado", "count": 104 },
+      { "departamento": "LORETO",       "distrito": "IQUITOS",           "promedio_anual": 8.6,  "maximo_anual": 14, "anios_con_eventos": 14, "nivel": "normal",   "count": 86  }
+    ]
+  },
+
+  "INCENDIO_FORESTAL_moderado": {
+    "intensidad": "moderado",
+    "total_zonas": 22,
+    "resumen_estadistico": { "total_historico": 15230, "departamentos_afectados": 9 },
+    "commentary": "En escenario moderado, Pucallpa concentra el mayor riesgo de incendio forestal con 24 eventos en el año pico. Las quemas agrícolas no controladas son el principal detonante.",
+    "ai_disponible": true,
+    "zonas_afectadas": [
+      { "departamento": "UCAYALI",      "distrito": "PUCALLPA",          "promedio_anual": 14.2, "maximo_anual": 24, "anios_con_eventos": 17, "nivel": "extremo",  "count": 142 },
+      { "departamento": "SAN MARTIN",   "distrito": "TARAPOTO",          "promedio_anual": 12.8, "maximo_anual": 20, "anios_con_eventos": 16, "nivel": "extremo",  "count": 128 },
+      { "departamento": "MADRE DE DIOS","distrito": "PUERTO MALDONADO",  "promedio_anual": 10.4, "maximo_anual": 18, "anios_con_eventos": 15, "nivel": "moderado", "count": 104 }
+    ]
+  },
+
+  "INCENDIO_FORESTAL_extremo": {
+    "intensidad": "extremo",
+    "total_zonas": 14,
+    "resumen_estadistico": { "total_historico": 15230, "departamentos_afectados": 6 },
+    "commentary": "Escenario crítico de incendios forestales activa alertas en 14 zonas. El calentamiento extremo combinado con sequía puede replicar las condiciones del año 2019 en la Amazonía.",
+    "ai_disponible": true,
+    "zonas_afectadas": [
+      { "departamento": "UCAYALI",      "distrito": "PUCALLPA",          "promedio_anual": 14.2, "maximo_anual": 24, "anios_con_eventos": 17, "nivel": "extremo",  "count": 142 },
+      { "departamento": "SAN MARTIN",   "distrito": "TARAPOTO",          "promedio_anual": 12.8, "maximo_anual": 20, "anios_con_eventos": 16, "nivel": "extremo",  "count": 128 }
+    ]
+  },
+
+  "SEQUIA_normal": {
+    "intensidad": "normal",
+    "total_zonas": 28,
+    "resumen_estadistico": { "total_historico": 4560, "departamentos_afectados": 10 },
+    "commentary": "La sequía afecta principalmente las cuencas del Pacífico sur durante el estiaje (junio-octubre). Arequipa, Moquegua y Tacna presentan el mayor déficit hídrico histórico.",
+    "ai_disponible": true,
+    "zonas_afectadas": [
+      { "departamento": "AREQUIPA",    "distrito": "AREQUIPA",    "promedio_anual": 3.8, "maximo_anual": 7, "anios_con_eventos": 16, "nivel": "moderado", "count": 38 },
+      { "departamento": "MOQUEGUA",   "distrito": "MOQUEGUA",    "promedio_anual": 3.4, "maximo_anual": 6, "anios_con_eventos": 15, "nivel": "normal",   "count": 34 },
+      { "departamento": "TACNA",      "distrito": "TACNA",       "promedio_anual": 3.0, "maximo_anual": 5, "anios_con_eventos": 14, "nivel": "normal",   "count": 30 },
+      { "departamento": "ICA",        "distrito": "ICA",         "promedio_anual": 2.6, "maximo_anual": 4, "anios_con_eventos": 12, "nivel": "normal",   "count": 26 }
+    ]
+  },
+
+  "SEQUIA_moderado": {
+    "intensidad": "moderado",
+    "total_zonas": 16,
+    "resumen_estadistico": { "total_historico": 4560, "departamentos_afectados": 7 },
+    "commentary": "Déficit hídrico moderado en el sur del Perú. Arequipa y Moquegua han registrado reservorios por debajo del 40% de capacidad en años de sequía moderada.",
+    "ai_disponible": false,
+    "zonas_afectadas": [
+      { "departamento": "AREQUIPA",    "distrito": "AREQUIPA",    "promedio_anual": 3.8, "maximo_anual": 7, "anios_con_eventos": 16, "nivel": "extremo",  "count": 38 },
+      { "departamento": "MOQUEGUA",   "distrito": "MOQUEGUA",    "promedio_anual": 3.4, "maximo_anual": 6, "anios_con_eventos": 15, "nivel": "moderado", "count": 34 }
+    ]
+  },
+
+  "SEQUIA_extremo": {
+    "intensidad": "extremo",
+    "total_zonas": 8,
+    "resumen_estadistico": { "total_historico": 4560, "departamentos_afectados": 4 },
+    "commentary": "Escenario de sequía severa: los reservorios de Arequipa pueden caer por debajo del 20%. Se activan restricciones de agua potable y se declaran emergencias agropecuarias.",
+    "ai_disponible": false,
+    "zonas_afectadas": [
+      { "departamento": "AREQUIPA",    "distrito": "AREQUIPA",    "promedio_anual": 3.8, "maximo_anual": 7, "anios_con_eventos": 16, "nivel": "extremo",  "count": 38 }
+    ]
+  },
+
+  "EPIDEMIA_normal": {
+    "intensidad": "normal",
+    "total_zonas": 30,
+    "resumen_estadistico": { "total_historico": 4780, "departamentos_afectados": 11 },
+    "commentary": "Los brotes de dengue y malaria se concentran en la selva baja. Loreto, San Martín y Ucayali presentan el mayor historial epidémico, con picos asociados a temporadas de lluvias.",
+    "ai_disponible": true,
+    "zonas_afectadas": [
+      { "departamento": "LORETO",     "distrito": "IQUITOS",     "promedio_anual": 8.6, "maximo_anual": 14, "anios_con_eventos": 18, "nivel": "extremo",  "count": 86 },
+      { "departamento": "SAN MARTIN", "distrito": "TARAPOTO",    "promedio_anual": 6.8, "maximo_anual": 11, "anios_con_eventos": 16, "nivel": "moderado", "count": 68 },
+      { "departamento": "UCAYALI",    "distrito": "PUCALLPA",    "promedio_anual": 5.4, "maximo_anual": 9,  "anios_con_eventos": 14, "nivel": "moderado", "count": 54 },
+      { "departamento": "PIURA",      "distrito": "PIURA",       "promedio_anual": 4.2, "maximo_anual": 8,  "anios_con_eventos": 13, "nivel": "normal",   "count": 42 }
+    ]
+  },
+
+  "EPIDEMIA_moderado": {
+    "intensidad": "moderado",
+    "total_zonas": 18,
+    "resumen_estadistico": { "total_historico": 4780, "departamentos_afectados": 8 },
+    "commentary": "Loreto registra los índices de dengue más altos del país. En años de El Niño, el brote puede extenderse hacia la costa norte, alcanzando a Piura y Tumbes.",
+    "ai_disponible": true,
+    "zonas_afectadas": [
+      { "departamento": "LORETO",     "distrito": "IQUITOS",     "promedio_anual": 8.6, "maximo_anual": 14, "anios_con_eventos": 18, "nivel": "extremo",  "count": 86 },
+      { "departamento": "SAN MARTIN", "distrito": "TARAPOTO",    "promedio_anual": 6.8, "maximo_anual": 11, "anios_con_eventos": 16, "nivel": "extremo",  "count": 68 },
+      { "departamento": "UCAYALI",    "distrito": "PUCALLPA",    "promedio_anual": 5.4, "maximo_anual": 9,  "anios_con_eventos": 14, "nivel": "moderado", "count": 54 }
+    ]
+  },
+
+  "EPIDEMIA_extremo": {
+    "intensidad": "extremo",
+    "total_zonas": 10,
+    "resumen_estadistico": { "total_historico": 4780, "departamentos_afectados": 5 },
+    "commentary": "En escenario extremo, Iquitos puede registrar hasta 14 brotes anuales. La saturación del sistema de salud en Loreto es el mayor riesgo asociado.",
+    "ai_disponible": false,
+    "zonas_afectadas": [
+      { "departamento": "LORETO",     "distrito": "IQUITOS",     "promedio_anual": 8.6, "maximo_anual": 14, "anios_con_eventos": 18, "nivel": "extremo",  "count": 86 }
+    ]
+  },
+
+  "OLA_CALOR_normal": {
+    "intensidad": "normal",
+    "total_zonas": 15,
+    "resumen_estadistico": { "total_historico": 1240, "departamentos_afectados": 6 },
+    "commentary": "Las olas de calor son un fenómeno emergente en el Perú. Lima y la costa norte registran temperaturas superiores a 35°C en veranos de El Niño.",
+    "ai_disponible": false,
+    "zonas_afectadas": [
+      { "departamento": "PIURA",      "distrito": "PIURA",       "promedio_anual": 2.4, "maximo_anual": 5, "anios_con_eventos": 12, "nivel": "moderado", "count": 24 },
+      { "departamento": "TUMBES",     "distrito": "TUMBES",      "promedio_anual": 2.1, "maximo_anual": 4, "anios_con_eventos": 11, "nivel": "normal",   "count": 21 },
+      { "departamento": "LIMA",       "distrito": "LIMA",        "promedio_anual": 1.8, "maximo_anual": 4, "anios_con_eventos": 10, "nivel": "normal",   "count": 18 }
+    ]
+  },
+
+  "OLA_CALOR_moderado": {
+    "intensidad": "moderado",
+    "total_zonas": 8,
+    "resumen_estadistico": { "total_historico": 1240, "departamentos_afectados": 4 },
+    "commentary": "Las olas de calor moderadas afectan principalmente el litoral norte. Piura puede alcanzar hasta 42°C en episodios de El Niño, generando estrés térmico en adultos mayores y niños.",
+    "ai_disponible": false,
+    "zonas_afectadas": [
+      { "departamento": "PIURA",      "distrito": "PIURA",       "promedio_anual": 2.4, "maximo_anual": 5, "anios_con_eventos": 12, "nivel": "extremo",  "count": 24 },
+      { "departamento": "TUMBES",     "distrito": "TUMBES",      "promedio_anual": 2.1, "maximo_anual": 4, "anios_con_eventos": 11, "nivel": "moderado", "count": 21 }
+    ]
+  },
+
+  "OLA_CALOR_extremo": {
+    "intensidad": "extremo",
+    "total_zonas": 4,
+    "resumen_estadistico": { "total_historico": 1240, "departamentos_afectados": 2 },
+    "commentary": "En escenario extremo de ola de calor, Piura puede superar los 45°C, un umbral crítico para la salud pública. La deforestación del bosque seco agrava el efecto de isla de calor urbano.",
+    "ai_disponible": false,
+    "zonas_afectadas": [
+      { "departamento": "PIURA",      "distrito": "PIURA",       "promedio_anual": 2.4, "maximo_anual": 5, "anios_con_eventos": 12, "nivel": "extremo",  "count": 24 }
+    ]
+  }
+}

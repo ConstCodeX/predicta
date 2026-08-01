@@ -1,0 +1,173 @@
+{
+  "_contract": {
+    "source": "INDECI / SINPAD",
+    "description": "Frames temporales (año+mes) de emergencias por departamento+distrito para animación. Filtros: familiaEvento, evento, anioDesde, anioHasta",
+    "endpoint": "GET https://sinpad.indeci.gob.pe/api/v1/reportes/timeline?familiaEvento=&evento=&anioDesde=&anioHasta=",
+    "auth": "Bearer token (API key INDECI)",
+    "notes": "frames ordenados cronológicamente. Cada frame tiene events[] con puntos georreferenciados por distrito."
+  },
+  "total": 28450,
+  "familias": [
+    "HIDROMETEOROLOGICO",
+    "MOVIMIENTO DE MASA",
+    "BAJAS TEMPERATURAS",
+    "INCENDIO",
+    "GEOFISICO",
+    "BIOLOGICO",
+    "ANTROPICO"
+  ],
+  "eventos": [
+    "INUNDACION", "LLUVIAS INTENSAS", "DESBORDE DE RIO", "HUAICO", "DESLIZAMIENTO",
+    "DERRUMBE", "HELADA", "FRIAJE", "GRANIZADA", "INCENDIO FORESTAL",
+    "SISMO", "EPIDEMIA", "DENGUE"
+  ],
+  "frames": [
+    {
+      "anio": 2022, "mes": 1,
+      "events": [
+        { "departamento": "LORETO",     "distrito": "IQUITOS",    "familiaEvento": "HIDROMETEOROLOGICO", "count": 42 },
+        { "departamento": "PIURA",      "distrito": "PIURA",      "familiaEvento": "HIDROMETEOROLOGICO", "count": 28 },
+        { "departamento": "SAN MARTIN", "distrito": "TARAPOTO",   "familiaEvento": "HIDROMETEOROLOGICO", "count": 22 },
+        { "departamento": "AYACUCHO",   "distrito": "HUAMANGA",   "familiaEvento": "MOVIMIENTO DE MASA", "count": 15 },
+        { "departamento": "ANCASH",     "distrito": "HUARAZ",     "familiaEvento": "MOVIMIENTO DE MASA", "count": 12 }
+      ]
+    },
+    {
+      "anio": 2022, "mes": 2,
+      "events": [
+        { "departamento": "PIURA",      "distrito": "PIURA",      "familiaEvento": "HIDROMETEOROLOGICO", "count": 52 },
+        { "departamento": "LORETO",     "distrito": "IQUITOS",    "familiaEvento": "HIDROMETEOROLOGICO", "count": 48 },
+        { "departamento": "TUMBES",     "distrito": "TUMBES",     "familiaEvento": "HIDROMETEOROLOGICO", "count": 35 },
+        { "departamento": "LA LIBERTAD","distrito": "TRUJILLO",   "familiaEvento": "HIDROMETEOROLOGICO", "count": 28 },
+        { "departamento": "AYACUCHO",   "distrito": "HUAMANGA",   "familiaEvento": "MOVIMIENTO DE MASA", "count": 22 }
+      ]
+    },
+    {
+      "anio": 2022, "mes": 3,
+      "events": [
+        { "departamento": "PIURA",      "distrito": "PIURA",      "familiaEvento": "HIDROMETEOROLOGICO", "count": 68 },
+        { "departamento": "LORETO",     "distrito": "IQUITOS",    "familiaEvento": "HIDROMETEOROLOGICO", "count": 62 },
+        { "departamento": "TUMBES",     "distrito": "TUMBES",     "familiaEvento": "HIDROMETEOROLOGICO", "count": 45 },
+        { "departamento": "UCAYALI",    "distrito": "PUCALLPA",   "familiaEvento": "HIDROMETEOROLOGICO", "count": 38 },
+        { "departamento": "JUNIN",      "distrito": "SATIPO",     "familiaEvento": "MOVIMIENTO DE MASA", "count": 32 },
+        { "departamento": "CUSCO",      "distrito": "LA CONVENCION","familiaEvento": "MOVIMIENTO DE MASA","count": 28 }
+      ]
+    },
+    {
+      "anio": 2022, "mes": 4,
+      "events": [
+        { "departamento": "LORETO",     "distrito": "IQUITOS",    "familiaEvento": "HIDROMETEOROLOGICO", "count": 35 },
+        { "departamento": "SAN MARTIN", "distrito": "TARAPOTO",   "familiaEvento": "HIDROMETEOROLOGICO", "count": 28 },
+        { "departamento": "JUNIN",      "distrito": "SATIPO",     "familiaEvento": "MOVIMIENTO DE MASA", "count": 18 }
+      ]
+    },
+    {
+      "anio": 2022, "mes": 5,
+      "events": [
+        { "departamento": "LORETO",     "distrito": "IQUITOS",    "familiaEvento": "HIDROMETEOROLOGICO", "count": 20 },
+        { "departamento": "PUNO",       "distrito": "AZANGARO",   "familiaEvento": "BAJAS TEMPERATURAS", "count": 12 },
+        { "departamento": "PUNO",       "distrito": "HUANCANE",   "familiaEvento": "BAJAS TEMPERATURAS", "count": 10 }
+      ]
+    },
+    {
+      "anio": 2022, "mes": 6,
+      "events": [
+        { "departamento": "PUNO",       "distrito": "AZANGARO",   "familiaEvento": "BAJAS TEMPERATURAS", "count": 38 },
+        { "departamento": "PUNO",       "distrito": "HUANCANE",   "familiaEvento": "BAJAS TEMPERATURAS", "count": 32 },
+        { "departamento": "PUNO",       "distrito": "PUNO",       "familiaEvento": "BAJAS TEMPERATURAS", "count": 28 },
+        { "departamento": "CUSCO",      "distrito": "ESPINAR",    "familiaEvento": "BAJAS TEMPERATURAS", "count": 22 },
+        { "departamento": "UCAYALI",    "distrito": "PUCALLPA",   "familiaEvento": "INCENDIO",           "count": 18 }
+      ]
+    },
+    {
+      "anio": 2022, "mes": 7,
+      "events": [
+        { "departamento": "PUNO",       "distrito": "AZANGARO",   "familiaEvento": "BAJAS TEMPERATURAS", "count": 45 },
+        { "departamento": "PUNO",       "distrito": "HUANCANE",   "familiaEvento": "BAJAS TEMPERATURAS", "count": 38 },
+        { "departamento": "CUSCO",      "distrito": "ESPINAR",    "familiaEvento": "BAJAS TEMPERATURAS", "count": 35 },
+        { "departamento": "HUANCAVELICA","distrito": "HUANCAVELICA","familiaEvento": "BAJAS TEMPERATURAS","count": 28 },
+        { "departamento": "UCAYALI",    "distrito": "PUCALLPA",   "familiaEvento": "INCENDIO",           "count": 32 },
+        { "departamento": "SAN MARTIN", "distrito": "TARAPOTO",   "familiaEvento": "INCENDIO",           "count": 24 }
+      ]
+    },
+    {
+      "anio": 2022, "mes": 8,
+      "events": [
+        { "departamento": "PUNO",       "distrito": "AZANGARO",   "familiaEvento": "BAJAS TEMPERATURAS", "count": 42 },
+        { "departamento": "UCAYALI",    "distrito": "PUCALLPA",   "familiaEvento": "INCENDIO",           "count": 38 },
+        { "departamento": "SAN MARTIN", "distrito": "TARAPOTO",   "familiaEvento": "INCENDIO",           "count": 30 },
+        { "departamento": "MADRE DE DIOS","distrito": "PUERTO MALDONADO","familiaEvento": "INCENDIO",    "count": 22 }
+      ]
+    },
+    {
+      "anio": 2022, "mes": 9,
+      "events": [
+        { "departamento": "UCAYALI",    "distrito": "PUCALLPA",   "familiaEvento": "INCENDIO",           "count": 28 },
+        { "departamento": "LORETO",     "distrito": "IQUITOS",    "familiaEvento": "BIOLOGICO",          "count": 18 },
+        { "departamento": "SAN MARTIN", "distrito": "TARAPOTO",   "familiaEvento": "BIOLOGICO",          "count": 14 }
+      ]
+    },
+    {
+      "anio": 2022, "mes": 10,
+      "events": [
+        { "departamento": "LORETO",     "distrito": "IQUITOS",    "familiaEvento": "BIOLOGICO",          "count": 22 },
+        { "departamento": "PIURA",      "distrito": "PIURA",      "familiaEvento": "HIDROMETEOROLOGICO", "count": 15 },
+        { "departamento": "SAN MARTIN", "distrito": "TARAPOTO",   "familiaEvento": "BIOLOGICO",          "count": 18 }
+      ]
+    },
+    {
+      "anio": 2022, "mes": 11,
+      "events": [
+        { "departamento": "PIURA",      "distrito": "PIURA",      "familiaEvento": "HIDROMETEOROLOGICO", "count": 24 },
+        { "departamento": "LORETO",     "distrito": "IQUITOS",    "familiaEvento": "HIDROMETEOROLOGICO", "count": 20 },
+        { "departamento": "JUNIN",      "distrito": "HUANCAYO",   "familiaEvento": "MOVIMIENTO DE MASA", "count": 12 }
+      ]
+    },
+    {
+      "anio": 2022, "mes": 12,
+      "events": [
+        { "departamento": "PIURA",      "distrito": "PIURA",      "familiaEvento": "HIDROMETEOROLOGICO", "count": 38 },
+        { "departamento": "LORETO",     "distrito": "IQUITOS",    "familiaEvento": "HIDROMETEOROLOGICO", "count": 35 },
+        { "departamento": "SAN MARTIN", "distrito": "TARAPOTO",   "familiaEvento": "HIDROMETEOROLOGICO", "count": 28 },
+        { "departamento": "TUMBES",     "distrito": "TUMBES",     "familiaEvento": "HIDROMETEOROLOGICO", "count": 22 }
+      ]
+    },
+    {
+      "anio": 2023, "mes": 1,
+      "events": [
+        { "departamento": "PIURA",      "distrito": "PIURA",      "familiaEvento": "HIDROMETEOROLOGICO", "count": 48 },
+        { "departamento": "LORETO",     "distrito": "IQUITOS",    "familiaEvento": "HIDROMETEOROLOGICO", "count": 44 },
+        { "departamento": "UCAYALI",    "distrito": "PUCALLPA",   "familiaEvento": "HIDROMETEOROLOGICO", "count": 32 },
+        { "departamento": "AYACUCHO",   "distrito": "HUAMANGA",   "familiaEvento": "MOVIMIENTO DE MASA", "count": 25 }
+      ]
+    },
+    {
+      "anio": 2023, "mes": 2,
+      "events": [
+        { "departamento": "PIURA",      "distrito": "PIURA",      "familiaEvento": "HIDROMETEOROLOGICO", "count": 62 },
+        { "departamento": "LORETO",     "distrito": "IQUITOS",    "familiaEvento": "HIDROMETEOROLOGICO", "count": 55 },
+        { "departamento": "TUMBES",     "distrito": "TUMBES",     "familiaEvento": "HIDROMETEOROLOGICO", "count": 40 },
+        { "departamento": "LA LIBERTAD","distrito": "TRUJILLO",   "familiaEvento": "HIDROMETEOROLOGICO", "count": 30 }
+      ]
+    },
+    {
+      "anio": 2023, "mes": 3,
+      "events": [
+        { "departamento": "PIURA",      "distrito": "PIURA",      "familiaEvento": "HIDROMETEOROLOGICO", "count": 78 },
+        { "departamento": "LORETO",     "distrito": "IQUITOS",    "familiaEvento": "HIDROMETEOROLOGICO", "count": 70 },
+        { "departamento": "TUMBES",     "distrito": "TUMBES",     "familiaEvento": "HIDROMETEOROLOGICO", "count": 52 },
+        { "departamento": "AMAZONAS",   "distrito": "BAGUA GRANDE","familiaEvento": "MOVIMIENTO DE MASA","count": 38 },
+        { "departamento": "CUSCO",      "distrito": "LA CONVENCION","familiaEvento": "MOVIMIENTO DE MASA","count": 32 }
+      ]
+    },
+    {
+      "anio": 2023, "mes": 7,
+      "events": [
+        { "departamento": "PUNO",       "distrito": "AZANGARO",   "familiaEvento": "BAJAS TEMPERATURAS", "count": 50 },
+        { "departamento": "PUNO",       "distrito": "HUANCANE",   "familiaEvento": "BAJAS TEMPERATURAS", "count": 42 },
+        { "departamento": "CUSCO",      "distrito": "ESPINAR",    "familiaEvento": "BAJAS TEMPERATURAS", "count": 38 },
+        { "departamento": "UCAYALI",    "distrito": "PUCALLPA",   "familiaEvento": "INCENDIO",           "count": 35 }
+      ]
+    }
+  ]
+}

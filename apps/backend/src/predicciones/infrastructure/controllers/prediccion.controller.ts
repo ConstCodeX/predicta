@@ -4,56 +4,36 @@ import {
   Body,
   HttpCode,
   HttpStatus,
-  UnprocessableEntityException,
-  ServiceUnavailableException,
-  BadRequestException,
   UseGuards,
 } from '@nestjs/common';
+import * as fs from 'fs';
+import * as path from 'path';
 import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
-import { GenerateForecastUseCase } from '../../application/use-cases/generate-forecast/generate-forecast.use-case';
 import { GenerateForecastRequestDto } from './generate-forecast.request.dto';
-import {
-  InvalidForecastResponseException,
-  LLMUnavailableException,
-  InsufficientHistoricalDataException,
-} from '../../domain/exceptions/prediccion.exceptions';
+import type { ForecastResponse } from '../../domain/value-objects/forecast-response.vo';
 
 @Controller('v1/ai')
 export class PrediccionController {
-  constructor(private readonly generateForecast: GenerateForecastUseCase) {}
+  private readonly mockForecast: ForecastResponse;
+
+  constructor() {
+    const raw = fs.readFileSync(
+      path.join(__dirname, '../../../mocks/data/forecast.json'),
+      'utf-8',
+    );
+    const { _contract: _c, ...payload } = JSON.parse(raw);
+    this.mockForecast = payload as ForecastResponse;
+  }
 
   /**
    * POST /api/v1/ai/forecast
-   *
-   * Body:
-   *   { query, departamento?, familiaEvento?, anioDesde?, anioHasta? }
-   *
-   * Respuesta validada contra ForecastResponse (esquema JSON estricto):
-   *   { analisis_general, nivel_riesgo_global, alertas_mapa[] }
+   * En modo mock devuelve el forecast estático del archivo JSON.
+   * Contract: POST https://api.predicta.pe/v1/ai/forecast { query, departamento?, familiaEvento?, anioDesde?, anioHasta? }
    */
   @Post('forecast')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
-  async forecast(@Body() body: GenerateForecastRequestDto) {
-    try {
-      return await this.generateForecast.execute({
-        query: body.query,
-        departamento: body.departamento,
-        familiaEvento: body.familiaEvento,
-        anioDesde: body.anioDesde,
-        anioHasta: body.anioHasta,
-      });
-    } catch (err) {
-      if (err instanceof InsufficientHistoricalDataException) {
-        throw new BadRequestException(err.message);
-      }
-      if (err instanceof InvalidForecastResponseException) {
-        throw new UnprocessableEntityException(err.message);
-      }
-      if (err instanceof LLMUnavailableException) {
-        throw new ServiceUnavailableException(err.message);
-      }
-      throw err;
-    }
+  forecast(@Body() _body: GenerateForecastRequestDto): ForecastResponse {
+    return this.mockForecast;
   }
 }

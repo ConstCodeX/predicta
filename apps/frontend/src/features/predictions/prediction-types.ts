@@ -17,12 +17,22 @@ export interface DistrictPrediction {
   nivel: NivelRiesgo;
 }
 
+export interface Pronostico {
+  texto: string;
+  nivel_alerta_nacional: 'verde' | 'amarillo' | 'naranja' | 'rojo';
+  recomendaciones: string[];
+  acciones_inmediatas: string[];
+  poblacion_en_riesgo: number;
+  viviendas_expuestas: number;
+}
+
 export interface PredictionResponse {
   tipo: string;
   tipo_label: string;
   ventana_dias: number;
   generado_en: string;
   resumen: string | null;
+  pronostico: Pronostico | null;
   predicciones: DistrictPrediction[];
   ai_disponible: boolean;
 }
