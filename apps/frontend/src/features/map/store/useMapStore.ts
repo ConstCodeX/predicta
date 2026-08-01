@@ -39,6 +39,8 @@ interface MapState {
   heatmapLoading: boolean;
   // [lng, lat] target for map flyTo; wraps in object so same coords re-trigger
   flyTarget: { coords: [number, number]; seq: number } | null;
+  // Departamento seleccionado en el mapa (se propaga al panel de predicciones)
+  selectedDepartamento: string | null;
 }
 
 interface MapActions {
@@ -55,6 +57,7 @@ interface MapActions {
   clearHeatmap: () => void;
   setHeatmapLoading: (v: boolean) => void;
   setFlyTarget: (coords: [number, number]) => void;
+  setSelectedDepartamento: (dept: string | null) => void;
 }
 
 export const useMapStore = create<MapState & MapActions>((set, get) => ({
@@ -74,6 +77,7 @@ export const useMapStore = create<MapState & MapActions>((set, get) => ({
   heatmapMax: 0,
   heatmapLoading: false,
   flyTarget: null,
+  selectedDepartamento: null,
 
   selectAlert: (alert, coords) =>
     set({ selectedAlert: alert, selectedCoords: coords }),
@@ -168,4 +172,5 @@ export const useMapStore = create<MapState & MapActions>((set, get) => ({
   setHeatmapLoading: (v) => set({ heatmapLoading: v }),
   setFlyTarget: (coords) =>
     set((state) => ({ flyTarget: { coords, seq: (state.flyTarget?.seq ?? 0) + 1 } })),
+  setSelectedDepartamento: (dept) => set({ selectedDepartamento: dept }),
 }));

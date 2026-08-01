@@ -71,6 +71,7 @@ export function MapDashboard({ seirData, seirSubTab = 'epidemico' }: MapDashboar
     heatmapPoints, timelineMode,
     setHoveredAlert,
     flyTarget, setFlyTarget,
+    setSelectedDepartamento,
   } = useMapStore();
 
   const [heatmapClick, setHeatmapClick] = useState<HeatmapClickInfo | null>(null);
@@ -101,6 +102,7 @@ export function MapDashboard({ seirData, seirSubTab = 'epidemico' }: MapDashboar
     if (!coords) return;
     selectAlert(alert, coords);
     setFlyTarget(coords);
+    setSelectedDepartamento(alert.departamento);
   };
 
   const handleMapClick = (e: {
@@ -124,6 +126,7 @@ export function MapDashboard({ seirData, seirSubTab = 'epidemico' }: MapDashboar
     };
     setHeatmapClick(info);
     setFlyTarget([info.lng, info.lat]);
+    setSelectedDepartamento(p.departamento);
   };
 
   const heatmapActive = heatmapPoints.length > 0;

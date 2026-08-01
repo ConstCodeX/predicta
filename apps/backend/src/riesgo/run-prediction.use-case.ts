@@ -17,7 +17,7 @@ export class RunPredictionUseCase {
     this.data = entries as Record<string, PredictionResponse>;
   }
 
-  execute(tipoId: string, ventanaDias: number): PredictionResponse {
+  execute(tipoId: string, ventanaDias: number, departamento?: string): PredictionResponse {
     const tipo = PREDICTION_TYPES[tipoId];
     if (!tipo) {
       throw new BadRequestException(`Tipo de predicción desconocido: ${tipoId}`);
@@ -36,6 +36,12 @@ export class RunPredictionUseCase {
       };
     }
 
-    return { ...base, ventana_dias: ventanaDias, generado_en: new Date().toISOString() };
+    const predicciones = departamento
+      ? base.predicciones.filter((p) =>
+          p.departamento.toUpperCase().includes(departamento.toUpperCase()),
+        )
+      : base.predicciones;
+
+    return { ...base, predicciones, ventana_dias: ventanaDias, generado_en: new Date().toISOString() };
   }
 }

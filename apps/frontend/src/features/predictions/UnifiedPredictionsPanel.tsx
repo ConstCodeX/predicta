@@ -434,10 +434,11 @@ const SEIR_SUBTABS: { id: SEIRSubTab; label: string }[] = [
   { id: 'economico', label: 'Económico' },
 ];
 
-function SEIRContent({ token, onResult, onSubTabChange }: {
+function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: {
   token: string;
   onResult?: (r: SEIRModelResponse) => void;
   onSubTabChange?: (tab: SEIRSubTab) => void;
+  externalDepartamento?: string | null;
 }) {
   const [activePreset, setActivePreset] = useState<Exclude<ENOSIntensidad, 'fuerte'>>('neutro');
   const [params, setParams] = useState<SEIRParametros>({ ...PRESETS.neutro });
@@ -473,6 +474,19 @@ function SEIRContent({ token, onResult, onSubTabChange }: {
     setParams(p);
     void runWith(p);
   };
+
+  // Sync region when user clicks a departamento on the map, then re-run
+  useEffect(() => {
+    if (!externalDepartamento) return;
+    const matched = REGIONES.find((r) =>
+      r.toUpperCase().startsWith(externalDepartamento.toUpperCase()),
+    );
+    if (matched && matched !== region) {
+      setRegion(matched);
+      void runWith(params);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [externalDepartamento]);
 
   if (!hasAutoRun.current) {
     hasAutoRun.current = true;
@@ -610,8 +624,8 @@ function nivelFallback(nivel: NivelRiesgo): AlertaMapa['tipo_alerta'] {
   return 'MOVIMIENTO_MASA';
 }
 
-function ClimateContent({ token, selectedTipo, tipos }: {
-  token: string; selectedTipo: string; tipos: PredictionType[];
+function ClimateContent({ token, selectedTipo, tipos, departamento }: {
+  token: string; selectedTipo: string; tipos: PredictionType[]; departamento?: string | null;
 }) {
   const setForecast = useMapStore((s) => s.setForecast);
   const setFlyTarget = useMapStore((s) => s.setFlyTarget);
@@ -633,7 +647,7 @@ function ClimateContent({ token, selectedTipo, tipos }: {
       const res = await fetch('/api/v1/riesgo/predict', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ tipo: selectedTipo, ventana_dias: parseInt(ventana, 10) }),
+        body: JSON.stringify({ tipo: selectedTipo, ventana_dias: parseInt(ventana, 10), ...(departamento ? { departamento } : {}) }),
       });
       if (!res.ok) {
         const body = (await res.json().catch(() => ({}))) as { message?: string };
@@ -641,6 +655,7 @@ function ClimateContent({ token, selectedTipo, tipos }: {
       }
       const data = (await res.json()) as PredictionResponse;
       setResult(data);
+      setSelected(null);
 
       const tipoAlerta = TIPO_PREDICCION_ALERTA[data.tipo] ?? nivelFallback('medio');
       setForecast({
@@ -665,7 +680,7 @@ function ClimateContent({ token, selectedTipo, tipos }: {
     }
   }, [token, selectedTipo, ventana, setForecast]);
 
-  // Run when category changes (or on first render)
+  // Re-run when category or departamento changes
   useEffect(() => {
     if (prevTipo.current !== selectedTipo) {
       prevTipo.current = selectedTipo;
@@ -673,7 +688,7 @@ function ClimateContent({ token, selectedTipo, tipos }: {
     }
     void runPrediction();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedTipo]);
+  }, [selectedTipo, departamento]);
 
   const sorted = result
     ? [...result.predicciones].sort((a, b) => b.probabilidad_pct - a.probabilidad_pct)
@@ -858,6 +873,7 @@ export function UnifiedPredictionsPanel({ token, onClose, onResult, onSubTabChan
   const [tipos, setTipos] = useState<PredictionType[]>([]);
   const isSeir = activeCategory === SEIR_TAB_ID;
   const currentTipo = tipos.find((t) => t.id === activeCategory);
+  const { selectedDepartamento, setSelectedDepartamento } = useMapStore();
 
   useEffect(() => {
     void fetch('/api/v1/riesgo/tipos', { headers: { Authorization: `Bearer ${token}` } })
@@ -889,6 +905,24 @@ export function UnifiedPredictionsPanel({ token, onClose, onResult, onSubTabChan
         </button>
       </div>
 
+      {/* Region chip — shown when user clicks a dept on the map */}
+      {selectedDepartamento && (
+        <div className="flex flex-shrink-0 items-center gap-2 px-5 py-2"
+          style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', background: 'rgba(20,184,166,0.06)' }}>
+          <span className="text-[10px]" style={{ color: 'oklch(0.46 0 0)' }}>Región activa:</span>
+          <span className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold" style={{ background: 'rgba(20,184,166,0.15)', color: '#14b8a6', border: '1px solid rgba(20,184,166,0.25)' }}>
+            {selectedDepartamento}
+          </span>
+          <button onClick={() => setSelectedDepartamento(null)}
+            className="ml-auto text-[10px] rounded px-2 py-0.5 transition-colors"
+            style={{ color: 'oklch(0.40 0 0)' }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = 'white')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'oklch(0.40 0 0)')}>
+            Limpiar
+          </button>
+        </div>
+      )}
+
       {/* Category tabs (scrollable pills) */}
       <div className="flex flex-shrink-0 gap-1.5 px-5 py-2.5 overflow-x-auto"
         style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', scrollbarWidth: 'none' }}>
@@ -919,12 +953,12 @@ export function UnifiedPredictionsPanel({ token, onClose, onResult, onSubTabChan
           {isSeir ? (
             <motion.div key="seir"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-              <SEIRContent token={token} onResult={onResult} onSubTabChange={onSubTabChange} />
+              <SEIRContent token={token} onResult={onResult} onSubTabChange={onSubTabChange} externalDepartamento={selectedDepartamento} />
             </motion.div>
           ) : (
             <motion.div key={activeCategory}
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-              <ClimateContent token={token} selectedTipo={activeCategory} tipos={tipos} />
+              <ClimateContent token={token} selectedTipo={activeCategory} tipos={tipos} departamento={selectedDepartamento} />
             </motion.div>
           )}
         </AnimatePresence>

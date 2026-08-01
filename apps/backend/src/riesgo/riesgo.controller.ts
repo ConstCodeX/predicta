@@ -19,6 +19,10 @@ class PredictDto {
   @Min(1)
   @Type(() => Number)
   ventana_dias?: number;
+
+  @IsOptional()
+  @IsString()
+  departamento?: string;
 }
 
 class SEIRParamsDto {
@@ -65,7 +69,7 @@ export class RiesgoController {
 
   @Post('predict')
   predict(@Body() body: PredictDto) {
-    return this.runPrediction.execute(body.tipo, body.ventana_dias ?? 30);
+    return this.runPrediction.execute(body.tipo, body.ventana_dias ?? 30, body.departamento);
   }
 
   /**
