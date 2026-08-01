@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { BarChart2, Database, LogOut, Map, Settings2, Shield } from 'lucide-react';
+import { LogOut, Map, Settings2, Shield } from 'lucide-react';
 import { useAuthStore } from '../features/auth/useAuthStore';
 
 export type AppView = 'map' | 'data' | 'analytics' | 'admin';
@@ -9,12 +9,12 @@ interface Props {
   onChangeView: (v: AppView) => void;
 }
 
-const NAV_ITEMS: { id: AppView; label: string; icon: React.ReactNode; superadminOnly?: boolean }[] = [
-  { id: 'map',       label: 'Mapa',           icon: <Map size={13} /> },
-  { id: 'data',      label: 'Datos',           icon: <Database size={13} /> },
-  { id: 'analytics', label: 'Análisis',        icon: <BarChart2 size={13} /> },
-  { id: 'admin',     label: 'Administración',  icon: <Settings2 size={13} />, superadminOnly: true },
+const ACTIVE_ITEMS: { id: AppView; label: string; icon: React.ReactNode; superadminOnly?: boolean }[] = [
+  { id: 'map',   label: 'Mapa',           icon: <Map size={13} /> },
+  { id: 'admin', label: 'Administración', icon: <Settings2 size={13} />, superadminOnly: true },
 ];
+
+const SOON_ITEMS = ['Datos', 'Análisis'];
 
 export function TopNav({ view, onChangeView }: Props) {
   const { user, logout } = useAuthStore();
@@ -40,7 +40,7 @@ export function TopNav({ view, onChangeView }: Props) {
 
       {/* Nav items */}
       <nav className="flex items-center gap-0.5 flex-shrink-0">
-        {NAV_ITEMS.map((item) => {
+        {ACTIVE_ITEMS.map((item) => {
           if (item.superadminOnly && user?.role !== 'SUPERADMIN') return null;
           const active = view === item.id;
           return (
@@ -59,6 +59,28 @@ export function TopNav({ view, onChangeView }: Props) {
             </motion.button>
           );
         })}
+
+        {/* Próximamente */}
+        {SOON_ITEMS.map((label) => (
+          <div
+            key={label}
+            title="Próximamente"
+            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium whitespace-nowrap cursor-not-allowed select-none"
+            style={{ color: 'oklch(0.30 0 0)' }}
+          >
+            <span className="hidden sm:inline">{label}</span>
+            <span
+              className="rounded-full px-1.5 py-0.5 text-[9px] font-semibold tracking-wide"
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                color: 'oklch(0.35 0 0)',
+                border: '1px solid rgba(255,255,255,0.06)',
+              }}
+            >
+              SOON
+            </span>
+          </div>
+        ))}
       </nav>
 
       <div className="flex-1" />

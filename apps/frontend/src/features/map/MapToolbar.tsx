@@ -8,18 +8,22 @@ interface Props {
   onToggle: (tool: MapTool) => void;
 }
 
-const TOOLS: { id: MapTool; icon: React.ReactNode; label: string; color: string }[] = [
-  { id: 'predictions', icon: <BarChart2 size={15} />,     label: 'Predicciones',    color: '#14b8a6' },
-  { id: 'heatmap',     icon: <Flame size={15} />,         label: 'Mapa de calor',   color: '#f97316' },
-  { id: 'timeline',    icon: <History size={15} />,       label: 'Línea de tiempo', color: '#a78bfa' },
-  { id: 'scenarios',   icon: <Crosshair size={15} />,     label: 'Escenarios',      color: '#8b5cf6' },
-  { id: 'chat',        icon: <MessageSquare size={15} />, label: 'Asistente IA',    color: '#22d3ee' },
+const ACTIVE_TOOLS: { id: MapTool; icon: React.ReactNode; label: string; color: string }[] = [
+  { id: 'predictions', icon: <BarChart2 size={15} />, label: 'Predicciones', color: '#14b8a6' },
+];
+
+const SOON_TOOLS: { id: MapTool; icon: React.ReactNode; label: string }[] = [
+  { id: 'heatmap',   icon: <Flame size={15} />,         label: 'Mapa de calor' },
+  { id: 'timeline',  icon: <History size={15} />,        label: 'Línea de tiempo' },
+  { id: 'scenarios', icon: <Crosshair size={15} />,      label: 'Escenarios' },
+  { id: 'chat',      icon: <MessageSquare size={15} />,  label: 'Asistente IA' },
 ];
 
 export function MapToolbar({ activeTool, onToggle }: Props) {
   return (
     <div className="absolute left-3 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-1.5">
-      {TOOLS.map((tool) => {
+      {/* Herramientas activas */}
+      {ACTIVE_TOOLS.map((tool) => {
         const active = activeTool === tool.id;
         return (
           <motion.button
@@ -52,6 +56,44 @@ export function MapToolbar({ activeTool, onToggle }: Props) {
           </motion.button>
         );
       })}
+
+      {/* Separador */}
+      <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', margin: '2px 4px' }} />
+
+      {/* Próximamente */}
+      {SOON_TOOLS.map((tool) => (
+        <div
+          key={tool.id}
+          title={`${tool.label} — Próximamente`}
+          className="group relative flex h-10 w-10 items-center justify-center rounded-xl cursor-not-allowed"
+          style={{
+            background:           'rgba(9,9,11,0.5)',
+            backdropFilter:       'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border:               '1px solid rgba(255,255,255,0.04)',
+            color:                'oklch(0.30 0 0)',
+          }}
+        >
+          {tool.icon}
+          <span
+            className="pointer-events-none absolute left-12 whitespace-nowrap rounded-lg px-2.5 py-1 text-[11px] font-medium opacity-0 group-hover:opacity-100 transition-opacity"
+            style={{
+              background:     'rgba(9,9,11,0.92)',
+              border:         '1px solid rgba(255,255,255,0.09)',
+              color:          'oklch(0.46 0 0)',
+              backdropFilter: 'blur(8px)',
+            }}
+          >
+            {tool.label}
+            <span
+              className="ml-2 rounded-full px-1.5 py-0.5 text-[9px] font-semibold"
+              style={{ background: 'rgba(255,255,255,0.06)', color: 'oklch(0.38 0 0)' }}
+            >
+              SOON
+            </span>
+          </span>
+        </div>
+      ))}
     </div>
   );
 }
