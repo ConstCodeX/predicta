@@ -35,10 +35,9 @@ services:
       ADMIN_EMAIL:    ${ADMIN_EMAIL:?ADMIN_EMAIL es obligatoria}
       ADMIN_NAME:     ${ADMIN_NAME:-Super Admin}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD es obligatoria}
-      GROQ_API_KEY:  ${GROQ_API_KEY:?GROQ_API_KEY es obligatoria}
-      LLM_BASE_URL:  ${LLM_BASE_URL:-https://api.groq.com/openai/v1}
-      LLM_MODEL:     ${LLM_MODEL:-llama-3.1-8b-instant}
-      LLM_JSON_MODE: ${LLM_JSON_MODE:-true}
+      GEMINI_API_KEY:    ${GEMINI_API_KEY:?GEMINI_API_KEY es obligatoria}
+      GEMINI_USE_SEARCH: ${GEMINI_USE_SEARCH:-false}
+      GEMINI_THINKING:   ${GEMINI_THINKING:-false}
     depends_on:
       db:
         condition: service_healthy
