@@ -1,64 +1,31 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  Activity, AlertCircle, AlertTriangle, Bot, BotOff,
-  ChevronDown, Info, Loader2, Maximize2, RefreshCw, Settings2, X,
+  AlertTriangle, BotOff,
+  Loader2, Maximize2, Settings2, X,
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Bar, CartesianGrid, ComposedChart, Line, ReferenceLine,
   ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts';
-import { SelectField } from '../../components/SelectField';
 import { ChartModal } from '../seir-model/ChartModal';
 import {
   PRESETS, REGIONES,
   type ENOSIntensidad, type SEIRModelResponse, type SEIRParametros,
 } from '../seir-model/seir-types';
-import { getCoords } from '../map/constants/peru-coords';
 import { useMapStore } from '../map/store/useMapStore';
-import type { AlertaMapa } from '../map/types';
-import {
-  NIVEL_BG, NIVEL_COLOR, NIVEL_LABEL,
-  type DistrictPrediction, type NivelRiesgo,
-  type PredictionResponse, type PredictionType,
-} from './prediction-types';
-
-// ─── Constants ────────────────────────────────────────────────
-const SEIR_TAB_ID = '__seir__';
-
-const VENTANA_OPTIONS = [
-  { value: '7', label: 'Próximos 7 días' },
-  { value: '14', label: 'Próximos 14 días' },
-  { value: '30', label: 'Próximo mes' },
-];
-
-const COLOR_BY_OPTIONS = [
-  { value: 'probabilidad', label: 'Probabilidad' },
-  { value: 'nivel', label: 'Nivel de riesgo' },
-  { value: 'lluvia', label: 'Lluvia estimada' },
-];
-
-const TIPO_PREDICCION_ALERTA: Record<string, AlertaMapa['tipo_alerta']> = {
-  HIDRO_GEOLOGICO: 'HIDROMETEOROLOGICO',
-  FRIAJE_HELADA: 'BAJAS_TEMPERATURAS',
-  INCENDIO: 'INCENDIO',
-  GEOFISICO: 'GEOFISICO',
-  BIOLOGICO: 'BIOLOGICO',
-  ANTROPICO: 'ANTROPICO',
-  SALUD_PUBLICA: 'SALUD_PUBLICA',
-  AGUA_SANEAMIENTO: 'AGUA_SANEAMIENTO',
-};
 
 const RIESGO_SEIR: Record<string, { color: string; label: string }> = {
-  bajo: { color: '#22c55e', label: 'BAJO' },
+  bajo:     { color: '#22c55e', label: 'BAJO' },
   moderado: { color: '#f97316', label: 'MODERADO' },
-  critico: { color: '#ef4444', label: 'CRÍTICO' },
+  critico:  { color: '#ef4444', label: 'CRÍTICO' },
 };
 
-const fmtNum = (n: number) => n.toLocaleString('es-PE');
-const fmtSoles = (n: number) => n >= 1_000_000
-  ? `S/ ${(n / 1_000_000).toFixed(1)}M`
-  : `S/ ${n.toLocaleString()}`;
+const AÑO_OPTIONS = [2025, 2026, 2027, 2028];
+
+const fmtNum   = (n: number) => n.toLocaleString('es-PE');
+const fmtSoles = (n: number) =>
+  n >= 1_000_000 ? `S/ ${(n / 1_000_000).toFixed(1)}M` : `S/ ${n.toLocaleString()}`;
 
 // ─── Small shared components ──────────────────────────────────
 function Label({ children }: { children: React.ReactNode }) {
@@ -127,20 +94,21 @@ function ProgBar({ label, value, color = '#22c55e' }: { label: string; value: nu
   );
 }
 
-// ─── SEIR Params Modal ────────────────────────────────────────
-function ParamsModal({ params, region, loading, onParamsChange, onRegionChange, onApply, onClose }: {
-  params: SEIRParametros; region: string; loading: boolean;
-  onParamsChange: (p: SEIRParametros) => void; onRegionChange: (r: string) => void;
-  onApply: (p: SEIRParametros, r: string) => void; onClose: () => void;
+// ─── SEIR Params Modal — solo región, fenómeno, año, lluvias ─
+function ParamsModal({ params, region, año, loading, onParamsChange, onRegionChange, onAñoChange, onApply, onClose }: {
+  params: SEIRParametros; region: string; año: number; loading: boolean;
+  onParamsChange: (p: SEIRParametros) => void;
+  onRegionChange: (r: string) => void;
+  onAñoChange: (a: number) => void;
+  onApply: (p: SEIRParametros, r: string, a: number) => void;
+  onClose: () => void;
 }) {
-  const set = <K extends keyof SEIRParametros>(k: K, v: SEIRParametros[K]) =>
-    onParamsChange({ ...params, [k]: v });
+  const tieneElNino = params.enos_intensidad !== 'neutro';
 
-  const ENOS: { key: ENOSIntensidad; label: string; sub: string; color: string }[] = [
-    { key: 'neutro', label: 'Sin El Niño', sub: 'Condiciones normales', color: '#22c55e' },
-    { key: 'moderado', label: 'El Niño Mod.', sub: 'Anomalía +40–80%', color: '#f97316' },
-    { key: 'fuerte', label: 'El Niño Fuerte', sub: 'Anomalía +150%+', color: '#ef4444' },
-  ];
+  const toggleElNino = (valor: boolean) => {
+    const preset = valor ? PRESETS.fuerte : PRESETS.neutro;
+    onParamsChange({ ...preset, anomalia_lluvias_pct: params.anomalia_lluvias_pct });
+  };
 
   return (
     <motion.div className="fixed inset-0 z-50 flex items-center justify-center"
@@ -148,15 +116,17 @@ function ParamsModal({ params, region, loading, onParamsChange, onRegionChange, 
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       onClick={onClose}>
       <motion.div className="relative flex flex-col overflow-hidden"
-        style={{ width: 480, maxHeight: '86vh', background: 'rgba(10,10,12,0.98)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: 20 }}
+        style={{ width: 420, maxHeight: '80vh', background: 'rgba(10,10,12,0.98)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: 20 }}
         initial={{ scale: 0.94, y: 12 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.96, y: 6 }}
         transition={{ type: 'spring', damping: 24, stiffness: 300 }}
         onClick={(e) => e.stopPropagation()}>
+
+        {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 flex-shrink-0"
           style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <div>
             <h3 className="text-sm font-semibold text-white">Parámetros del modelo</h3>
-            <p className="text-[11px] mt-0.5" style={{ color: 'oklch(0.42 0 0)' }}>Ajusta las condiciones de entrada del Dengue</p>
+            <p className="text-[11px] mt-0.5" style={{ color: 'oklch(0.42 0 0)' }}>Condiciones de entrada — Dengue SEIR</p>
           </div>
           <button onClick={onClose} className="rounded-full p-1.5" style={{ color: 'oklch(0.46 0 0)' }}
             onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.07)')}
@@ -164,7 +134,10 @@ function ParamsModal({ params, region, loading, onParamsChange, onRegionChange, 
             <X size={14} />
           </button>
         </div>
+
+        {/* Body */}
         <div className="overflow-y-auto flex-1 px-6 py-5 space-y-6" style={{ scrollbarWidth: 'none' }}>
+
           {/* Región */}
           <div>
             <Label>Región de análisis</Label>
@@ -175,15 +148,18 @@ function ParamsModal({ params, region, loading, onParamsChange, onRegionChange, 
             </select>
           </div>
 
-          {/* ENOS — most impactful parameter */}
+          {/* Fenómeno El Niño — sí / no */}
           <div>
-            <Label>Fenómeno El Niño (ENOS)</Label>
+            <Label>¿Fenómeno El Niño?</Label>
             <div className="flex gap-2 mt-2">
-              {ENOS.map((o) => {
-                const on = params.enos_intensidad === o.key;
+              {[
+                { valor: false, label: 'Sin El Niño', sub: 'Condiciones normales', color: '#22c55e' },
+                { valor: true,  label: 'Con El Niño', sub: 'Anomalía climática activa', color: '#ef4444' },
+              ].map((o) => {
+                const on = tieneElNino === o.valor;
                 return (
-                  <button key={o.key} onClick={() => set('enos_intensidad', o.key)}
-                    className="flex-1 rounded-xl px-2 py-3 text-left transition-all"
+                  <button key={String(o.valor)} onClick={() => toggleElNino(o.valor)}
+                    className="flex-1 rounded-xl px-3 py-3 text-left transition-all"
                     style={{ background: on ? `${o.color}14` : 'rgba(255,255,255,0.04)', border: `1px solid ${on ? `${o.color}50` : 'rgba(255,255,255,0.07)'}` }}>
                     <p className="text-[11px] font-semibold" style={{ color: on ? o.color : 'white' }}>{o.label}</p>
                     <p className="text-[9px] mt-0.5" style={{ color: 'oklch(0.42 0 0)' }}>{o.sub}</p>
@@ -193,33 +169,44 @@ function ParamsModal({ params, region, loading, onParamsChange, onRegionChange, 
             </div>
           </div>
 
-          {/* Sliders — only the two most operationally meaningful */}
-          <div className="space-y-5">
-            <Label>Parámetros de ajuste</Label>
-            <Slider
-              label="Anomalía de lluvias"
-              value={params.anomalia_lluvias_pct}
-              min={-50} max={300} step={5} unit="%"
-              onChange={(v) => set('anomalia_lluvias_pct', v)}
-            />
-            <Slider
-              label="Eficiencia control vectorial"
-              value={params.eficiencia_control_vectorial_pct}
-              min={0} max={100} unit="%" accent="#22c55e"
-              onChange={(v) => set('eficiencia_control_vectorial_pct', v)}
-            />
+          {/* Año */}
+          <div>
+            <Label>Año de proyección</Label>
+            <div className="flex gap-2 mt-2">
+              {AÑO_OPTIONS.map((a) => {
+                const on = año === a;
+                return (
+                  <button key={a} onClick={() => onAñoChange(a)}
+                    className="flex-1 rounded-xl py-2.5 text-xs font-semibold transition-all"
+                    style={{ background: on ? 'rgba(20,184,166,0.15)' : 'rgba(255,255,255,0.04)', border: `1px solid ${on ? 'rgba(20,184,166,0.40)' : 'rgba(255,255,255,0.07)'}`, color: on ? '#14b8a6' : 'oklch(0.50 0 0)' }}>
+                    {a}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          <p className="text-[10px] leading-relaxed" style={{ color: 'oklch(0.34 0 0)' }}>
-            Los demás parámetros (temperatura, racionamiento hídrico, serotipo) se calibran automáticamente según el escenario ENOS seleccionado.
-          </p>
+          {/* Anomalía de lluvias */}
+          <div>
+            <Label>Anomalía de lluvias</Label>
+            <div className="mt-3">
+              <Slider
+                label="Desviación respecto al promedio histórico"
+                value={params.anomalia_lluvias_pct}
+                min={-50} max={300} step={5} unit="%"
+                onChange={(v) => onParamsChange({ ...params, anomalia_lluvias_pct: v })}
+              />
+            </div>
+          </div>
         </div>
+
+        {/* Footer */}
         <div className="flex gap-2 px-6 py-4 flex-shrink-0" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
           <button onClick={onClose} className="rounded-xl px-4 py-2 text-xs"
             style={{ background: 'rgba(255,255,255,0.05)', color: 'oklch(0.50 0 0)', border: '1px solid rgba(255,255,255,0.07)' }}>
             Cancelar
           </button>
-          <button onClick={() => { onApply(params, region); onClose(); }} disabled={loading}
+          <button onClick={() => { onApply(params, region, año); onClose(); }} disabled={loading}
             className="flex-1 rounded-xl py-2 text-sm font-medium disabled:opacity-50"
             style={{ background: 'oklch(0.60 0.18 240)', color: 'white' }}>
             {loading ? 'Ejecutando…' : 'Aplicar y ejecutar modelo'}
@@ -239,16 +226,16 @@ function SEIREpidemicTab({ data, onExpand }: { data: SEIRModelResponse; onExpand
     hosp: s.hospitalizados_requeridos, rt: s.tasa_rt, historico: s.es_historico,
   }));
   const camas = data.kpis.camas_disponibles;
-  const rtMax = data.kpis.rt_maximo;
+  const rtMax  = data.kpis.rt_maximo;
 
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-4 gap-2">
         {[
-          { label: 'Pico semana', value: `Sem. ${data.kpis.pico_semana}` },
+          { label: 'Pico semana',  value: `Sem. ${data.kpis.pico_semana}` },
           { label: 'Máx. semanal', value: fmtNum(data.kpis.maximo_semanal_casos), sub: 'casos' },
-          { label: 'Rt máximo', value: rtMax.toFixed(2), color: rtMax > 4 ? '#ef4444' : rtMax > 2 ? '#f97316' : '#22c55e' },
-          { label: 'Camas disp.', value: fmtNum(camas), color: '#ef4444', sub: `${data.kpis.saturacion_hospitalaria_pct}% sat.` },
+          { label: 'Rt máximo',    value: rtMax.toFixed(2), color: rtMax > 4 ? '#ef4444' : rtMax > 2 ? '#f97316' : '#22c55e' },
+          { label: 'Camas disp.',  value: fmtNum(camas), color: '#ef4444', sub: `${data.kpis.saturacion_hospitalaria_pct}% sat.` },
         ].map((s) => (
           <div key={s.label} className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
             <p className="text-[9px] uppercase tracking-widest mb-1.5" style={{ color: 'oklch(0.36 0 0)' }}>{s.label}</p>
@@ -284,7 +271,7 @@ function SEIREpidemicTab({ data, onExpand }: { data: SEIRModelResponse; onExpand
                 contentStyle={{ background: 'rgba(10,10,12,0.97)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: 10, fontSize: 11, color: 'white' }}
                 formatter={(v, n) => {
                   const val = v as number;
-                  if (n === 'rt') return [`${val.toFixed(2)}`, 'Rt'];
+                  if (n === 'rt')   return [`${val.toFixed(2)}`, 'Rt'];
                   if (n === 'hosp') return [fmtNum(val), 'Hospitalizados'];
                   return [fmtNum(val), 'Casos'];
                 }}
@@ -293,9 +280,9 @@ function SEIREpidemicTab({ data, onExpand }: { data: SEIRModelResponse; onExpand
               <ReferenceLine yAxisId="l" x="S4" stroke="rgba(255,255,255,0.12)" strokeDasharray="3 2" />
               <ReferenceLine yAxisId="l" y={camas} stroke="#ef4444" strokeDasharray="5 3" strokeWidth={1}
                 label={{ value: `Camas: ${camas}`, position: 'right', fill: '#ef4444', fontSize: 9 }} />
-              <Bar yAxisId="l" dataKey="casos" fill="rgba(59,130,246,0.42)" radius={[2, 2, 0, 0]} maxBarSize={22} />
+              <Bar  yAxisId="l" dataKey="casos" fill="rgba(59,130,246,0.42)" radius={[2, 2, 0, 0]} maxBarSize={22} />
               <Line yAxisId="l" dataKey="hosp" stroke="#f97316" strokeWidth={2} dot={{ fill: '#f97316', r: 2 }} activeDot={{ r: 5 }} />
-              <Line yAxisId="r" dataKey="rt" stroke="#475569" strokeWidth={1.5} strokeDasharray="4 2" dot={false} />
+              <Line yAxisId="r" dataKey="rt"   stroke="#475569" strokeWidth={1.5} strokeDasharray="4 2" dot={false} />
             </ComposedChart>
           </ResponsiveContainer>
           <div className="flex gap-5 mt-1 flex-wrap">
@@ -359,17 +346,17 @@ function SEIREpidemicTab({ data, onExpand }: { data: SEIRModelResponse; onExpand
 function SEIRHumanitarianTab({ data }: { data: SEIRModelResponse }) {
   const h = data.humanitario;
   if (!h) return <p className="py-12 text-center text-xs" style={{ color: 'oklch(0.40 0 0)' }}>Sin datos.</p>;
-  const aguaColor = h.acceso_agua_potable_pct < 50 ? '#ef4444' : h.acceso_agua_potable_pct < 75 ? '#f97316' : '#22c55e';
-  const saludPct = Math.round(Math.min(h.personal_salud_por_1000hab / 2 * 100, 100));
+  const aguaColor  = h.acceso_agua_potable_pct < 50 ? '#ef4444' : h.acceso_agua_potable_pct < 75 ? '#f97316' : '#22c55e';
+  const saludPct   = Math.round(Math.min(h.personal_salud_por_1000hab / 2 * 100, 100));
   const saludColor = h.personal_salud_por_1000hab < 0.5 ? '#ef4444' : h.personal_salud_por_1000hab < 1.0 ? '#f97316' : '#22c55e';
   return (
     <div>
       <div className="grid grid-cols-2 gap-3 mb-1">
         {[
-          { l: 'Fallecidos estimados', v: h.fallecidos_estimados, c: '#ef4444', bg: 'rgba(239,68,68,0.07)', b: 'rgba(239,68,68,0.14)' },
-          { l: 'Heridos graves', v: h.heridos_graves, c: '#f97316', bg: 'rgba(249,115,22,0.07)', b: 'rgba(249,115,22,0.14)' },
-          { l: 'Desplazados', v: h.personas_desplazadas, c: 'rgba(255,255,255,0.88)', bg: 'rgba(255,255,255,0.04)', b: 'rgba(255,255,255,0.07)' },
-          { l: 'Albergues req.', v: h.albergues_requeridos, c: 'rgba(255,255,255,0.88)', bg: 'rgba(255,255,255,0.04)', b: 'rgba(255,255,255,0.07)' },
+          { l: 'Fallecidos estimados', v: h.fallecidos_estimados,    c: '#ef4444',              bg: 'rgba(239,68,68,0.07)',   b: 'rgba(239,68,68,0.14)' },
+          { l: 'Heridos graves',       v: h.heridos_graves,          c: '#f97316',              bg: 'rgba(249,115,22,0.07)',  b: 'rgba(249,115,22,0.14)' },
+          { l: 'Desplazados',          v: h.personas_desplazadas,    c: 'rgba(255,255,255,0.88)', bg: 'rgba(255,255,255,0.04)', b: 'rgba(255,255,255,0.07)' },
+          { l: 'Albergues req.',       v: h.albergues_requeridos,    c: 'rgba(255,255,255,0.88)', bg: 'rgba(255,255,255,0.04)', b: 'rgba(255,255,255,0.07)' },
         ].map((x) => (
           <div key={x.l} className="rounded-2xl p-4" style={{ background: x.bg, border: `1px solid ${x.b}` }}>
             <p className="text-[9px] uppercase tracking-widest mb-2"
@@ -381,12 +368,12 @@ function SEIRHumanitarianTab({ data }: { data: SEIRModelResponse }) {
       </div>
       <SectionLabel>Servicios básicos</SectionLabel>
       <div className="space-y-4 pt-1">
-        <ProgBar label="Acceso a agua potable" value={h.acceso_agua_potable_pct} color={aguaColor} />
-        <ProgBar label="Cobertura sistema de salud" value={saludPct} color={saludColor} />
+        <ProgBar label="Acceso a agua potable"     value={h.acceso_agua_potable_pct} color={aguaColor} />
+        <ProgBar label="Cobertura sistema de salud" value={saludPct}                 color={saludColor} />
       </div>
       <div className="mt-1">
         <Row label="Personal salud / 1,000 hab." value={h.personal_salud_por_1000hab.toFixed(1)} />
-        <Row label="Personas en riesgo" value={fmtNum(h.personas_en_riesgo)} accent="rgba(255,255,255,0.65)" />
+        <Row label="Personas en riesgo"           value={fmtNum(h.personas_en_riesgo)} accent="rgba(255,255,255,0.65)" />
       </div>
     </div>
   );
@@ -411,27 +398,27 @@ function SEIREconomicTab({ data }: { data: SEIRModelResponse }) {
         </div>
       </div>
       <SectionLabel>Agricultura</SectionLabel>
-      <Row label="Arroz" value={`${fmtNum(e.cultivos.arroz_has)} ha`} />
-      <Row label="Mango" value={`${fmtNum(e.cultivos.mango_has)} ha`} />
+      <Row label="Arroz"   value={`${fmtNum(e.cultivos.arroz_has)} ha`} />
+      <Row label="Mango"   value={`${fmtNum(e.cultivos.mango_has)} ha`} />
       <Row label="Plátano" value={`${fmtNum(e.cultivos.platano_has)} ha`} />
       <Row label="Pérdidas" value={fmtSoles(e.cultivos.total_valor_soles)} accent="#f97316" />
       <SectionLabel>Infraestructura</SectionLabel>
       <Row label="Carreteras" value={`${e.infraestructura.carreteras_afectadas_km} km`} />
-      <Row label="Puentes" value={String(e.infraestructura.puentes_danados)} />
-      <Row label="Viviendas" value={fmtNum(e.infraestructura.viviendas_afectadas)} />
+      <Row label="Puentes"    value={String(e.infraestructura.puentes_danados)} />
+      <Row label="Viviendas"  value={fmtNum(e.infraestructura.viviendas_afectadas)} />
     </div>
   );
 }
 
 // ─── SEIR content ─────────────────────────────────────────────
 const SEIR_SCENARIOS: { key: Exclude<ENOSIntensidad, 'fuerte'>; label: string }[] = [
-  { key: 'neutro', label: 'Optimista' },
+  { key: 'neutro',   label: 'Optimista' },
   { key: 'moderado', label: 'Moderado' },
 ];
 const SEIR_SUBTABS: { id: SEIRSubTab; label: string }[] = [
-  { id: 'epidemico', label: 'Epidémico' },
+  { id: 'epidemico',   label: 'Epidémico' },
   { id: 'humanitario', label: 'Humanitario' },
-  { id: 'economico', label: 'Económico' },
+  { id: 'economico',   label: 'Económico' },
 ];
 
 function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: {
@@ -441,37 +428,42 @@ function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: 
   externalDepartamento?: string | null;
 }) {
   const [activePreset, setActivePreset] = useState<Exclude<ENOSIntensidad, 'fuerte'>>('neutro');
-  const [params, setParams] = useState<SEIRParametros>({ ...PRESETS.neutro });
-  const [region, setRegion] = useState(REGIONES[0]);
-  const [result, setResult] = useState<SEIRModelResponse | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [subTab, setSubTab] = useState<SEIRSubTab>('epidemico');
-  const [showParams, setShowParams] = useState(false);
+  const [params, setParams]             = useState<SEIRParametros>({ ...PRESETS.neutro });
+  const [region, setRegion]             = useState(REGIONES[0]);
+  const [año, setAño]                   = useState(2027);
+  const [result, setResult]             = useState<SEIRModelResponse | null>(null);
+  const [loading, setLoading]           = useState(false);
+  const [subTab, setSubTab]             = useState<SEIRSubTab>('epidemico');
+  const [showParams, setShowParams]     = useState(false);
   const [chartExpanded, setChartExpanded] = useState(false);
   const hasAutoRun = useRef(false);
 
-  const runWith = useCallback(async (p: SEIRParametros, overrideRegion?: string) => {
+  const runWith = useCallback(async (p: SEIRParametros, overrideRegion?: string, overrideAño?: number) => {
     setLoading(true);
     setResult(null);
-    onResult?.(null as unknown as SEIRModelResponse); // limpia el overlay del mapa al iniciar
+    onResult?.(null as unknown as SEIRModelResponse);
     try {
       const res = await fetch('/api/v1/riesgo/seir-model', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ region: overrideRegion ?? region, ventana_semanas: 16, parametros: p }),
+        body: JSON.stringify({
+          region: overrideRegion ?? region,
+          año: overrideAño ?? año,
+          ventana_semanas: 16,
+          parametros: p,
+        }),
       });
       if (res.ok) {
         const data = (await res.json()) as SEIRModelResponse;
         setResult(data);
-        // Solo propagamos al mapa si Gemma generó la respuesta (no mock fallback)
-        if ((data as Record<string, unknown>)['generado_por'] !== 'mock') {
+        if ((data as unknown as Record<string, unknown>)['generado_por'] !== 'mock') {
           onResult?.(data);
         }
       }
     } finally {
       setLoading(false);
     }
-  }, [token, region, onResult]);
+  }, [token, region, año, onResult]);
 
   const selectPreset = (preset: Exclude<ENOSIntensidad, 'fuerte'>) => {
     const p = { ...PRESETS[preset] };
@@ -480,7 +472,7 @@ function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: 
     void runWith(p);
   };
 
-  // Sync region when user clicks a departamento on the map and re-run immediately
+  // Sync region when user clicks a departamento on the map
   useEffect(() => {
     if (!externalDepartamento) return;
     const matched = REGIONES.find((r) =>
@@ -498,22 +490,23 @@ function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: 
     void runWith(params);
   }
 
-  const kpis = result?.kpis;
-  const nivel = kpis ? RIESGO_SEIR[kpis.nivel_riesgo] : null;
-  const esMock = result && (result as Record<string, unknown>)['generado_por'] === 'mock';
+  const kpis   = result?.kpis;
+  const nivel  = kpis ? RIESGO_SEIR[kpis.nivel_riesgo] : null;
+  const esMock = result && (result as unknown as Record<string, unknown>)['generado_por'] === 'mock';
 
   return (
     <div className="space-y-5">
-      {/* Aviso cuando el resultado es mock (Gemma no disponible) */}
+      {/* Mock warning */}
       {esMock && (
         <div className="flex items-start gap-2.5 rounded-xl px-3.5 py-3"
           style={{ background: 'rgba(234,179,8,0.07)', border: '1px solid rgba(234,179,8,0.20)' }}>
           <BotOff size={12} style={{ color: '#eab308', flexShrink: 0, marginTop: 1 }} />
           <p className="text-[11px] leading-relaxed" style={{ color: '#fde68a' }}>
-            Gemma no disponible — los datos mostrados son estimaciones estáticas de referencia, no un pronóstico real. Configura <strong>GEMINI_API_KEY</strong> para activar el modelo.
+            Gemma no disponible — datos de referencia estáticos. Configura <strong>GEMINI_API_KEY</strong> para activar el modelo.
           </p>
         </div>
       )}
+
       {/* Presets row + gear */}
       <div className="flex items-center gap-2">
         <div className="flex flex-1 gap-1 p-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)' }}>
@@ -535,13 +528,12 @@ function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: 
                 className="ml-1 flex items-center gap-1.5 rounded-lg px-3 py-2.5 text-xs"
                 style={{ background: `${enos.color}15`, border: `1px solid ${enos.color}35`, color: enos.color }}>
                 <span className="text-[9px] font-semibold">
-                  El Niño: {params.enos_intensidad === 'fuerte' ? 'Fuerte' : params.enos_intensidad === 'moderado' ? 'Mod.' : 'Sin'}
+                  El Niño: {params.enos_intensidad === 'neutro' ? 'Sin' : 'Con'}
                 </span>
               </button>
             );
           })()}
         </div>
-        {/* Gear */}
         <button onClick={() => setShowParams(true)} title="Configurar parámetros"
           className="rounded-xl p-2 flex-shrink-0 transition-colors"
           style={{ color: 'oklch(0.50 0 0)', border: '1px solid rgba(255,255,255,0.08)' }}
@@ -560,12 +552,12 @@ function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: 
             label: 'Saturación', value: kpis ? `${kpis.saturacion_hospitalaria_pct}%` : '—',
             color: kpis && kpis.saturacion_hospitalaria_pct > 100 ? '#ef4444' : '#f97316',
             sub: kpis && kpis.saturacion_hospitalaria_pct > 100 ? 'Colapso proy.' : 'Sin desborde',
-            highlight: kpis ? kpis.saturacion_hospitalaria_pct > 100 : false
+            highlight: kpis ? kpis.saturacion_hospitalaria_pct > 100 : false,
           },
-          { label: 'Riesgo', value: nivel?.label ?? '—', color: nivel?.color, highlight: nivel?.label === 'CRÍTICO' },
+          { label: 'Riesgo',   value: nivel?.label ?? '—', color: nivel?.color, highlight: nivel?.label === 'CRÍTICO' },
           {
             label: 'Impacto', value: kpis ? fmtSoles(kpis.impacto_economico_soles) : '—',
-            sub: kpis ? `Ahorro: ${fmtSoles(kpis.ahorro_preventivo_soles)}` : '', color: '#22c55e'
+            sub: kpis ? `Ahorro: ${fmtSoles(kpis.ahorro_preventivo_soles)}` : '', color: '#22c55e',
           },
         ].map((k) => (
           <div key={k.label} className="flex flex-col gap-1 rounded-2xl px-4 py-3.5 min-w-0"
@@ -596,9 +588,9 @@ function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: 
       {/* Sub-tab content */}
       {result ? (
         <AnimatePresence mode="wait">
-          {subTab === 'epidemico' && <motion.div key="e" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}><SEIREpidemicTab data={result} onExpand={() => setChartExpanded(true)} /></motion.div>}
+          {subTab === 'epidemico'   && <motion.div key="e" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}><SEIREpidemicTab data={result} onExpand={() => setChartExpanded(true)} /></motion.div>}
           {subTab === 'humanitario' && <motion.div key="h" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}><SEIRHumanitarianTab data={result} /></motion.div>}
-          {subTab === 'economico' && <motion.div key="c" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}><SEIREconomicTab data={result} /></motion.div>}
+          {subTab === 'economico'   && <motion.div key="c" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}><SEIREconomicTab data={result} /></motion.div>}
         </AnimatePresence>
       ) : (
         <div className="flex items-center justify-center py-20">
@@ -621,258 +613,18 @@ function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: 
 
       <AnimatePresence>
         {showParams && (
-          <ParamsModal params={params} region={region} loading={loading}
-            onParamsChange={setParams} onRegionChange={setRegion}
-            onApply={(p, r) => { setParams(p); setRegion(r); void runWith(p, r); }}
-            onClose={() => setShowParams(false)} />
+          <ParamsModal
+            params={params} region={region} año={año} loading={loading}
+            onParamsChange={setParams}
+            onRegionChange={setRegion}
+            onAñoChange={setAño}
+            onApply={(p, r, a) => { setParams(p); setRegion(r); setAño(a); void runWith(p, r, a); }}
+            onClose={() => setShowParams(false)}
+          />
         )}
       </AnimatePresence>
       <AnimatePresence>
         {chartExpanded && result && <ChartModal data={result} onClose={() => setChartExpanded(false)} />}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-// ─── Climate content ──────────────────────────────────────────
-function nivelFallback(nivel: NivelRiesgo): AlertaMapa['tipo_alerta'] {
-  if (nivel === 'alto') return 'INUNDACION';
-  if (nivel === 'medio') return 'LLUVIAS_EXTREMAS';
-  return 'MOVIMIENTO_MASA';
-}
-
-function ClimateContent({ token, selectedTipo, tipos, departamento }: {
-  token: string; selectedTipo: string; tipos: PredictionType[]; departamento?: string | null;
-}) {
-  const setForecast = useMapStore((s) => s.setForecast);
-  const setFlyTarget = useMapStore((s) => s.setFlyTarget);
-  const [ventana, setVentana] = useState('7');
-  const [colorBy, setColorBy] = useState('probabilidad');
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<PredictionResponse | null>(null);
-  const [selected, setSelected] = useState<DistrictPrediction | null>(null);
-  const [error, setError] = useState('');
-  const prevTipo = useRef(selectedTipo);
-
-  const currentTipo = tipos.find((t) => t.id === selectedTipo);
-
-  const runPrediction = useCallback(async () => {
-    setLoading(true);
-    setError('');
-    setSelected(null);
-    try {
-      const res = await fetch('/api/v1/riesgo/predict', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ tipo: selectedTipo, ventana_dias: parseInt(ventana, 10), ...(departamento ? { departamento } : {}) }),
-      });
-      if (!res.ok) {
-        const body = (await res.json().catch(() => ({}))) as { message?: string };
-        throw new Error(body.message ?? `Error ${res.status}`);
-      }
-      const data = (await res.json()) as PredictionResponse;
-      setResult(data);
-      setSelected(null);
-
-      const tipoAlerta = TIPO_PREDICCION_ALERTA[data.tipo] ?? nivelFallback('medio');
-      setForecast({
-        analisis_general: data.resumen ?? '',
-        nivel_riesgo_global: 'MEDIO',
-        alertas_mapa: data.predicciones.slice(0, 30).map((p) => ({
-          departamento: p.departamento,
-          distrito: p.distrito,
-          tipo_alerta: tipoAlerta,
-          severidad: p.nivel === 'alto' ? 5 : p.nivel === 'medio' ? 3 : 1,
-          probabilidad_porcentaje: p.probabilidad_pct,
-          descripcion: `${p.probabilidad_pct.toFixed(1)}% · X${p.x_base.toFixed(1)} · Pico: ${p.dia_pico}`,
-          acciones_sugeridas: [],
-        })),
-        charts: [],
-        metricas_clave: [],
-      });
-    } catch (err) {
-      setError((err as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  }, [token, selectedTipo, ventana, setForecast]);
-
-  // Re-run when category or departamento changes
-  useEffect(() => {
-    if (prevTipo.current !== selectedTipo) {
-      prevTipo.current = selectedTipo;
-      setResult(null);
-    }
-    void runPrediction();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedTipo, departamento]);
-
-  const sorted = result
-    ? [...result.predicciones].sort((a, b) => b.probabilidad_pct - a.probabilidad_pct)
-    : [];
-
-  return (
-    <div className="flex flex-col gap-0" style={{ minHeight: 400 }}>
-      {/* Controls */}
-      <div className="flex flex-shrink-0 items-center gap-3 pb-3 flex-wrap"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-        <div className="flex items-center gap-1.5 flex-shrink-0">
-          <span className="text-[10px]" style={{ color: 'oklch(0.44 0 0)' }}>Ventana</span>
-          <div style={{ width: 150 }}>
-            <SelectField value={ventana} onChange={setVentana} options={VENTANA_OPTIONS} placeholder="7 días" />
-          </div>
-        </div>
-        <div className="flex items-center gap-1.5 flex-shrink-0">
-          <span className="text-[10px]" style={{ color: 'oklch(0.44 0 0)' }}>Colorear</span>
-          <div style={{ width: 130 }}>
-            <SelectField value={colorBy} onChange={setColorBy} options={COLOR_BY_OPTIONS} placeholder="Probabilidad" />
-          </div>
-        </div>
-        <button onClick={() => void runPrediction()} disabled={loading}
-          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50 ml-auto flex-shrink-0"
-          style={{ background: '#14b8a6' }}>
-          {loading ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
-          Actualizar
-        </button>
-      </div>
-
-      {/* Calibration note */}
-      <div className="flex flex-shrink-0 items-start gap-2 py-2 mb-1"
-        style={{ background: 'rgba(96,165,250,0.04)', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-        <Info size={11} style={{ color: 'oklch(0.55 0.10 240)', marginTop: 1, flexShrink: 0 }} />
-        <p className="text-[10px] leading-relaxed" style={{ color: 'oklch(0.48 0 0)' }}>
-          Calibrado ±<strong style={{ color: 'oklch(0.62 0 0)' }}>0.64 pp</strong> INDECI · {currentTipo?.label ?? '—'} · {ventana} días.
-        </p>
-      </div>
-
-      {/* KPI summary cards — shown once results arrive */}
-      <AnimatePresence>
-        {sorted.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="grid grid-cols-4 gap-2 my-3">
-            {(() => {
-              const altos  = sorted.filter((p) => p.nivel === 'alto').length;
-              const medios = sorted.filter((p) => p.nivel === 'medio').length;
-              const avgP   = (sorted.reduce((s, p) => s + p.probabilidad_pct, 0) / sorted.length).toFixed(1);
-              const maxL   = Math.max(...sorted.map((p) => p.lluvia_estimada_mm));
-              return [
-                { label: 'Riesgo alto',  value: String(altos),   sub: 'distritos',   color: '#ef4444', hi: altos > 3 },
-                { label: 'Riesgo medio', value: String(medios),  sub: 'distritos',   color: '#f97316', hi: false },
-                { label: 'Prob. media',  value: `${avgP}%`,      sub: 'del período', color: 'white',   hi: false },
-                { label: 'Lluvia máx.',  value: `${maxL}mm`,     sub: 'estimada',    color: 'oklch(0.60 0.18 240)', hi: false },
-              ].map((k) => (
-                <div key={k.label} className="flex flex-col gap-1 rounded-2xl px-3 py-3 min-w-0"
-                  style={{ background: k.hi ? `${k.color}0d` : 'rgba(255,255,255,0.04)', border: `1px solid ${k.hi ? `${k.color}28` : 'rgba(255,255,255,0.07)'}` }}>
-                  <p className="text-[9px] uppercase tracking-widest truncate" style={{ color: 'oklch(0.36 0 0)' }}>{k.label}</p>
-                  <p className="text-lg font-semibold tabular-nums leading-none" style={{ color: k.color, letterSpacing: '-0.02em' }}>{k.value}</p>
-                  <p className="text-[10px] truncate" style={{ color: 'oklch(0.44 0 0)' }}>{k.sub}</p>
-                </div>
-              ));
-            })()}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Error */}
-      <AnimatePresence>
-        {error && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-            className="flex shrink-0 items-center gap-2 py-2 text-xs mb-1"
-            style={{ background: 'rgba(239,68,68,0.07)', color: '#f87171' }}>
-            <AlertCircle size={12} />{error}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Table */}
-      <div className="overflow-auto" style={{ maxHeight: 340, scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.08) transparent' }}>
-        {loading && (
-          <div className="flex flex-col items-center justify-center h-40 gap-3">
-            <Loader2 size={20} className="animate-spin" style={{ color: 'oklch(0.44 0 0)' }} />
-            <p className="text-xs" style={{ color: 'oklch(0.44 0 0)' }}>Analizando datos históricos INDECI…</p>
-          </div>
-        )}
-        {!loading && sorted.length === 0 && !error && (
-          <div className="flex flex-col items-center justify-center h-40 gap-2 text-center">
-            <ChevronDown size={18} style={{ color: 'oklch(0.36 0 0)' }} />
-            <p className="text-xs" style={{ color: 'oklch(0.44 0 0)' }}>Pulsa <strong style={{ color: 'oklch(0.60 0 0)' }}>Actualizar</strong> para generar predicciones.</p>
-          </div>
-        )}
-        {!loading && sorted.length > 0 && (
-          <table className="w-full text-xs border-collapse">
-            <thead>
-              <tr style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.07)', position: 'sticky', top: 0, zIndex: 1 }}>
-                {['DISTRITO', 'DEPTO', 'PROB %', 'X BASE', 'LLUVIA 3D', 'DÍA PICO'].map((h) => (
-                  <th key={h} className="px-3 py-2 text-left font-semibold"
-                    style={{ color: 'oklch(0.42 0 0)', whiteSpace: 'nowrap', fontSize: '0.6875rem', letterSpacing: '0.05em' }}>
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {sorted.map((p, i) => {
-                const isSel = selected?.distrito === p.distrito && selected?.departamento === p.departamento;
-                return (
-                  <tr key={i} onClick={() => {
-                    setSelected(isSel ? null : p);
-                    const coords = getCoords(p.departamento, p.distrito);
-                    if (coords) setFlyTarget(coords);
-                  }}
-                    className="cursor-pointer"
-                    style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', background: isSel ? NIVEL_BG[p.nivel] : i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)' }}>
-                    <td className="px-3 py-2 font-medium text-white" style={{ whiteSpace: 'nowrap' }}>{p.distrito}</td>
-                    <td className="px-3 py-2" style={{ color: 'oklch(0.56 0 0)', whiteSpace: 'nowrap' }}>{p.departamento}</td>
-                    <td className="px-3 py-2 tabular-nums font-semibold" style={{ color: NIVEL_COLOR[p.nivel] }}>{p.probabilidad_pct.toFixed(1)}%</td>
-                    <td className="px-3 py-2 tabular-nums" style={{ color: p.x_base > 1.5 ? '#f97316' : 'oklch(0.56 0 0)' }}>{p.x_base.toFixed(1)}x</td>
-                    <td className="px-3 py-2 tabular-nums" style={{ color: p.lluvia_estimada_mm > 10 ? 'oklch(0.60 0.18 240)' : 'oklch(0.50 0 0)' }}>{p.lluvia_estimada_mm}mm</td>
-                    <td className="px-3 py-2 tabular-nums" style={{ color: 'oklch(0.50 0 0)', whiteSpace: 'nowrap' }}>{p.dia_pico}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </div>
-
-      {/* Footer */}
-      <AnimatePresence>
-        {(result || selected) && (
-          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-            className="flex flex-col gap-2 pt-3 mt-2"
-            style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-            {selected && (
-              <div className="rounded-xl px-3.5 py-3" style={{ background: NIVEL_BG[selected.nivel], border: `1px solid ${NIVEL_COLOR[selected.nivel]}22` }}>
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-xs font-bold text-white">{selected.distrito}, {selected.departamento}</span>
-                  <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold"
-                    style={{ background: `${NIVEL_COLOR[selected.nivel]}22`, color: NIVEL_COLOR[selected.nivel] }}>
-                    {NIVEL_LABEL[selected.nivel].toUpperCase()}
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px]" style={{ color: 'oklch(0.60 0 0)' }}>
-                  <span>Prob.: <strong style={{ color: NIVEL_COLOR[selected.nivel] }}>{selected.probabilidad_pct.toFixed(1)}%</strong></span>
-                  <span>Mult.: <strong style={{ color: 'white' }}>{selected.x_base.toFixed(1)}x</strong></span>
-                  <span>Lluvia: <strong style={{ color: 'white' }}>{selected.lluvia_estimada_mm}mm</strong></span>
-                  <span>Pico: <strong style={{ color: 'white' }}>{selected.dia_pico}</strong></span>
-                </div>
-              </div>
-            )}
-            {result?.resumen && (
-              <p className="text-[10px] leading-relaxed" style={{ color: 'oklch(0.48 0 0)' }}>{result.resumen}</p>
-            )}
-            {result && (
-              <div className="flex items-center gap-1.5">
-                {result.ai_disponible ? <Bot size={10} style={{ color: '#22c55e' }} /> : <BotOff size={10} style={{ color: 'oklch(0.44 0 0)' }} />}
-                <span className="text-[9px]" style={{ color: result.ai_disponible ? '#22c55e' : 'oklch(0.38 0 0)' }}>
-                  {result.ai_disponible ? 'Análisis con IA' : 'Fallback estadístico (IA no disponible)'}
-                </span>
-              </div>
-            )}
-          </motion.div>
-        )}
       </AnimatePresence>
     </div>
   );
@@ -927,7 +679,7 @@ export function UnifiedPredictionsPanel({ token, onClose, onResult, onSubTabChan
         </div>
       )}
 
-      {/* Content area */}
+      {/* Content */}
       <div className="flex-1 overflow-y-auto px-5 py-4"
         style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.07) transparent' }}>
         <SEIRContent
