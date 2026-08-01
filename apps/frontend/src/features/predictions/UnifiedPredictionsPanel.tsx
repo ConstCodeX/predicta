@@ -30,7 +30,7 @@ const fmtSoles = (n: number) =>
 // ─── Small shared components ──────────────────────────────────
 function Label({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[9px] uppercase tracking-widest" style={{ color: 'oklch(0.34 0 0)' }}>
+    <p className="text-[9px] uppercase tracking-widest" style={{ color: 'oklch(0.40 0 0)' }}>
       {children}
     </p>
   );
@@ -45,7 +45,7 @@ function Slider({ label, value, min, max, step = 1, unit = '', accent, onChange 
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
         <span className="text-[11px]" style={{ color: 'oklch(0.50 0 0)' }}>{label}</span>
-        <span className="text-[11px] font-mono" style={{ color: 'rgba(255,255,255,0.75)' }}>
+        <span className="text-[11px] font-mono" style={{ color: 'var(--c-text-md)' }}>
           {value > 0 && !unit.startsWith('°') ? '+' : ''}
           {Number.isInteger(value) ? value : value.toFixed(1)}{unit}
         </span>
@@ -61,9 +61,9 @@ function Slider({ label, value, min, max, step = 1, unit = '', accent, onChange 
 function Row({ label, value, accent }: { label: string; value: string; accent?: string }) {
   return (
     <div className="flex items-center justify-between py-2.5"
-      style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+      style={{ borderBottom: '1px solid var(--c-row-sep)' }}>
       <span className="text-[11px]" style={{ color: 'oklch(0.48 0 0)' }}>{label}</span>
-      <span className="text-xs font-medium tabular-nums" style={{ color: accent ?? 'rgba(255,255,255,0.88)' }}>
+      <span className="text-xs font-medium tabular-nums" style={{ color: accent ?? 'var(--c-text-hi)' }}>
         {value}
       </span>
     </div>
@@ -72,7 +72,7 @@ function Row({ label, value, accent }: { label: string; value: string; accent?: 
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[9px] uppercase tracking-widest mt-5 mb-2" style={{ color: 'oklch(0.32 0 0)' }}>
+    <p className="text-[9px] uppercase tracking-widest mt-5 mb-2" style={{ color: 'oklch(0.40 0 0)' }}>
       {children}
     </p>
   );
@@ -85,7 +85,7 @@ function ProgBar({ label, value, color = '#22c55e' }: { label: string; value: nu
         <span className="text-[11px]" style={{ color: 'oklch(0.50 0 0)' }}>{label}</span>
         <span className="text-[11px] font-medium tabular-nums" style={{ color }}>{value}%</span>
       </div>
-      <div className="h-[3px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+      <div className="h-[3px] rounded-full overflow-hidden" style={{ background: 'var(--c-bar)' }}>
         <motion.div className="h-full rounded-full" style={{ background: color }}
           initial={{ width: 0 }} animate={{ width: `${Math.min(value, 100)}%` }}
           transition={{ duration: 0.65, ease: 'easeOut' }} />
@@ -112,24 +112,24 @@ function ParamsModal({ params, region, año, loading, onParamsChange, onRegionCh
 
   return (
     <motion.div className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(6px)' }}
+      style={{ background: 'var(--c-overlay)', backdropFilter: 'blur(6px)' }}
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       onClick={onClose}>
       <motion.div className="relative flex flex-col overflow-hidden"
-        style={{ width: 420, maxHeight: '80vh', background: 'rgba(10,10,12,0.98)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: 20 }}
+        style={{ width: 420, maxHeight: '80vh', background: 'var(--c-modal)', border: '1px solid var(--c-border)', borderRadius: 20 }}
         initial={{ scale: 0.94, y: 12 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.96, y: 6 }}
         transition={{ type: 'spring', damping: 24, stiffness: 300 }}
         onClick={(e) => e.stopPropagation()}>
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 flex-shrink-0"
-          style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          style={{ borderBottom: '1px solid var(--c-border2)' }}>
           <div>
-            <h3 className="text-sm font-semibold text-white">Parámetros del modelo</h3>
+            <h3 className="text-sm font-semibold" style={{ color: 'var(--c-text)' }}>Parámetros del modelo</h3>
             <p className="text-[11px] mt-0.5" style={{ color: 'oklch(0.42 0 0)' }}>Condiciones de entrada — Dengue SEIR</p>
           </div>
           <button onClick={onClose} className="rounded-full p-1.5" style={{ color: 'oklch(0.46 0 0)' }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.07)')}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--c-card-hi)')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}>
             <X size={14} />
           </button>
@@ -143,8 +143,8 @@ function ParamsModal({ params, region, año, loading, onParamsChange, onRegionCh
             <Label>Región de análisis</Label>
             <select value={region} onChange={(e) => onRegionChange(e.target.value)}
               className="w-full rounded-xl px-3 py-2.5 text-xs outline-none mt-2"
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)', color: 'white' }}>
-              {REGIONES.map((r) => <option key={r} value={r} style={{ background: '#0a0a0b' }}>{r}</option>)}
+              style={{ background: 'var(--c-card)', border: '1px solid var(--c-border)', color: 'var(--c-text)' }}>
+              {REGIONES.map((r) => <option key={r} value={r} style={{ background: 'var(--c-select)' }}>{r}</option>)}
             </select>
           </div>
 
@@ -160,8 +160,8 @@ function ParamsModal({ params, region, año, loading, onParamsChange, onRegionCh
                 return (
                   <button key={String(o.valor)} onClick={() => toggleElNino(o.valor)}
                     className="flex-1 rounded-xl px-3 py-3 text-left transition-all"
-                    style={{ background: on ? `${o.color}14` : 'rgba(255,255,255,0.04)', border: `1px solid ${on ? `${o.color}50` : 'rgba(255,255,255,0.07)'}` }}>
-                    <p className="text-[11px] font-semibold" style={{ color: on ? o.color : 'white' }}>{o.label}</p>
+                    style={{ background: on ? `${o.color}14` : 'var(--c-card)', border: `1px solid ${on ? `${o.color}50` : 'var(--c-border2)'}` }}>
+                    <p className="text-[11px] font-semibold" style={{ color: on ? o.color : 'var(--c-text)' }}>{o.label}</p>
                     <p className="text-[9px] mt-0.5" style={{ color: 'oklch(0.42 0 0)' }}>{o.sub}</p>
                   </button>
                 );
@@ -178,7 +178,7 @@ function ParamsModal({ params, region, año, loading, onParamsChange, onRegionCh
                 return (
                   <button key={a} onClick={() => onAñoChange(a)}
                     className="flex-1 rounded-xl py-2.5 text-xs font-semibold transition-all"
-                    style={{ background: on ? 'rgba(20,184,166,0.15)' : 'rgba(255,255,255,0.04)', border: `1px solid ${on ? 'rgba(20,184,166,0.40)' : 'rgba(255,255,255,0.07)'}`, color: on ? '#14b8a6' : 'oklch(0.50 0 0)' }}>
+                    style={{ background: on ? 'rgba(20,184,166,0.15)' : 'var(--c-card)', border: `1px solid ${on ? 'rgba(20,184,166,0.40)' : 'var(--c-border2)'}`, color: on ? '#14b8a6' : 'oklch(0.50 0 0)' }}>
                     {a}
                   </button>
                 );
@@ -201,9 +201,9 @@ function ParamsModal({ params, region, año, loading, onParamsChange, onRegionCh
         </div>
 
         {/* Footer */}
-        <div className="flex gap-2 px-6 py-4 flex-shrink-0" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="flex gap-2 px-6 py-4 flex-shrink-0" style={{ borderTop: '1px solid var(--c-border2)' }}>
           <button onClick={onClose} className="rounded-xl px-4 py-2 text-xs"
-            style={{ background: 'rgba(255,255,255,0.05)', color: 'oklch(0.50 0 0)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            style={{ background: 'var(--c-card)', color: 'oklch(0.50 0 0)', border: '1px solid var(--c-border2)' }}>
             Cancelar
           </button>
           <button onClick={() => { onApply(params, region, año); onClose(); }} disabled={loading}
@@ -237,23 +237,23 @@ function SEIREpidemicTab({ data, onExpand }: { data: SEIRModelResponse; onExpand
           { label: 'Rt máximo',    value: rtMax.toFixed(2), color: rtMax > 4 ? '#ef4444' : rtMax > 2 ? '#f97316' : '#22c55e' },
           { label: 'Camas disp.',  value: fmtNum(camas), color: '#ef4444', sub: `${data.kpis.saturacion_hospitalaria_pct}% sat.` },
         ].map((s) => (
-          <div key={s.label} className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
-            <p className="text-[9px] uppercase tracking-widest mb-1.5" style={{ color: 'oklch(0.36 0 0)' }}>{s.label}</p>
-            <p className="text-base font-semibold tabular-nums" style={{ color: s.color ?? 'white' }}>{s.value}</p>
+          <div key={s.label} className="rounded-xl p-3" style={{ background: 'var(--c-card)' }}>
+            <p className="text-[9px] uppercase tracking-widest mb-1.5" style={{ color: 'oklch(0.42 0 0)' }}>{s.label}</p>
+            <p className="text-base font-semibold tabular-nums" style={{ color: s.color ?? 'var(--c-text)' }}>{s.value}</p>
             {s.sub && <p className="text-[10px] mt-0.5" style={{ color: 'oklch(0.44 0 0)' }}>{s.sub}</p>}
           </div>
         ))}
       </div>
-      <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="rounded-2xl overflow-hidden" style={{ background: 'var(--c-card)', border: '1px solid var(--c-border2)' }}>
         <div className="flex items-center justify-between px-4 pt-3.5 pb-2">
           <div>
-            <p className="text-xs font-medium text-white">Proyección semanal</p>
+            <p className="text-xs font-medium" style={{ color: 'var(--c-text)' }}>Proyección semanal</p>
             <p className="text-[10px]" style={{ color: 'oklch(0.40 0 0)' }}>S1–S4 histórico · S5–S16 proyección Dengue</p>
           </div>
           <button onClick={onExpand}
             className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[10px]"
-            style={{ color: 'oklch(0.48 0 0)', border: '1px solid rgba(255,255,255,0.07)' }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; e.currentTarget.style.color = 'white'; }}
+            style={{ color: 'oklch(0.48 0 0)', border: '1px solid var(--c-border2)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--c-card-hi)'; e.currentTarget.style.color = 'var(--c-text)'; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'oklch(0.48 0 0)'; }}>
             <Maximize2 size={11} /> Ampliar
           </button>
@@ -268,7 +268,7 @@ function SEIREpidemicTab({ data, onExpand }: { data: SEIRModelResponse; onExpand
               <YAxis yAxisId="r" orientation="right" domain={[0, Math.ceil(rtMax) + 2]}
                 tick={{ fill: '#444', fontSize: 9 }} tickLine={false} axisLine={false} />
               <Tooltip
-                contentStyle={{ background: 'rgba(10,10,12,0.97)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: 10, fontSize: 11, color: 'white' }}
+                contentStyle={{ background: 'var(--c-tooltip)', border: '1px solid var(--c-border)', borderRadius: 10, fontSize: 11, color: 'var(--c-text)' }}
                 formatter={(v, n) => {
                   const val = v as number;
                   if (n === 'rt')   return [`${val.toFixed(2)}`, 'Rt'];
@@ -305,7 +305,7 @@ function SEIREpidemicTab({ data, onExpand }: { data: SEIRModelResponse; onExpand
           <SectionLabel>Distribución por ciudad · proyección pico</SectionLabel>
           <table className="w-full text-xs border-collapse mt-1">
             <thead>
-              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+              <tr style={{ borderBottom: '1px solid var(--c-border2)' }}>
                 {['CIUDAD', 'CASOS PROY.', '% TOTAL', 'HOSP. REQ.'].map((h) => (
                   <th key={h} className="pb-2 text-left font-semibold"
                     style={{ color: 'oklch(0.42 0 0)', fontSize: '0.6875rem', letterSpacing: '0.05em' }}>
@@ -321,8 +321,8 @@ function SEIREpidemicTab({ data, onExpand }: { data: SEIRModelResponse; onExpand
                   const riesgoColor = RIESGO_SEIR[data.kpis.nivel_riesgo]?.color ?? '#6b7280';
                   const hosp = Math.round(c.casos * 0.126);
                   return (
-                    <tr key={c.ciudad} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                      <td className="py-2 font-medium text-white">{c.ciudad}</td>
+                    <tr key={c.ciudad} style={{ borderBottom: '1px solid var(--c-row-sep)' }}>
+                      <td className="py-2 font-medium" style={{ color: 'var(--c-text)' }}>{c.ciudad}</td>
                       <td className="py-2 tabular-nums font-semibold" style={{ color: riesgoColor }}>
                         {c.casos.toLocaleString()}
                       </td>
@@ -355,14 +355,15 @@ function SEIRHumanitarianTab({ data }: { data: SEIRModelResponse }) {
         {[
           { l: 'Fallecidos estimados', v: h.fallecidos_estimados,    c: '#ef4444',              bg: 'rgba(239,68,68,0.07)',   b: 'rgba(239,68,68,0.14)' },
           { l: 'Heridos graves',       v: h.heridos_graves,          c: '#f97316',              bg: 'rgba(249,115,22,0.07)',  b: 'rgba(249,115,22,0.14)' },
-          { l: 'Desplazados',          v: h.personas_desplazadas,    c: 'rgba(255,255,255,0.88)', bg: 'rgba(255,255,255,0.04)', b: 'rgba(255,255,255,0.07)' },
-          { l: 'Albergues req.',       v: h.albergues_requeridos,    c: 'rgba(255,255,255,0.88)', bg: 'rgba(255,255,255,0.04)', b: 'rgba(255,255,255,0.07)' },
+          { l: 'Desplazados',          v: h.personas_desplazadas,    c: null,       bg: null, b: null },
+          { l: 'Albergues req.',       v: h.albergues_requeridos,    c: null,       bg: null, b: null },
         ].map((x) => (
-          <div key={x.l} className="rounded-2xl p-4" style={{ background: x.bg, border: `1px solid ${x.b}` }}>
+          <div key={x.l} className="rounded-2xl p-4"
+            style={{ background: x.bg ?? 'var(--c-card)', border: `1px solid ${x.b ?? 'var(--c-border2)'}` }}>
             <p className="text-[9px] uppercase tracking-widest mb-2"
-              style={{ color: x.c === 'rgba(255,255,255,0.88)' ? 'oklch(0.36 0 0)' : `${x.c}99` }}>{x.l}</p>
+              style={{ color: x.c ? `${x.c}99` : 'oklch(0.42 0 0)' }}>{x.l}</p>
             <p className="text-2xl font-semibold tabular-nums leading-none"
-              style={{ color: x.c, letterSpacing: '-0.02em' }}>{x.v.toLocaleString()}</p>
+              style={{ color: x.c ?? 'var(--c-text)', letterSpacing: '-0.02em' }}>{x.v.toLocaleString()}</p>
           </div>
         ))}
       </div>
@@ -373,7 +374,7 @@ function SEIRHumanitarianTab({ data }: { data: SEIRModelResponse }) {
       </div>
       <div className="mt-1">
         <Row label="Personal salud / 1,000 hab." value={h.personal_salud_por_1000hab.toFixed(1)} />
-        <Row label="Personas en riesgo"           value={fmtNum(h.personas_en_riesgo)} accent="rgba(255,255,255,0.65)" />
+        <Row label="Personas en riesgo"           value={fmtNum(h.personas_en_riesgo)} accent="var(--c-text-md)" />
       </div>
     </div>
   );
@@ -386,9 +387,9 @@ function SEIREconomicTab({ data }: { data: SEIRModelResponse }) {
   return (
     <div>
       <div className="grid grid-cols-2 gap-3 mb-2">
-        <div className="rounded-2xl p-4" style={{ background: 'rgba(255,255,255,0.04)' }}>
-          <p className="text-[9px] uppercase tracking-widest mb-1.5" style={{ color: 'oklch(0.34 0 0)' }}>Impacto total</p>
-          <p className="text-2xl font-semibold tabular-nums" style={{ letterSpacing: '-0.02em' }}>{fmtSoles(e.impacto_total_soles)}</p>
+        <div className="rounded-2xl p-4" style={{ background: 'var(--c-card)' }}>
+          <p className="text-[9px] uppercase tracking-widest mb-1.5" style={{ color: 'oklch(0.42 0 0)' }}>Impacto total</p>
+          <p className="text-2xl font-semibold tabular-nums" style={{ letterSpacing: '-0.02em', color: 'var(--c-text)' }}>{fmtSoles(e.impacto_total_soles)}</p>
           <p className="text-[10px] mt-1" style={{ color: 'oklch(0.44 0 0)' }}>Atención: {fmtSoles(e.costo_atencion_soles)}</p>
         </div>
         <div className="rounded-2xl p-4" style={{ background: 'rgba(34,197,94,0.07)', border: '1px solid rgba(34,197,94,0.15)' }}>
@@ -427,6 +428,7 @@ function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: 
   onSubTabChange?: (tab: SEIRSubTab) => void;
   externalDepartamento?: string | null;
 }) {
+  const { setSelectedDepartamento } = useMapStore();
   const [activePreset, setActivePreset] = useState<Exclude<ENOSIntensidad, 'fuerte'>>('neutro');
   const [params, setParams]             = useState<SEIRParametros>({ ...PRESETS.neutro });
   const [region, setRegion]             = useState(REGIONES[0]);
@@ -511,13 +513,13 @@ function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: 
       <div className="space-y-2">
         {/* Fila 1: preset escenario + gear + spinner */}
         <div className="flex items-center gap-2">
-          <div className="flex flex-1 gap-1 p-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)' }}>
+          <div className="flex flex-1 gap-1 p-1 rounded-xl" style={{ background: 'var(--c-card)' }}>
             {SEIR_SCENARIOS.map((s) => {
               const active = activePreset === s.key;
               return (
                 <button key={s.key} onClick={() => selectPreset(s.key)}
                   className="flex-1 rounded-lg py-2.5 text-xs font-medium transition-all"
-                  style={{ background: active ? 'rgba(255,255,255,0.11)' : 'transparent', color: active ? 'white' : 'oklch(0.44 0 0)' }}>
+                  style={{ background: active ? 'var(--c-card-hi)' : 'transparent', color: active ? 'var(--c-text)' : 'oklch(0.44 0 0)' }}>
                   {s.label}
                 </button>
               );
@@ -525,8 +527,8 @@ function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: 
           </div>
           <button onClick={() => setShowParams(true)} title="Configurar parámetros"
             className="rounded-xl p-2 flex-shrink-0 transition-colors"
-            style={{ color: 'oklch(0.50 0 0)', border: '1px solid rgba(255,255,255,0.08)' }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; e.currentTarget.style.color = 'white'; }}
+            style={{ color: 'oklch(0.50 0 0)', border: '1px solid var(--c-divider)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--c-card-hi)'; e.currentTarget.style.color = 'var(--c-text)'; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'oklch(0.50 0 0)'; }}>
             <Settings2 size={14} />
           </button>
@@ -550,8 +552,8 @@ function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: 
                 disabled={loading}
                 className="flex-1 rounded-xl py-2 text-xs font-semibold transition-all disabled:opacity-40"
                 style={{
-                  background: active ? `${o.color}18` : 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${active ? `${o.color}45` : 'rgba(255,255,255,0.07)'}`,
+                  background: active ? `${o.color}18` : 'var(--c-card)',
+                  border: `1px solid ${active ? `${o.color}45` : 'var(--c-border2)'}`,
                   color: active ? o.color : 'oklch(0.46 0 0)',
                 }}>
                 {o.label}
@@ -578,15 +580,15 @@ function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: 
           },
         ].map((k) => (
           <div key={k.label} className="flex flex-col gap-1 rounded-2xl px-4 py-3.5 min-w-0"
-            style={{ background: k.highlight ? `${k.color}0d` : 'rgba(255,255,255,0.04)', border: `1px solid ${k.highlight ? `${k.color}28` : 'rgba(255,255,255,0.07)'}` }}>
-            <p className="text-[9px] uppercase tracking-widest truncate" style={{ color: 'oklch(0.36 0 0)' }}>{k.label}</p>
-            <p className="text-xl font-semibold tabular-nums leading-none" style={{ color: k.color ?? 'white', letterSpacing: '-0.02em' }}>{k.value}</p>
+            style={{ background: k.highlight ? `${k.color}0d` : 'var(--c-card)', border: `1px solid ${k.highlight ? `${k.color}28` : 'var(--c-border2)'}` }}>
+            <p className="text-[9px] uppercase tracking-widest truncate" style={{ color: 'oklch(0.42 0 0)' }}>{k.label}</p>
+            <p className="text-xl font-semibold tabular-nums leading-none" style={{ color: k.color ?? 'var(--c-text)', letterSpacing: '-0.02em' }}>{k.value}</p>
             {k.sub && <p className="text-[10px] truncate" style={{ color: k.highlight ? `${k.color}bb` : 'oklch(0.44 0 0)' }}>{k.sub}</p>}
           </div>
         ))}
       </div>
 
-      <div style={{ height: 1, background: 'rgba(255,255,255,0.05)' }} />
+      <div style={{ height: 1, background: 'var(--c-border3)' }} />
 
       {/* Sub-tabs */}
       <div className="flex">
@@ -595,7 +597,7 @@ function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: 
           return (
             <button key={t.id} onClick={() => { setSubTab(t.id); onSubTabChange?.(t.id); }}
               className="flex-1 py-2 text-xs font-medium"
-              style={{ color: active ? 'white' : 'oklch(0.42 0 0)', borderBottom: `1.5px solid ${active ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.06)'}` }}>
+              style={{ color: active ? 'var(--c-text)' : 'oklch(0.42 0 0)', borderBottom: `1.5px solid ${active ? 'var(--c-text)' : 'var(--c-border2)'}` }}>
               {t.label}
             </button>
           );
@@ -631,15 +633,15 @@ function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: 
       {/* Explicación del pronóstico generada por el modelo */}
       {result?.explicacion_pronostico && (
         <div className="rounded-2xl px-4 py-4 space-y-2"
-          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-          <p className="text-[9px] uppercase tracking-widest" style={{ color: 'oklch(0.36 0 0)' }}>
+          style={{ background: 'var(--c-card)', border: '1px solid var(--c-border2)' }}>
+          <p className="text-[9px] uppercase tracking-widest" style={{ color: 'oklch(0.42 0 0)' }}>
             Cómo se generó este pronóstico
           </p>
-          <p className="text-[11px] leading-relaxed" style={{ color: 'oklch(0.58 0 0)' }}>
+          <p className="text-[11px] leading-relaxed" style={{ color: 'oklch(0.56 0 0)' }}>
             {result.explicacion_pronostico}
           </p>
           {result.notas_metodologicas && (
-            <p className="text-[10px] leading-relaxed pt-1" style={{ color: 'oklch(0.38 0 0)', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '0.5rem' }}>
+            <p className="text-[10px] leading-relaxed" style={{ color: 'oklch(0.42 0 0)', borderTop: '1px solid var(--c-border3)', paddingTop: '0.5rem' }}>
               {result.notas_metodologicas}
             </p>
           )}
@@ -653,7 +655,13 @@ function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: 
             onParamsChange={setParams}
             onRegionChange={setRegion}
             onAñoChange={setAño}
-            onApply={(p, r, a) => { setParams(p); setRegion(r); setAño(a); void runWith(p, r, a); }}
+            onApply={(p, r, a) => {
+              setParams(p); setRegion(r); setAño(a);
+              // Sync map zoom to the newly selected region
+              const deptKey = r.split(' — ')[0].trim().toUpperCase();
+              setSelectedDepartamento(deptKey);
+              void runWith(p, r, a);
+            }}
             onClose={() => setShowParams(false)}
           />
         )}
@@ -677,19 +685,19 @@ export function UnifiedPredictionsPanel({ token, onClose, onResult, onSubTabChan
 
   return (
     <div className="h-full flex flex-col overflow-hidden"
-      style={{ background: 'rgba(9,9,11,0.98)', borderLeft: '1px solid rgba(255,255,255,0.07)', backdropFilter: 'blur(24px)' }}>
+      style={{ background: 'var(--c-nav)', borderLeft: '1px solid var(--c-border2)', backdropFilter: 'blur(24px)' }}>
 
       {/* Header */}
       <div className="flex items-center gap-3 px-5 py-3.5 flex-shrink-0"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        style={{ borderBottom: '1px solid var(--c-border2)' }}>
         <div className="flex-1 min-w-0">
-          <h1 className="text-[15px] font-semibold text-white tracking-tight">Predicciones · Dengue</h1>
+          <h1 className="text-[15px] font-semibold tracking-tight" style={{ color: 'var(--c-text)' }}>Predicciones · Dengue</h1>
           <p className="text-[11px] mt-0.5" style={{ color: 'oklch(0.40 0 0)' }}>
             Modelo epidémico SEIR · Generado por Gemma via AI Studio
           </p>
         </div>
         <button onClick={onClose} className="rounded-full p-1.5" style={{ color: 'oklch(0.46 0 0)' }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.07)')}
+          onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--c-card-hi)')}
           onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}>
           <X size={14} />
         </button>
@@ -698,7 +706,7 @@ export function UnifiedPredictionsPanel({ token, onClose, onResult, onSubTabChan
       {/* Region chip */}
       {selectedDepartamento && (
         <div className="flex flex-shrink-0 items-center gap-2 px-5 py-2"
-          style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', background: 'rgba(20,184,166,0.06)' }}>
+          style={{ borderBottom: '1px solid var(--c-border3)', background: 'rgba(20,184,166,0.06)' }}>
           <span className="text-[10px]" style={{ color: 'oklch(0.46 0 0)' }}>Región activa:</span>
           <span className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
             style={{ background: 'rgba(20,184,166,0.15)', color: '#14b8a6', border: '1px solid rgba(20,184,166,0.25)' }}>
@@ -707,7 +715,7 @@ export function UnifiedPredictionsPanel({ token, onClose, onResult, onSubTabChan
           <button onClick={() => setSelectedDepartamento(null)}
             className="ml-auto text-[10px] rounded px-2 py-0.5 transition-colors"
             style={{ color: 'oklch(0.40 0 0)' }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = 'white')}
+            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--c-text)')}
             onMouseLeave={(e) => (e.currentTarget.style.color = 'oklch(0.40 0 0)')}>
             Limpiar
           </button>
@@ -716,7 +724,7 @@ export function UnifiedPredictionsPanel({ token, onClose, onResult, onSubTabChan
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-5 py-4"
-        style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.07) transparent' }}>
+        style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--c-border2) transparent' }}>
         <SEIRContent
           token={token}
           onResult={onResult}

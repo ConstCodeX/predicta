@@ -33,21 +33,21 @@ export function MapToolbar({ activeTool, onToggle }: Props) {
             title={tool.label}
             className="group relative flex h-10 w-10 items-center justify-center rounded-xl transition-all"
             style={{
-              background:           active ? tool.color : 'rgba(9,9,11,0.82)',
+              background:           active ? tool.color : 'var(--c-surface)',
               backdropFilter:       'blur(12px)',
               WebkitBackdropFilter: 'blur(12px)',
-              border:               `1px solid ${active ? 'transparent' : 'rgba(255,255,255,0.09)'}`,
+              border:               `1px solid ${active ? 'transparent' : 'var(--c-border)'}`,
               color:                active ? 'white' : 'oklch(0.54 0 0)',
-              boxShadow:            active ? `0 0 16px ${tool.color}55` : '0 2px 8px rgba(0,0,0,0.4)',
+              boxShadow:            active ? `0 0 16px ${tool.color}55` : '0 2px 8px rgba(0,0,0,0.25)',
             }}
           >
             {tool.icon}
             <span
               className="pointer-events-none absolute left-12 whitespace-nowrap rounded-lg px-2.5 py-1 text-[11px] font-medium opacity-0 group-hover:opacity-100 transition-opacity"
               style={{
-                background:     'rgba(9,9,11,0.92)',
-                border:         '1px solid rgba(255,255,255,0.09)',
-                color:          'white',
+                background:     'var(--c-tooltip)',
+                border:         '1px solid var(--c-border)',
+                color:          'var(--c-text)',
                 backdropFilter: 'blur(8px)',
               }}
             >
@@ -58,7 +58,7 @@ export function MapToolbar({ activeTool, onToggle }: Props) {
       })}
 
       {/* Separador */}
-      <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', margin: '2px 4px' }} />
+      <div style={{ height: 1, background: 'var(--c-divider)', margin: '2px 4px' }} />
 
       {/* Próximamente */}
       {SOON_TOOLS.map((tool) => (
@@ -67,19 +67,19 @@ export function MapToolbar({ activeTool, onToggle }: Props) {
           title={`${tool.label} — Próximamente`}
           className="group relative flex h-10 w-10 items-center justify-center rounded-xl cursor-not-allowed"
           style={{
-            background:           'rgba(9,9,11,0.5)',
+            background:           'var(--c-dim)',
             backdropFilter:       'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
-            border:               '1px solid rgba(255,255,255,0.04)',
-            color:                'oklch(0.30 0 0)',
+            border:               '1px solid var(--c-border3)',
+            color:                'oklch(0.36 0 0)',
           }}
         >
           {tool.icon}
           <span
             className="pointer-events-none absolute left-12 whitespace-nowrap rounded-lg px-2.5 py-1 text-[11px] font-medium opacity-0 group-hover:opacity-100 transition-opacity"
             style={{
-              background:     'rgba(9,9,11,0.92)',
-              border:         '1px solid rgba(255,255,255,0.09)',
+              background:     'var(--c-tooltip)',
+              border:         '1px solid var(--c-border)',
               color:          'oklch(0.46 0 0)',
               backdropFilter: 'blur(8px)',
             }}
@@ -87,7 +87,7 @@ export function MapToolbar({ activeTool, onToggle }: Props) {
             {tool.label}
             <span
               className="ml-2 rounded-full px-1.5 py-0.5 text-[9px] font-semibold"
-              style={{ background: 'rgba(255,255,255,0.06)', color: 'oklch(0.38 0 0)' }}
+              style={{ background: 'var(--c-card-hi)', color: 'oklch(0.44 0 0)' }}
             >
               SOON
             </span>

@@ -12,8 +12,10 @@ import { MapStatusBar } from './MapStatusBar';
 import { getCoords } from './constants/peru-coords';
 import { useMapStore } from './store/useMapStore';
 import type { AlertaMapa } from './types';
+import { useThemeStore } from '../../store/themeStore';
 
-const CARTO_DARK = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
+const CARTO_DARK    = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
+const CARTO_VOYAGER = 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json';
 
 interface HeatmapClickInfo {
   lng: number;
@@ -45,16 +47,33 @@ function PulseMarker({ coords }: { coords: [number, number] }) {
   );
 }
 
-// Region center coordinates for fly-to
+// Region center coordinates for fly-to (all 25 departments)
 const REGION_CENTERS: Record<string, [number, number]> = {
-  PIURA:       [-80.63, -5.19],
-  LORETO:      [-73.25, -3.75],
-  'SAN MARTIN': [-76.37, -6.49],
-  UCAYALI:     [-74.55, -8.39],
-  TUMBES:      [-80.45, -3.57],
+  AMAZONAS:      [-77.87, -5.95],
+  ANCASH:        [-77.53, -9.53],
+  APURIMAC:      [-73.09, -14.05],
+  AREQUIPA:      [-71.54, -16.40],
+  AYACUCHO:      [-74.22, -13.16],
+  CAJAMARCA:     [-78.51, -7.16],
+  CALLAO:        [-77.12, -12.05],
+  CUSCO:         [-72.00, -13.52],
+  HUANCAVELICA:  [-75.03, -12.79],
+  HUANUCO:       [-76.24, -9.93],
+  ICA:           [-75.73, -14.07],
+  JUNIN:         [-75.20, -11.16],
   'LA LIBERTAD': [-79.00, -8.12],
-  LAMBAYEQUE:  [-79.84, -6.70],
-  LIMA:        [-77.04, -12.04],
+  LAMBAYEQUE:    [-79.84, -6.70],
+  LIMA:          [-77.04, -12.04],
+  LORETO:        [-73.25, -3.75],
+  'MADRE DE DIOS': [-70.03, -12.59],
+  MOQUEGUA:      [-70.93, -17.19],
+  PASCO:         [-76.26, -10.68],
+  PIURA:         [-80.63, -5.19],
+  PUNO:          [-70.02, -15.84],
+  'SAN MARTIN':  [-76.37, -6.49],
+  TACNA:         [-70.25, -18.01],
+  TUMBES:        [-80.45, -3.57],
+  UCAYALI:       [-74.55, -8.39],
 };
 
 interface MapDashboardProps {
@@ -64,6 +83,7 @@ interface MapDashboardProps {
 
 export function MapDashboard({ seirData, seirSubTab = 'epidemico' }: MapDashboardProps = {}) {
   const mapRef = useRef<MapRef>(null);
+  const { theme } = useThemeStore();
 
   const {
     alerts, selectedAlert, selectedCoords,
@@ -71,7 +91,7 @@ export function MapDashboard({ seirData, seirSubTab = 'epidemico' }: MapDashboar
     heatmapPoints, timelineMode,
     setHoveredAlert,
     flyTarget, setFlyTarget,
-    setSelectedDepartamento,
+    selectedDepartamento, setSelectedDepartamento,
   } = useMapStore();
 
   const [heatmapClick, setHeatmapClick] = useState<HeatmapClickInfo | null>(null);
@@ -87,10 +107,20 @@ export function MapDashboard({ seirData, seirSubTab = 'epidemico' }: MapDashboar
     });
   }, [flyTarget?.seq]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Fly to the SEIR region when data arrives
+  // Fly to selected department when it changes (predictions panel region change or map click)
+  useEffect(() => {
+    if (!selectedDepartamento || !mapRef.current) return;
+    const coords = REGION_CENTERS[selectedDepartamento.toUpperCase()];
+    if (coords) {
+      mapRef.current.flyTo({ center: coords, zoom: 9, duration: 1400, essential: true });
+    }
+  }, [selectedDepartamento]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Fly to the SEIR region when data arrives (fallback for when dept isn't in store)
   useEffect(() => {
     if (!seirData || !mapRef.current) return;
     const regionKey = seirData.region.split(' — ')[0].toUpperCase();
+    if (regionKey === selectedDepartamento?.toUpperCase()) return; // already flew there
     const coords = REGION_CENTERS[regionKey];
     if (coords) {
       mapRef.current.flyTo({ center: coords, zoom: 9, duration: 1600, essential: true });
@@ -137,7 +167,7 @@ export function MapDashboard({ seirData, seirSubTab = 'epidemico' }: MapDashboar
         ref={mapRef}
         initialViewState={{ longitude: -75.0, latitude: -9.1, zoom: 5 }}
         style={{ width: '100%', height: '100%' }}
-        mapStyle={CARTO_DARK}
+        mapStyle={theme === 'light' ? CARTO_VOYAGER : CARTO_DARK}
         interactiveLayerIds={heatmapActive ? ['heatmap-circles'] : []}
         cursor={heatmapActive ? 'pointer' : 'grab'}
         onClick={handleMapClick as never}

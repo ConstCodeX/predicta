@@ -36,6 +36,59 @@
   --radius-xl: 1rem;
 }
 
+/* ── Surface tokens (used in inline styles — overridable via html.light) ── */
+:root {
+  --c-nav:     rgba(9,9,11,0.96);
+  --c-surface: rgba(9,9,11,0.88);
+  --c-modal:   rgba(10,10,12,0.98);
+  --c-tooltip: rgba(9,9,11,0.92);
+  --c-dim:     rgba(9,9,11,0.50);
+  --c-card:    rgba(255,255,255,0.04);
+  --c-card-hi: rgba(255,255,255,0.11);
+  --c-border:  rgba(255,255,255,0.09);
+  --c-border2: rgba(255,255,255,0.07);
+  --c-border3: rgba(255,255,255,0.05);
+  --c-row-sep: rgba(255,255,255,0.04);
+  --c-divider: rgba(255,255,255,0.08);
+  --c-bar:     rgba(255,255,255,0.06);
+  --c-text:    white;
+  --c-text-hi: rgba(255,255,255,0.88);
+  --c-text-md: rgba(255,255,255,0.60);
+  --c-overlay: rgba(0,0,0,0.72);
+  --c-select:  #0a0a0b;
+}
+
+/* ── Light theme — proyector / presentaciones ── */
+html.light {
+  /* Tailwind @theme color overrides */
+  --color-background:  oklch(0.97 0 0);
+  --color-foreground:  oklch(0.12 0 0);
+  --color-muted:       oklch(0.44 0 0);
+  --color-border:      oklch(0.85 0 0);
+  --color-card:        oklch(0.96 0.002 250);
+  --color-card-hover:  oklch(0.93 0.004 250);
+
+  /* Surface tokens */
+  --c-nav:     rgba(255,255,255,0.97);
+  --c-surface: rgba(255,255,255,0.95);
+  --c-modal:   rgba(250,250,252,0.99);
+  --c-tooltip: rgba(248,250,252,0.98);
+  --c-dim:     rgba(230,232,240,0.90);
+  --c-card:    rgba(0,0,0,0.04);
+  --c-card-hi: rgba(0,0,0,0.08);
+  --c-border:  rgba(0,0,0,0.12);
+  --c-border2: rgba(0,0,0,0.08);
+  --c-border3: rgba(0,0,0,0.05);
+  --c-row-sep: rgba(0,0,0,0.05);
+  --c-divider: rgba(0,0,0,0.09);
+  --c-bar:     rgba(0,0,0,0.07);
+  --c-text:    oklch(0.10 0 0);
+  --c-text-hi: oklch(0.18 0 0);
+  --c-text-md: oklch(0.32 0 0);
+  --c-overlay: rgba(0,0,0,0.55);
+  --c-select:  white;
+}
+
 * {
   border-color: var(--color-border);
 }
