@@ -79,6 +79,7 @@ export interface SEIRModelResponse {
   distribucion_geografica?: SEIRCiudad[];
   alertas: string[];
   notas_metodologicas: string;
+  explicacion_pronostico?: string;
 }
 
 export const PRESETS: Record<ENOSIntensidad, SEIRParametros> = {

@@ -611,6 +611,24 @@ function SEIRContent({ token, onResult, onSubTabChange, externalDepartamento }: 
         </div>
       )}
 
+      {/* Explicación del pronóstico generada por el modelo */}
+      {result?.explicacion_pronostico && (
+        <div className="rounded-2xl px-4 py-4 space-y-2"
+          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <p className="text-[9px] uppercase tracking-widest" style={{ color: 'oklch(0.36 0 0)' }}>
+            Cómo se generó este pronóstico
+          </p>
+          <p className="text-[11px] leading-relaxed" style={{ color: 'oklch(0.58 0 0)' }}>
+            {result.explicacion_pronostico}
+          </p>
+          {result.notas_metodologicas && (
+            <p className="text-[10px] leading-relaxed pt-1" style={{ color: 'oklch(0.38 0 0)', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '0.5rem' }}>
+              {result.notas_metodologicas}
+            </p>
+          )}
+        </div>
+      )}
+
       <AnimatePresence>
         {showParams && (
           <ParamsModal

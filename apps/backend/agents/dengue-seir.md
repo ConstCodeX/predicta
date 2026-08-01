@@ -78,5 +78,14 @@ ciudades reales del departamento con lat/lng aproximados; los % deben sumar ~100
 Responde ÚNICAMENTE con un objeto JSON válido que cumpla EXACTAMENTE el contrato
 de salida indicado en el mensaje de usuario (forma `SEIRModelResponse`). Sin texto
 adicional, sin markdown, sin fences. Números planos (no strings). Los KPIs deben
-derivarse de `proyeccion_semanal` y de los `datos_reales`. En
-`notas_metodologicas` explica en 1-3 frases de qué datos saliste y qué supusiste.
+derivarse de `proyeccion_semanal` y de los `datos_reales`.
+
+Para `explicacion_pronostico`: redacta 4-6 oraciones en español técnico dirigido
+a funcionarios de salud pública del MINSA/DIRESA. Explica en orden:
+1. De qué datos históricos reales partió el modelo (menciona años y cifras clave).
+2. Qué factores climáticos u operacionales tuvieron mayor peso en el resultado.
+3. Cómo se construyó la curva epidémica: nivel base, efecto ENOS y Rt proyectado.
+4. Qué significa el nivel de riesgo obtenido y qué acciones se recomiendan.
+Usa cifras concretas del JSON (casos, Rt, saturación). Sin frases genéricas.
+
+Para `notas_metodologicas`: 1-2 frases sobre supuestos o limitaciones del modelo.

@@ -68,5 +68,6 @@ export const SEIR_OUTPUT_CONTRACT = `{
     { "ciudad": "string", "lat": "number", "lng": "number", "casos": "number", "pct": "number" }
   ],
   "alertas": ["string"],
-  "notas_metodologicas": "string"
+  "notas_metodologicas": "string",
+  "explicacion_pronostico": "string — párrafo de 4-6 oraciones en español explicando: (1) de qué datos reales partió el modelo, (2) qué factores climáticos/operacionales más influyeron en el resultado, (3) cómo se construyó la curva epidémica (nivel base, ajuste ENOS, Rt), (4) qué significa el nivel de riesgo obtenido y qué acciones se recomiendan. Lenguaje técnico pero comprensible para funcionarios de salud pública."
 }`;
